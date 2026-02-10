@@ -1,0 +1,11 @@
+@use "@styles/variables";
+
+.button {
+    color: white;
+    background: var(--accent-color);
+    border-radius: 1rem;
+    padding: 1rem 0;
+
+    user-select: none;
+    cursor: pointer;
+}

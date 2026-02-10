@@ -1,0 +1,36 @@
+.auth__input {
+    min-width: 20vw;
+    height: 3.5rem;
+    
+    background: #f6f6f6;
+    border: 2px solid transparent;
+    border-radius: 1rem;
+    transition: .3s;
+
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 1rem;
+    margin: .5rem 0;
+
+    input {
+        width: 100%;
+
+        background: none;
+        border: none;
+        font-family: inherit;
+        font-size: inherit;
+        
+        &:focus {
+            outline: none;
+        }
+
+        &::placeholder {
+            color: #aaa;
+        }
+    }
+
+    &:hover, &:focus-within {
+        border-color: var(--accent-color);
+    }
+}

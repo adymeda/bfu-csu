@@ -1,7 +1,10 @@
+import AuthPage from "./components/auth/AuthPage"
+import "./styles/index.scss"
+
 function App() {
 
   return (
-    <h1>Hello, world!</h1>
+    <AuthPage />
   )
 }
 
