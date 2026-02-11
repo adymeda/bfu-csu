@@ -1,10 +1,9 @@
-import AuthPage from "./components/auth/AuthPage"
 import "./styles/index.scss"
+import AppRouter from "./routes"
 
 function App() {
-
   return (
-    <AuthPage />
+    <AppRouter />
   )
 }
 
