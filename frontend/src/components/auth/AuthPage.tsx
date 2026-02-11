@@ -1,12 +1,14 @@
 import "@styles/auth/AuthPage.scss"
 import randomImg from "@assets/nevskogo.jpg"
 import randomImg2 from "@assets/chernysh.webp"
+import { useNavigate } from "react-router"
 import AuthInput from "./AuthInput"
 import Button from "../ui/Button"
-import { useNavigate } from "react-router"
 import Checkbox from "../ui/Checkbox"
+import PasswordInput from "./PasswordInput"
 
 function AuthPage() {
+
     const navigate = useNavigate()
     const imgs = [ randomImg, randomImg2 ]
     const rand = Math.floor(Math.random() * imgs.length)
@@ -20,12 +22,10 @@ function AuthPage() {
                     <form id="login_form" className="login-card__form">
                         {/* <input type="text" name="email" placeholder="E-mail"/> */}
                         <AuthInput name="email" placeholder="E-mail" type="text"/>
-                        <AuthInput name="password" placeholder="Пароль" type="password">
-                            eye_icon
-                        </AuthInput>
+                        <PasswordInput />
                         <Checkbox text="Запомнить меня" />
                         <div className="login-card__form-error">Неверная почта или пароль</div>
-                        <Button onClick={() => navigate("/main")}>Button</Button>
+                        <Button onClick={() => navigate("/main")}>Войти</Button>
                         <div className="login-card__form-reminder" onClick={() => navigate("/auth/reset")}>Забыли пароль?</div>
                     </form>
                 </div>

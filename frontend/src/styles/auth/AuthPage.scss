@@ -24,6 +24,7 @@
         z-index: 1;
 
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
     }
@@ -51,6 +52,11 @@
         user-select: none;
     }
 
+    &__form-error, &__form-reminder {
+        color: var(--accent-color);
+        user-select: none;
+    }
+
     &__form-error {
         margin: 1.5rem 0;
         color: var(--accent-color);
@@ -58,6 +64,10 @@
 
     &__form-reminder {
         margin-top: 1rem;
-        color: var(--accent-color);
+        cursor: pointer;
+
+        &:hover {
+            color: var(--accent-hover-color)
+        }
     }
 }
