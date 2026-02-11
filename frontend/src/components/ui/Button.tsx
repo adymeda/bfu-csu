@@ -2,11 +2,12 @@ import "@styles/ui/Button.scss"
 import type { ButtonProps } from "./types"
 
 function Button(props: ButtonProps) {
-    const { children, onClick } = props
+    let { children, onClick, buttonType } = props
+    if(!buttonType) buttonType = "submit"
     return (
-        <div className="button" onClick={onClick}>
+        <button type={buttonType} className="button" onClick={onClick}>
             { children }
-        </div>
+        </button>
     )
 }
 
