@@ -2,70 +2,70 @@
 @use "../variables";
 
 .auth {
-    @include mixins.full-size;
-    
-    display: flex;
-    text-align: center;
+	@include mixins.full-size;
+	
+	display: flex;
+	text-align: center;
 
-    > img {
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-        @include mixins.full-size;
-        object-fit: cover;
-        user-select: none;
+	> img {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		@include mixins.full-size;
+		object-fit: cover;
+		user-select: none;
 
-        filter: blur(5px);
-    }
+		filter: blur(5px);
+	}
 
-    &__content {
-        @include mixins.full-size;
-        background: rgba(200,200,200,.4);
-        z-index: 1;
+	&__content {
+		@include mixins.full-size;
+		background: rgba(200,200,200,.4);
+		z-index: 1;
 
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
 }
 
 .login-card {
-    width: fit-content;
-    height: fit-content;
+	width: fit-content;
+	height: fit-content;
 
-    background: white;
-    border-radius: 2rem;
-    filter: drop-shadow(0 0 10px rgba(0,0,0,.2));
+	background: white;
+	border-radius: 2rem;
+	filter: drop-shadow(0 0 10px rgba(0,0,0,.2));
 
-    display: flex;
-    flex-direction: column;
-    gap: .5rem;
-    padding: 2rem;
-    margin: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: .5rem;
+	padding: 2rem;
+	margin: 1rem;
 
-    &__logo {
-        margin-bottom: 1rem;
-        max-height: 4rem;
-        user-select: none;
-    }
+	&__logo {
+		margin-bottom: 1rem;
+		max-height: 4rem;
+		user-select: none;
+	}
 
-    &__form-error, &__form-reminder {
-        color: var(--accent-color);
-        user-select: none;
-    }
+	&__form-error, &__form-reminder {
+		color: var(--accent-color);
+		user-select: none;
+	}
 
-    &__form-error {
-        margin: 1rem 0;
-        color: rgb(255,60,60);
-    }
+	&__form-error {
+		margin: 1rem 0;
+		color: rgb(255,60,60);
+	}
 
-    &__form-reminder {
-        margin-top: 1rem;
-        cursor: pointer;
+	&__form-reminder {
+		margin-top: 1rem;
+		cursor: pointer;
 
-        &:hover {
-            color: var(--accent-hover-color)
-        }
-    }
+		&:hover {
+				color: var(--accent-hover-color)
+		}
+	}
 }

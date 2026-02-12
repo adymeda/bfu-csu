@@ -1,40 +1,39 @@
 @use "@styles/variables";
 
 .checkbox {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    margin: .5rem 0;
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: .5rem;
+	margin: .5rem 0;
 
-    color: var(--text-info-color);
+	color: var(--text-info-color);
 
-    user-select: none;
-    cursor: pointer;
+	user-select: none;
+	cursor: pointer;
 
-    &:hover {
-        color: var(--accent-hover-color);
-    }
+	&:hover {
+		color: var(--accent-hover-color);
+	}
 
-    > input {
-        position: absolute;
-        opacity: 0;
-        width: 0;
-        height: 0;
+	> input {
+		position: absolute;
+		opacity: 0;
+		width: 0;
+		height: 0;
 
-        &:checked ~ .checkbox__skin {
-            background: var(--accent-color);
-            
-        }
-    }
+		&:checked ~ .checkbox__skin {
+			background: var(--accent-color);
+		}
+	}
 
-    &__skin {
-        position: relative;
+	&__skin {
+		position: relative;
 
-        width: 1.25rem;
-        aspect-ratio: 1/1;
-        border: 1px solid #ddd;
-        border-radius: .5rem;
-        transition: .3s;
-    }
+		width: 1.25rem;
+		aspect-ratio: 1/1;
+		border: 1px solid #ddd;
+		border-radius: .5rem;
+		transition: .3s;
+	}
 }
