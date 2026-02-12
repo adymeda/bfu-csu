@@ -1,11 +1,20 @@
 import "@styles/ui/Button.scss"
 import type { ButtonProps } from "./types"
 
+const buttonLevels = {
+    1: "primary",
+    2: "secondary",
+    3: "misc"
+}
+
 function Button(props: ButtonProps) {
-    let { children, onClick, buttonType } = props
+    let { buttonLevel, children, onClick, buttonType } = props
     if(!buttonType) buttonType = "button"
+    if(!buttonLevel) buttonLevel = 1
+    let className = `button button-${buttonLevels[buttonLevel]}`
+    
     return (
-        <button type={buttonType} className="button" onClick={onClick}>
+        <button type={buttonType} className={className} onClick={onClick}>
             { children }
         </button>
     )
