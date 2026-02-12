@@ -34,8 +34,6 @@
     width: fit-content;
     height: fit-content;
 
-    min-height: 20rem;
-
     background: white;
     border-radius: 2rem;
     filter: drop-shadow(0 0 10px rgba(0,0,0,.2));
@@ -58,8 +56,8 @@
     }
 
     &__form-error {
-        margin: 1.5rem 0;
-        color: var(--accent-color);
+        margin: 1rem 0;
+        color: rgb(255,60,60);
     }
 
     &__form-reminder {
