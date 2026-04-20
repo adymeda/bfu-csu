@@ -1,7 +1,6 @@
 import "@styles/auth/PasswordInput.scss"
 import { useState } from "react"
-import EyeIcon from "@assets/icons/eye.svg?react"
-import EyeSlashIcon from "@assets/icons/eye-slash.svg?react"
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 import AuthInput from "./AuthInput"
 
 function PasswordInput() {

@@ -12,7 +12,10 @@ function AuthLayout() {
 			<img src={imgs[rand]} alt="" draggable={false}/>
 			<div className="auth__content">
 				<div className="login-card">
-					<img src="https://kantiana.ru/bitrix/templates/bfu.2023/images/svg/logo--short.svg" alt="BFU Logo" draggable={false} className="login-card__logo"/>
+					<img src="https://kantiana.ru/bitrix/templates/bfu.2023/images/svg/logo--short.svg"
+					  alt="BFU Logo"
+					  draggable={false}
+					  className="login-card__logo"/>
 					<Outlet />
 				</div>
 			</div>
