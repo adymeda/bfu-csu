@@ -1,4 +1,5 @@
 @use "@styles/variables";
+@use "@styles/mixins";
 
 .checkbox {
 	position: relative;
@@ -12,7 +13,7 @@
 	user-select: none;
 	cursor: pointer;
 
-	&:hover {
+	&:hover, &:has(> input:checked) {
 		color: var(--accent-hover-color);
 	}
 
@@ -24,16 +25,31 @@
 
 		&:checked ~ .checkbox__skin {
 			background: var(--accent-color);
+
+			svg {
+				display: initial;
+				color: white;
+				width: 75%;
+				height: 75%;
+			}
 		}
 	}
 
 	&__skin {
 		position: relative;
 
-		width: 1.25rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		width: 1.5rem;
 		aspect-ratio: 1/1;
 		border: 1px solid #ddd;
 		border-radius: .5rem;
 		transition: .3s;
+
+		svg {
+			display: none;
+		}
 	}
 }

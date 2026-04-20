@@ -1,4 +1,5 @@
 import "@styles/ui/Checkbox.scss"
+import { CheckIcon } from "@heroicons/react/24/outline"
 import type { CheckboxProps } from "./types"
 
 function Checkbox(props: CheckboxProps) {
@@ -8,6 +9,7 @@ function Checkbox(props: CheckboxProps) {
             <input type="checkbox"/>
             <div className="checkbox__skin">
                 {/* TODO Add check icon */}
+                <CheckIcon />
             </div>
             <span>{ text }</span>
         </label>
