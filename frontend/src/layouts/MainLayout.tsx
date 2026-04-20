@@ -6,7 +6,6 @@ import NavButton from "../components/ui/NavButton"
 
 function MainLayout() {
     return (
-    <>
         <div className="main-layout">
             <aside className="main-sidebar">
                 <div className="main-sidebar__logo">
@@ -22,9 +21,8 @@ function MainLayout() {
                     Icon={InboxIcon} />
                 </nav>
             </aside>
+            <Outlet />
         </div>
-        <Outlet />
-    </>
     )
 }
 
