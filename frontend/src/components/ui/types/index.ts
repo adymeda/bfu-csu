@@ -14,3 +14,13 @@ export interface CheckboxProps {
 export interface LogoProps {
     className?: string
 }
+
+export interface NavButtonProps {
+    text: string,
+    path: string,
+    Icon?: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, "ref"> & {
+            title?: string;
+            titleId?: string;
+        } & React.RefAttributes<SVGSVGElement>>,
+    className?: string
+}

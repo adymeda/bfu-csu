@@ -16,7 +16,7 @@ function AuthCard() {
                 <PasswordInput />
                 <Checkbox text="Запомнить меня" />
                 <div className="login-card__form-error">Неверная почта или пароль</div>
-                <Button onClick={() => navigate("/main")}>Войти</Button>
+                <Button onClick={() => navigate("/")}>Войти</Button>
                 <div className="login-card__form-reminder" onClick={() => navigate("/auth/reset")}>Забыли пароль?</div>
             </form>
         </>
