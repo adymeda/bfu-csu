@@ -2,6 +2,7 @@ import "@styles/auth/AuthPage.scss"
 import randomImg from "@assets/nevskogo.jpg"
 import randomImg2 from "@assets/chernysh.webp"
 import { Outlet } from "react-router"
+import Logo from "../components/ui/Logo"
 
 function AuthLayout() {
 	const imgs = [ randomImg, randomImg2 ]
@@ -12,10 +13,7 @@ function AuthLayout() {
 			<img src={imgs[rand]} alt="" draggable={false}/>
 			<div className="auth__content">
 				<div className="login-card">
-					<img src="https://kantiana.ru/bitrix/templates/bfu.2023/images/svg/logo--short.svg"
-					  alt="BFU Logo"
-					  draggable={false}
-					  className="login-card__logo"/>
+					<Logo className="login-card__logo"/>
 					<Outlet />
 				</div>
 			</div>

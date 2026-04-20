@@ -10,3 +10,7 @@ export interface ButtonProps {
 export interface CheckboxProps {
     text: string
 }
+
+export interface LogoProps {
+    className?: string
+}
