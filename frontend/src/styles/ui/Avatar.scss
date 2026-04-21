@@ -1,0 +1,20 @@
+.avatar {
+    --avatar-color: #4caf50;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    aspect-ratio: 1;
+    border-radius: 50%;
+    padding: 7px;
+
+    color: white;
+    border: 1px solid var(--border-primary-color);
+    background: linear-gradient(
+        0deg,
+        color-mix(in srgb, var(--avatar-color) 75%, white),
+        color-mix(in srgb, var(--avatar-color) 35%, white)
+    );
+    user-select: none;
+}

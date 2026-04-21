@@ -24,3 +24,9 @@ export interface NavButtonProps {
         } & React.RefAttributes<SVGSVGElement>>,
     className?: string
 }
+
+export interface AvatarProps {
+    image?: string,
+    placeholder?: string,
+    color?: string
+}
