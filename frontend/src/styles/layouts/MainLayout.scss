@@ -1,5 +1,7 @@
 @use "@styles/mixins";
 
+$top-bar-height: 5rem;
+
 body {
     background: #fafafa;
 }
@@ -90,6 +92,65 @@ body {
                     height: 1.25rem;
                 }
             }
+        }
+    }
+
+    &-body {
+        flex-grow: 1;
+
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.top-bar {
+    height: $top-bar-height;
+
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    
+    background: white;
+    border-bottom: 1px solid var(--border-primary-color);
+    padding: 0 1rem;
+
+    &__location {
+        display: flex;
+        flex-direction: column;
+        gap: .2rem;
+        margin: 0 1rem;
+
+        span:first-child {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        span:last-child {
+            font-size: 13px;
+            color: #a8a8a8;
+        }
+    }
+
+    &__search {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+
+        margin-left: auto;
+        padding: 5px 10px;
+        border: 1px solid var(--border-primary-color);
+        border-radius: .5rem;
+
+        svg {
+            width: 16px;
+            height: 16px;
+            color: var(--text-info-color);
+        }
+
+        input {
+            color: var(--text-secondary-color);
+            border: none;
+            outline: none;
         }
     }
 }
