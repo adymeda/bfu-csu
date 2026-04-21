@@ -153,6 +153,16 @@ body {
             outline: none;
         }
     }
+
+    &__profile {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: .5rem;
+
+        cursor: pointer;
+        user-select: none;
+    }
 }
 
 @media screen and (max-width: 768px) {
