@@ -4,6 +4,7 @@ import Logo from "../components/ui/Logo"
 import { CalendarIcon, InboxIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline"
 import NavButton from "../components/ui/NavButton"
 import Avatar from "../components/ui/Avatar"
+import Dropdown from "../components/ui/Dropdown"
 
 function MainLayout() {
     return (
@@ -34,9 +35,15 @@ function MainLayout() {
                         <MagnifyingGlassIcon />
                     </div>
 
-                    <div className="top-bar__profile">
-                        <Avatar placeholder="Джатус Турбированный" color="#0051ff"/>
-                    </div>
+                    <Dropdown
+                      trigger={<Avatar placeholder="Джатус Турбированный" color="#0051ff"/>}
+                      triggerClassName="top-bar__profile">
+                        <div>Профиль</div>
+                        <div>Выйти</div>
+                    </Dropdown>
+                </div>
+                <div className="main-content">
+
                 </div>
                 <Outlet />
             </div>

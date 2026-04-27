@@ -30,3 +30,10 @@ export interface AvatarProps {
     placeholder?: string,
     color?: string
 }
+
+export interface DropdownProps {
+    trigger: React.ReactNode,
+    children: React.ReactNode,
+    className?: string,
+    triggerClassName?: string
+}

@@ -101,6 +101,15 @@ body {
         display: flex;
         flex-direction: column;
     }
+
+    &-content {
+        flex-grow: 1;
+        margin: 1rem;
+
+        background: #f4f4f4;
+        border: 1px solid var(--border-primary-color);
+        border-radius: 1rem;
+    }
 }
 
 .top-bar {
@@ -155,6 +164,7 @@ body {
     }
 
     &__profile {
+        position: relative;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -162,6 +172,7 @@ body {
 
         cursor: pointer;
         user-select: none;
+        outline: none;
     }
 }
 
