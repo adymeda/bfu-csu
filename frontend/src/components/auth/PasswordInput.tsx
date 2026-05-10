@@ -1,4 +1,4 @@
-import "@styles/auth/PasswordInput.scss"
+import "@styles/components/auth/PasswordInput.scss"
 import { useState } from "react"
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 import AuthInput from "./AuthInput"

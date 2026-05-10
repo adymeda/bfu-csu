@@ -99,7 +99,7 @@ $shadow-width: 56px;
         border-radius: 6px;
         color: var(--text-secondary-color);
         cursor: pointer;
-        transition: background 0.15s ease, color 0.15s ease;
+        transition: .15s;
 
         svg {
             width: 16px;
@@ -123,7 +123,7 @@ $shadow-width: 56px;
         font-weight: 500;
         color: var(--text-secondary-color);
         cursor: pointer;
-        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        transition: .15s;
 
         &:hover {
             background: var(--border-primary-color);

@@ -1,4 +1,4 @@
-import "@styles/auth/AuthInput.scss"
+import "@styles/components/auth/AuthInput.scss"
 import type { AuthInputProps } from "./types"
 
 function AuthInput(props: AuthInputProps) {

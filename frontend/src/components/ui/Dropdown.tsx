@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import "@styles/ui/Dropdown.scss";
+import "@styles/components/ui/Dropdown.scss";
 import type { DropdownProps } from "./types";
 
 export default function Dropdown({ trigger, children, className, triggerClassName }: DropdownProps) {

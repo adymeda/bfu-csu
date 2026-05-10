@@ -1,4 +1,4 @@
-import "@styles/auth/AuthPage.scss"
+import "@styles/layouts/AuthLayout.scss"
 import { useNavigate } from "react-router"
 import AuthInput from "./AuthInput"
 import Button from "../ui/Button"

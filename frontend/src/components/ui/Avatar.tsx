@@ -1,4 +1,4 @@
-import "@styles/ui/Avatar.scss";
+import "@styles/components/ui/Avatar.scss";
 import type { AvatarProps } from "./types";
 
 function Avatar({ image, placeholder, color }: AvatarProps) {

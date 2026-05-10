@@ -1,4 +1,4 @@
-import "@styles/ui/NavButton.scss"
+import "@styles/components/ui/NavButton.scss"
 import { useNavigate, useLocation } from "react-router"
 import type { NavButtonProps } from "./types"
 

@@ -1,4 +1,4 @@
-import "@styles/ui/Button.scss"
+import "@styles/components/ui/Button.scss"
 import type { ButtonProps } from "./types"
 
 const buttonLevels = {

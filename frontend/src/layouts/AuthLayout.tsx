@@ -1,4 +1,4 @@
-import "@styles/auth/AuthPage.scss"
+import "@styles/layouts/AuthLayout.scss"
 import randomImg from "@assets/nevskogo.jpg"
 import randomImg2 from "@assets/chernysh.webp"
 import { Outlet } from "react-router"

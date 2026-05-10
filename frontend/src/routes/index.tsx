@@ -5,6 +5,7 @@ import AuthLayout from "../layouts/AuthLayout"
 import MainLayout from "../layouts/MainLayout"
 import ResetCard from "../components/auth/ResetCard"
 import CalendarPage from "../pages/CalendarPage"
+import InboxPage from "../pages/InboxPage"
 
 function AppRouter() {
 	return (
@@ -12,7 +13,7 @@ function AppRouter() {
 			<Routes>
 				<Route path="/" element={<MainLayout />}>
 					<Route index element={<CalendarPage />} />
-					<Route path="inbox" />
+					<Route path="inbox" element={<InboxPage />} />
 					<Route path="settings" />
 				</Route>
 				<Route path="/auth" element={<AuthLayout />}>
