@@ -45,7 +45,7 @@
             }
         }
 
-        &__filter {
+        &__new-message {
             height: 100%;
             aspect-ratio: 1/1;
             display: flex;
@@ -59,18 +59,12 @@
             cursor: pointer;
             
             > svg {
-                height: 18px;
+                height: 20px;
                 color: var(--text-info-color);
 
                 &:hover {
-                    color: black;
+                    color: var(--accent-hover-color);
                 }
-
-            }
-
-            &.active > svg {
-                color: var(--accent-hover-color);
-                filter: drop-shadow(0 0 15px var(--accent-hover-color));
             }
         }
 

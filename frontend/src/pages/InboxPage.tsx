@@ -1,6 +1,5 @@
 import { useRef, useState } from "react"
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
-import { TagIcon } from "@heroicons/react/24/solid"
+import { MagnifyingGlassIcon, PencilSquareIcon } from "@heroicons/react/24/outline"
 import "@styles/pages/InboxPage.scss"
 import Message from "@components/inbox/Message"
 
@@ -27,10 +26,10 @@ function InboxPage() {
                 <div className="inbox-sidebar__header">
                     <div className="inbox-sidebar__search">
                         <MagnifyingGlassIcon />
-                        <input placeholder="Поиск..." />
+                        <input placeholder="Поиск по имени, содержанию..." />
                     </div>
-                    <button className="inbox-sidebar__filter">
-                        <TagIcon />
+                    <button className="inbox-sidebar__new-message">
+                        <PencilSquareIcon />
                     </button>
                 </div>
 
