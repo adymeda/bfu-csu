@@ -12,5 +12,7 @@ export interface MessageProps {
     authorColor?: string,
     authorIcon?: string,
     isRead?: boolean,
-    text: string
+    selected?: boolean,
+    text: string,
+    onClose?: () => void
 }

@@ -1,11 +1,11 @@
 import "@styles/components/inbox/MessageDisplay.scss"
 import type { MessageProps } from "./types";
-import { ArrowTurnUpRightIcon, ArrowUpRightIcon, ArrowUturnLeftIcon, ChevronDownIcon, ChevronLeftIcon, ClipboardDocumentListIcon, EllipsisVerticalIcon, StarIcon } from "@heroicons/react/24/outline";
+import { ArrowTurnUpRightIcon, ArrowUpRightIcon, ArrowUturnLeftIcon, ChevronDownIcon, ChevronLeftIcon, ClipboardDocumentListIcon, EllipsisVerticalIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Avatar from "@components/ui/Avatar";
 import MessageRecipient from "./MessageRecipient";
 import { useLayoutEffect, useRef, useState } from "react";
 
-function MessageDisplay({ title, text }: MessageProps) {
+function MessageDisplay({ title, text, onClose }: MessageProps) {
     const [expanded, setExpanded] = useState(false);
     const [hasOverflow, setHasOverflow] = useState(false);
     const [rowHeight, setRowHeight] = useState(0);
@@ -26,7 +26,7 @@ function MessageDisplay({ title, text }: MessageProps) {
     return (
         <>
         <div className="message-display__header">
-            <ChevronLeftIcon />
+            <ChevronLeftIcon className="message-display__header-back" onClick={onClose} />
             <div className="message-display__header-info">
                 <div className="message-display__header-title">
                     {title}
@@ -42,6 +42,7 @@ function MessageDisplay({ title, text }: MessageProps) {
             <div className="message-display__header-buttons">
                 <StarIcon />
                 <EllipsisVerticalIcon />
+                <XMarkIcon className="message-display__header-close" onClick={onClose} />
             </div>
         </div>
         <div className="message-display__content">

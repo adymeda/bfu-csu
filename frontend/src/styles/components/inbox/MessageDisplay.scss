@@ -16,6 +16,22 @@
             aspect-ratio: 1;
         }
 
+        &-back {
+            display: none;
+            flex-shrink: 0;
+            cursor: pointer;
+            color: var(--text-info-color);
+
+            &:hover { color: var(--accent-hover-color); }
+        }
+
+        &-close {
+            cursor: pointer;
+            color: var(--text-info-color);
+
+            &:hover { color: var(--accent-hover-color); }
+        }
+
         &-info {
             display: flex;
             flex-direction: column;
@@ -201,6 +217,14 @@
             border-left: none;
             border-top: 1px solid var(--border-primary-color);
             overflow-y: visible;
+        }
+
+        &__header-back {
+            display: block;
+        }
+
+        &__header-close {
+            display: none;
         }
     }
 }
