@@ -1,0 +1,32 @@
+.message-recipient {
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .15rem .5rem .15rem .2rem;
+
+    background: #f4f4f4;
+    border: 1px solid var(--border-primary-color);
+    border-radius: 2rem;
+
+    .avatar {
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        font-size: 7px;
+        flex-shrink: 0;
+    }
+
+    > svg {
+        width: 16px;
+        aspect-ratio: 1;
+        flex-shrink: 0;
+        color: var(--text-info-color);
+        margin-left: .15rem;
+    }
+
+    > span {
+        font-size: 12px;
+        color: var(--text-secondary-color);
+        white-space: nowrap;
+    }
+}

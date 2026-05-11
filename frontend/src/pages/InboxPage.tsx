@@ -2,6 +2,7 @@ import { useRef, useState } from "react"
 import { MagnifyingGlassIcon, PencilSquareIcon } from "@heroicons/react/24/outline"
 import "@styles/pages/InboxPage.scss"
 import Message from "@components/inbox/Message"
+import MessageDisplay from "@components/inbox/MessageDisplay"
 
 const TABS = [
     { name: "Все", count: 3 },
@@ -53,7 +54,7 @@ function InboxPage() {
                 </div>
             </div>
             <div className="inbox-content">
-
+                <MessageDisplay author="Ишанов Сергей Александрович" title="Переписка контрольных по дифференциальным уравнениям" text="Следующая переписка контрольных работ по дифференциальным уравнениям пройдёт 14 апреля в 13:50, аудитория 229. Старосты должны предварительно предоставить списки переписываемых контрольных работ"/>
             </div>
         </div>
     )
