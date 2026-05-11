@@ -57,6 +57,10 @@ function MainLayout() {
                     <NavButton text="Сообщения"
                     path="/inbox"
                     Icon={InboxIcon} />
+                    <button className="mobile-profile-btn nav-button" onClick={() => {}}>
+                        <Avatar placeholder="Джатус Турбированный" color="#0051ff" />
+                        Профиль
+                    </button>
                 </nav>
             </aside>
             <div className="main-body">

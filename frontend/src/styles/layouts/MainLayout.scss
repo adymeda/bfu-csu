@@ -1,6 +1,7 @@
 @use "@styles/mixins";
 
 $top-bar-height: 5rem;
+$tab-bar-height: 4.5rem;
 
 body {
     background: #fafafa;
@@ -145,10 +146,60 @@ body {
     }
 }
 
+.mobile-profile-btn {
+    display: none;
+}
+
 @media screen and (max-width: 768px) {
     .main {
         &-layout {
             flex-direction: column;
         }
+
+        &-sidebar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: $tab-bar-height;
+            z-index: 100;
+
+            padding: 0 .5rem;
+            border-right: none;
+            border-top: 1px solid var(--border-primary-color);
+
+            &__logo {
+                display: none;
+            }
+
+            &__nav {
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                gap: .25rem;
+            }
+        }
+
+        &-body {
+            padding-bottom: $tab-bar-height;
+        }
+
+        &-content {
+            margin: 0;
+            border-radius: 0;
+            border: none;
+        }
+    }
+
+    .top-bar {
+        display: none;
+    }
+
+    .mobile-profile-btn {
+        display: flex;
     }
 }
