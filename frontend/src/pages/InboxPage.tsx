@@ -1,18 +1,28 @@
 import { useRef, useState, useEffect } from "react"
-import { EnvelopeIcon, MagnifyingGlassIcon, PencilSquareIcon } from "@heroicons/react/24/outline"
+import { EnvelopeIcon, MagnifyingGlassIcon, PencilSquareIcon, StarIcon as StarOutline } from "@heroicons/react/24/outline"
+import { StarIcon as StarSolid } from "@heroicons/react/24/solid"
 import "@styles/pages/InboxPage.scss"
 import Message from "@components/inbox/Message"
 import MessageDisplay from "@components/inbox/MessageDisplay"
+import type { FC, SVGProps } from "react"
 
-const TABS = [
-    { name: "Все", count: 3 },
-    { name: "Избранное" },
-    { name: "Мероприятия", count: 1 },
+type Tab = {
+    name?: string
+    icon?: FC<SVGProps<SVGSVGElement>>
+    activeIcon?: FC<SVGProps<SVGSVGElement>>
+    count?: number
+}
+
+const TABS: Tab[] = [
+    { icon: StarOutline, activeIcon: StarSolid },
+    { name: "Входящие", count: 3 },
+    { name: "Отправленные" },
     { name: "Важное" },
+    { name: "Мероприятия", count: 1 }
 ]
 
 function InboxPage() {
-    const [activeTab, setActiveTab] = useState(0)
+    const [activeTab, setActiveTab] = useState(1)
     const [currentMessageId, setCurrentMessageId] = useState<number | null>(null)
     const [isClosing, setIsClosing] = useState(false)
     const tabsRef = useRef<HTMLDivElement>(null)
@@ -62,18 +72,25 @@ function InboxPage() {
                 </div>
 
                 <div className="inbox-sidebar__tabs" ref={tabsRef} onWheel={handleWheel}>
-                    {TABS.map((tab, i) => (
-                        <div
-                            key={tab.name}
-                            className={`inbox-sidebar__tab${activeTab === i ? " active" : ""}`}
-                            onClick={() => setActiveTab(i)}
-                        >
-                            <span className="inbox-sidebar__tab-name">{tab.name}</span>
-                            {tab.count !== undefined && (
-                                <span className="inbox-sidebar__tab-count">{tab.count}</span>
-                            )}
-                        </div>
-                    ))}
+                    {TABS.map((tab, i) => {
+                        const isActive = activeTab === i
+                        const IconToRender = isActive ? (tab.activeIcon ?? tab.icon) : tab.icon
+                        return (
+                            <div
+                                key={tab.name ?? i}
+                                className={`inbox-sidebar__tab${isActive ? " active" : ""}`}
+                                onClick={() => setActiveTab(i)}
+                            >
+                                <span className={`inbox-sidebar__tab-name${IconToRender ? " inbox-sidebar__tab-name--icon" : ""}`}>
+                                    {IconToRender && <IconToRender />}
+                                    {tab.name}
+                                </span>
+                                {tab.count !== undefined && (
+                                    <span className="inbox-sidebar__tab-count">{tab.count}</span>
+                                )}
+                            </div>
+                        )
+                    })}
                 </div>
 
                 <div className="inbox-sidebar__messages">

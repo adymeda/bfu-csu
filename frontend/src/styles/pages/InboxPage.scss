@@ -96,6 +96,15 @@
             user-select: none;
             cursor: pointer;
 
+            &-name--icon {
+                display: flex;
+                align-items: center;
+
+                svg {
+                    height: 16px;
+                }
+            }
+
             &.active > &-name,
             &-name:hover {
                 color: var(--accent-hover-color);
