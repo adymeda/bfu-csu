@@ -13,12 +13,17 @@ const TABS = [
 
 function InboxPage() {
     const [activeTab, setActiveTab] = useState(0)
+    const [currentMessageId, setCurrentMessageId] = useState<number | null>(null)
     const tabsRef = useRef<HTMLDivElement>(null)
 
     function handleWheel(e: React.WheelEvent<HTMLDivElement>) {
         if (tabsRef.current) {
             tabsRef.current.scrollLeft += e.deltaY
         }
+    }
+
+    function handleMessageClick(id: number) {
+        setCurrentMessageId(id)
     }
 
     return (
@@ -50,11 +55,15 @@ function InboxPage() {
                 </div>
 
                 <div className="inbox-sidebar__messages">
-                    <Message author="Ишанов Сергей Александрович" title="Переписка контрольных по дифференциальным уравнениям" text="Следующая переписка контрольных работ по дифференциальным уравнениям пройдёт 14 апреля в 13:50, аудитория 229. Старосты должны предварительно предоставить списки переписываемых контрольных работ" isRead={false}/>
+                    <div onClick={() => handleMessageClick(1)}>
+                        <Message author="Ишанов Сергей Александрович" title="Переписка контрольных по дифференциальным уравнениям" text="Следующая переписка контрольных работ по дифференциальным уравнениям пройдёт 14 апреля в 13:50, аудитория 229. Старосты должны предварительно предоставить списки переписываемых контрольных работ" isRead={false}/>
+                    </div>
                 </div>
             </div>
-            <div className="inbox-content">
-                <MessageDisplay author="Ишанов Сергей Александрович" title="Переписка контрольных по дифференциальным уравнениям" text="Следующая переписка контрольных работ по дифференциальным уравнениям пройдёт 14 апреля в 13:50, аудитория 229. Старосты должны предварительно предоставить списки переписываемых контрольных работ"/>
+            <div className={`inbox-content${currentMessageId !== null ? " inbox-content--active" : ""}`}>
+                {currentMessageId !== null && (
+                    <MessageDisplay author="Ишанов Сергей Александрович" title="Переписка контрольных по дифференциальным уравнениям" text="Следующая переписка контрольных работ по дифференциальным уравнениям пройдёт 14 апреля в 13:50, аудитория 229. Старосты должны предварительно предоставить списки переписываемых контрольных работ"/>
+                )}
             </div>
         </div>
     )

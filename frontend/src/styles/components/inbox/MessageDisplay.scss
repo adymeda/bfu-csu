@@ -74,9 +74,9 @@
 
         background: white;
         border-left: 1px solid var(--border-primary-color);
-
+        
         overflow-y: auto;
-    
+
         &-title {
             font-size: 18px;
             margin: .5rem;
@@ -90,6 +90,7 @@
 
         &-buttons {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             gap: .25rem;
             margin: .5rem 0;
@@ -106,6 +107,7 @@
                 color: var(--text-secondary-color);
                 border: 1px solid var(--text-info-color);
                 font-size: 13px;
+                white-space: nowrap;
 
                 cursor: pointer;
                 user-select: none;
@@ -179,5 +181,26 @@
         color: #444;
         overflow-y: auto;
         margin-bottom: 1rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .message-display {
+        &__content {
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        &__text-area {
+            flex-grow: 0;
+        }
+
+        &__attachments-area {
+            width: 100%;
+            border-left: none;
+            border-top: 1px solid var(--border-primary-color);
+            overflow-y: visible;
+        }
     }
 }
