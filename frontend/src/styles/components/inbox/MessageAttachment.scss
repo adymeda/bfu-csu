@@ -1,0 +1,84 @@
+.message-attachment {
+    width: 100%;
+    padding: .5rem .75rem;
+    border-bottom: 1px solid var(--border-primary-color);
+    box-sizing: border-box;
+
+    &__main {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    &__icon {
+        display: flex;
+        flex-shrink: 0;
+        color: var(--text-info-color);
+
+        svg {
+            width: 16px;
+            aspect-ratio: 1;
+        }
+    }
+
+    &__info {
+        display: flex;
+        flex-direction: column;
+        gap: .1rem;
+        flex-grow: 1;
+        min-width: 0;
+    }
+
+    &__name {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-primary-color);
+        word-break: break-word;
+    }
+
+    &__description {
+        font-size: 11px;
+        color: var(--text-info-color);
+    }
+
+    &__action {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+
+        button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: .3rem;
+
+            background: none;
+            border: 1px solid var(--border-primary-color);
+            border-radius: .4rem;
+            color: var(--text-info-color);
+            cursor: pointer;
+
+            svg {
+                width: 14px;
+                aspect-ratio: 1;
+            }
+
+            &:hover {
+                color: var(--accent-hover-color);
+                border-color: var(--accent-hover-color);
+                background: #f5f4ff;
+            }
+        }
+    }
+
+    &__body {
+        margin-top: .4rem;
+        margin-left: 1.5rem;
+        padding-left: .6rem;
+        border-left: 3px solid var(--border-primary-color);
+        font-size: 12px;
+        color: var(--text-secondary-color);
+        line-height: 1.4;
+        word-break: break-word;
+    }
+}

@@ -1,8 +1,9 @@
 import "@styles/components/inbox/MessageDisplay.scss"
 import type { MessageProps } from "./types";
-import { ArrowTurnUpRightIcon, ArrowUpRightIcon, ArrowUturnLeftIcon, ChevronDownIcon, ChevronLeftIcon, ClipboardDocumentListIcon, EllipsisVerticalIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, ArrowTurnUpRightIcon, ArrowUpRightIcon, ArrowUturnLeftIcon, ChevronDownIcon, ChevronLeftIcon, ClipboardDocumentListIcon, EllipsisVerticalIcon, GlobeAltIcon, PaperClipIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Avatar from "@components/ui/Avatar";
 import MessageRecipient from "./MessageRecipient";
+import MessageAttachment from "./MessageAttachment";
 import { useLayoutEffect, useRef, useState } from "react";
 
 function MessageDisplay({ title, text, onClose }: MessageProps) {
@@ -93,6 +94,33 @@ function MessageDisplay({ title, text, onClose }: MessageProps) {
 
             <div className="message-display__attachments-area">
                 <div className="message-display__attachments-area-title">Вложения</div>
+                <MessageAttachment
+                    icon={<PaperClipIcon />}
+                    name="Учебный план 2025-2026.pdf"
+                    description="1.2 МБ"
+                    action={<button title="Скачать"><ArrowDownTrayIcon /></button>}
+                />
+                <MessageAttachment
+                    icon={<PaperClipIcon />}
+                    name="Расписание_весна.xlsx"
+                    description="345 КБ"
+                    action={<button title="Скачать"><ArrowDownTrayIcon /></button>}
+                />
+                <MessageAttachment
+                    icon={<GlobeAltIcon />}
+                    name="Установочная лекция"
+                    description="15 мая 2026, 10:00 – 11:30"
+                    accentColor="#e05c5c"
+                >
+                    Ауд. 214, корп. А. Обязательное присутствие для всех студентов первого курса.
+                </MessageAttachment>
+                <MessageAttachment
+                    icon={<GlobeAltIcon />}
+                    name="Консультация по курсовой"
+                    description="18 мая 2026, 14:00 – 15:00"
+                    accentColor="#4a90d9">
+                    Онлайн, ссылка будет отправлена дополнительно.
+                </MessageAttachment>
             </div>
         </div>
         </>
