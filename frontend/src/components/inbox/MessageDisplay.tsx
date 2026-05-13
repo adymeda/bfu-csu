@@ -112,7 +112,7 @@ function MessageDisplay({ title, text, onClose }: MessageProps) {
                     description="15 мая 2026, 10:00 – 11:30"
                     accentColor="#e05c5c"
                 >
-                    Ауд. 214, корп. А. Обязательное присутствие для всех студентов первого курса.
+                    Ауд. 214. Обязательное присутствие для всех студентов первого курса.
                 </MessageAttachment>
                 <MessageAttachment
                     icon={<GlobeAltIcon />}

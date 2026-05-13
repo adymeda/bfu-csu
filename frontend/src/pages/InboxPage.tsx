@@ -4,6 +4,7 @@ import { StarIcon as StarSolid } from "@heroicons/react/24/solid"
 import "@styles/pages/InboxPage.scss"
 import Message from "@components/inbox/Message"
 import MessageDisplay from "@components/inbox/MessageDisplay"
+import MessageCreate from "@components/inbox/MessageCreate"
 import type { FC, SVGProps } from "react"
 
 type Tab = {
@@ -24,8 +25,11 @@ const TABS: Tab[] = [
 function InboxPage() {
     const [activeTab, setActiveTab] = useState(1)
     const [currentMessageId, setCurrentMessageId] = useState<number | null>(null)
+    const [isComposing, setIsComposing] = useState(false)
     const [isClosing, setIsClosing] = useState(false)
     const tabsRef = useRef<HTMLDivElement>(null)
+
+    const isContentOpen = (currentMessageId !== null || isComposing) && !isClosing
 
     function handleWheel(e: React.WheelEvent<HTMLDivElement>) {
         if (tabsRef.current) {
@@ -35,18 +39,19 @@ function InboxPage() {
 
     function handleMessageClick(id: number) {
         setCurrentMessageId(id)
+        setIsComposing(false)
     }
 
-    useEffect(() => {
-        function onKeyDown(e: KeyboardEvent) {
-            if (e.key !== "Escape" || currentMessageId === null) return
-            handleClose()
-        }
-        document.addEventListener("keydown", onKeyDown)
-        return () => document.removeEventListener("keydown", onKeyDown)
-    }, [currentMessageId, isClosing])
+    function handleComposeOpen() {
+        setIsComposing(true)
+        setCurrentMessageId(null)
+    }
 
-    function handleClose() {
+    function handleComposeClose() {
+        setIsComposing(false)
+    }
+
+    function handleMessageClose() {
         if (window.matchMedia("(max-width: 768px)").matches) {
             setIsClosing(true)
             setTimeout(() => {
@@ -58,6 +63,16 @@ function InboxPage() {
         }
     }
 
+    useEffect(() => {
+        function onKeyDown(e: KeyboardEvent) {
+            if (e.key !== "Escape") return
+            if (isComposing) { handleComposeClose(); return }
+            if (currentMessageId !== null) handleMessageClose()
+        }
+        document.addEventListener("keydown", onKeyDown)
+        return () => document.removeEventListener("keydown", onKeyDown)
+    }, [currentMessageId, isComposing, isClosing])
+
     return (
         <div className="inbox">
             <div className="inbox-sidebar">
@@ -66,7 +81,7 @@ function InboxPage() {
                         <MagnifyingGlassIcon />
                         <input placeholder="Поиск по имени, содержанию..." />
                     </div>
-                    <button className="inbox-sidebar__new-message">
+                    <button className="inbox-sidebar__new-message" onClick={handleComposeOpen}>
                         <PencilSquareIcon />
                     </button>
                 </div>
@@ -102,12 +117,14 @@ function InboxPage() {
                     </div>
                 </div>
             </div>
-            <div className={`inbox-content${currentMessageId !== null && !isClosing ? " inbox-content--active" : ""}`}>
-                {currentMessageId !== null
-                ? <MessageDisplay author="Ишанов Сергей Александрович" title="Переписка контрольных по дифференциальным уравнениям" text="Следующая переписка контрольных работ по дифференциальным уравнениям пройдёт 14 апреля в 13:50, аудитория 229. Старосты должны предварительно предоставить списки переписываемых контрольных работ" onClose={handleClose}/>
+            <div className={`inbox-content${isContentOpen ? " inbox-content--active" : ""}`}>
+                {isComposing
+                ? <MessageCreate onClose={handleComposeClose} />
+                : currentMessageId !== null
+                ? <MessageDisplay author="Ишанов Сергей Александрович" title="Переписка контрольных по дифференциальным уравнениям" text="Следующая переписка контрольных работ по дифференциальным уравнениям пройдёт 14 апреля в 13:50, аудитория 229. Старосты должны предварительно предоставить списки переписываемых контрольных работ" onClose={handleMessageClose}/>
                 : <div className="inbox-content__empty">
                     <EnvelopeIcon />
-                    <span>Нажмите на сообщение слева, чтобы открыть его</span>    
+                    <span>Нажмите на сообщение слева, чтобы открыть его</span>
                 </div>
                 }
             </div>
