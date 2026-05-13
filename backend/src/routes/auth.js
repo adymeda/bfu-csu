@@ -9,9 +9,13 @@ const router = express.Router()
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-function sessionTTL() {
-  const days = parseInt(process.env.SESSION_TTL_DAYS || "30", 10)
-  return new Date(Date.now() + days * 24 * 60 * 60 * 1000)
+function sessionTTL(rememberUser = true) {
+  if (rememberuser) {
+    const days = parseInt(process.env.SESSION_TTL_DAYS || "30", 10)
+    return new Date(Date.now() + days * 24 * 60 * 60 * 1000)
+  }
+  const hours = parseInt(process.env.SESSION_TEMP_TTL_HOURS || "24", 10)
+  return new Date(Date.now() + hours * 60 * 60 * 1000)
 }
 
 function formatUser(row) {
@@ -84,7 +88,7 @@ router.post("/register", async (req, res, next) => {
 
 router.post("/login", async (req, res, next) => {
   try {
-    const { email, password } = req.body
+    const { email, password, rememberMe = true } = req.body
 
     if (!email || !password) {
       return res.status(400).json({ message: "Email и пароль обязательны" })
@@ -110,7 +114,7 @@ router.post("/login", async (req, res, next) => {
     }
 
     const token = generateSessionToken()
-    const expiresAt = sessionTTL()
+    const expiresAt = sessionTTL(!!rememberMe)
     await db.query(
       "INSERT INTO sessions (token, user_id, expires_at) VALUES ($1, $2, $3)",
       [token, row.id, expiresAt]
