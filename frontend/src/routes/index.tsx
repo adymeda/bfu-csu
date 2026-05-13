@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router"
+import { createBrowserRouter, RouterProvider } from "react-router"
 import NotFoundPage from "../components/NotFoundPage"
 import AuthCard from "../components/auth/AuthCard"
 import AuthLayout from "../layouts/AuthLayout"
@@ -7,23 +7,30 @@ import ResetCard from "../components/auth/ResetCard"
 import CalendarPage from "../pages/CalendarPage"
 import InboxPage from "../pages/InboxPage"
 
+const router = createBrowserRouter([
+	{
+		path: "/",
+		element: <MainLayout />,
+		errorElement: <NotFoundPage />,
+		children: [
+			{ index: true, element: <CalendarPage /> },
+			{ path: "inbox", element: <InboxPage /> },
+			{ path: "settings" },
+		],
+	},
+	{
+		path: "/auth",
+		element: <AuthLayout />,
+		children: [
+			{ index: true, element: <AuthCard /> },
+			{ path: "reset", element: <ResetCard /> },
+		],
+	},
+	{ path: "*", element: <NotFoundPage /> },
+])
+
 function AppRouter() {
-	return (
-		<BrowserRouter>
-			<Routes>
-				<Route path="/" element={<MainLayout />}>
-					<Route index element={<CalendarPage />} />
-					<Route path="inbox" element={<InboxPage />} />
-					<Route path="settings" />
-				</Route>
-				<Route path="/auth" element={<AuthLayout />}>
-					<Route index element={<AuthCard />} />
-					<Route path="reset" element={<ResetCard />} />
-				</Route>
-				<Route path="*" element={<NotFoundPage />}/>
-			</Routes>
-		</BrowserRouter>
-	)
+	return <RouterProvider router={router} />
 }
 
 export default AppRouter
