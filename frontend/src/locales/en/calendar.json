@@ -6,5 +6,8 @@
     },
     "today": "Today",
     "prevDay": "Previous day",
-    "nextDay": "Next day"
+    "nextDay": "Next day",
+    "selectEvent": "Select an event",
+    "noEvents": "No events",
+    "linkedMessage": "Linked message"
 }

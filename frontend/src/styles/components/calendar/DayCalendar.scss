@@ -191,10 +191,14 @@ $shadow-width: 56px;
         gap: 3px;
         overflow: hidden;
         cursor: pointer;
-        transition: filter 0.15s ease;
+        transition: filter 0.15s ease, box-shadow 0.15s ease;
 
         &:hover {
-            filter: brightness(0.93);
+            outline: 2px solid var(--border-primary-color);
+        }
+
+        &--selected {
+            outline: 2px solid var(--accent-hover-color);
         }
     }
 

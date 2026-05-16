@@ -65,7 +65,7 @@ function addDays(date: Date, days: number): Date {
     return d
 }
 
-function DayCalendar({ events, date: initialDate, onDateChange }: DayCalendarProps) {
+function DayCalendar({ events, date: initialDate, onDateChange, selectedEventId, onEventSelect }: DayCalendarProps) {
     const { t, i18n } = useTranslation('calendar')
     const timelineRef = useRef<HTMLDivElement>(null)
     const [selectedDate, setSelectedDate] = useState(() => initialDate ?? new Date())
@@ -206,7 +206,8 @@ function DayCalendar({ events, date: initialDate, onDateChange }: DayCalendarPro
 
                                 return (
                                     <div key={event.id}
-                                        className="day-calendar__event"
+                                        className={clsx("day-calendar__event", selectedEventId === event.id && "day-calendar__event--selected")}
+                                        onClick={() => onEventSelect?.(event.id)}
                                         style={{
                                             left,
                                             width,
@@ -219,7 +220,7 @@ function DayCalendar({ events, date: initialDate, onDateChange }: DayCalendarPro
                                             {event.title}
                                         </span>
                                         <span className="day-calendar__event-time">
-                                            {event.startTime}–{event.endTime}
+                                            {event.startTime}-{event.endTime}
                                         </span>
                                     </div>
                                 )

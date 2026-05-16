@@ -112,7 +112,7 @@ function MessageDisplay({ title, text, onClose }: MessageProps) {
 				<MessageAttachment
 					icon={<GlobeAltIcon />}
 					name="Установочная лекция"
-					description="15 мая 2026, 10:00 – 11:30"
+					description="15 мая 2026, 10:00 - 11:30"
 					accentColor="#e05c5c"
 				>
 					Ауд. 214. Обязательное присутствие для всех студентов первого курса.
@@ -120,7 +120,7 @@ function MessageDisplay({ title, text, onClose }: MessageProps) {
 				<MessageAttachment
 					icon={<GlobeAltIcon />}
 					name="Консультация по курсовой"
-					description="18 мая 2026, 14:00 – 15:00"
+					description="18 мая 2026, 14:00 - 15:00"
 					accentColor="#4a90d9">
 					Онлайн, ссылка будет отправлена дополнительно.
 				</MessageAttachment>
