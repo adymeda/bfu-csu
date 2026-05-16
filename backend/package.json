@@ -7,25 +7,6 @@
   "type": "commonjs",
   "main": "src/server.js",
   "scripts": {
-    "start": "node .",
-    "dev": "nodemon .",
-    "migrate": "node-pg-migrate",
-    "migrate:up": "node-pg-migrate up",
-    "migrate:down": "node-pg-migrate down"
-  },
-  "node-pg-migrate": {
-    "migrations-dir": "migrations",
-    "database-url-var": "DATABASE_URL"
-  },
-  "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "cors": "^2.8.6",
-    "dotenv": "^17.3.1",
-    "express": "^5.2.1",
-    "node-pg-migrate": "^8.0.4",
-    "pg": "^8.20.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.14"
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
