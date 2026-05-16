@@ -1,3 +1,4 @@
+import clsx from "clsx"
 import "@styles/components/ui/Button.scss"
 import type { ButtonProps } from "./types"
 
@@ -11,7 +12,7 @@ function Button(props: ButtonProps) {
     let { buttonLevel, children, onClick, buttonType } = props
     if(!buttonType) buttonType = "button"
     if(!buttonLevel) buttonLevel = 1
-    let className = `button button-${buttonLevels[buttonLevel]}`
+    const className = clsx("button", `button-${buttonLevels[buttonLevel]}`)
     
     return (
         <button type={buttonType} className={className} onClick={onClick}>

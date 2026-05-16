@@ -1,3 +1,4 @@
+import clsx from "clsx"
 import { useRef, useEffect, useState, useCallback } from "react"
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
 import type { DayCalendarProps, CalendarEvent, PositionedEvent } from "./types"
@@ -52,9 +53,7 @@ function formatDate(date: Date): string {
         day: "numeric",
         month: "long",
         year: "numeric",
-    })
-        .format(date)
-        .replace(" г.", "")
+    }).format(date).replace(" г.", "")
 }
 
 function addDays(date: Date, days: number): Date {
@@ -143,21 +142,19 @@ function DayCalendar({ events, date: initialDate, onDateChange }: DayCalendarPro
         : 0
     const totalWidth = CELL_WIDTH * HOURS_COUNT
 
-    const timelineWrapperClass = [
+    const timelineWrapperClass = clsx(
         "day-calendar__timeline-wrapper",
         shadows.left  && "day-calendar__timeline-wrapper--shadow-left",
         shadows.right && "day-calendar__timeline-wrapper--shadow-right",
-    ].filter(Boolean).join(" ")
+    )
 
     return (
         <div className="day-calendar">
             <div className="day-calendar__header">
                 <div className="day-calendar__header-nav">
                     {!isToday && (
-                        <button
-                            className="day-calendar__today-btn"
-                            onClick={handleToday}
-                        >
+                        <button className="day-calendar__today-btn"
+                          onClick={handleToday}>
                             Сегодня
                         </button>
                     )}

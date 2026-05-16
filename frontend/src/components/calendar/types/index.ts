@@ -1,9 +1,9 @@
 export interface CalendarEvent {
     id: string
     title: string
-    startTime: string  // "H:MM" or "HH:MM"
-    endTime: string    // "H:MM" or "HH:MM"
-    color: string      // CSS color (hex)
+    startTime: string
+    endTime: string
+    color: string
 }
 
 export interface PositionedEvent {

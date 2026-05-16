@@ -1,3 +1,4 @@
+import clsx from "clsx"
 import { useRef, useState, useEffect } from "react"
 import { EnvelopeIcon, MagnifyingGlassIcon, PencilSquareIcon, StarIcon as StarOutline } from "@heroicons/react/24/outline"
 import { StarIcon as StarSolid } from "@heroicons/react/24/solid"
@@ -93,10 +94,10 @@ function InboxPage() {
                         return (
                             <div
                                 key={tab.name ?? i}
-                                className={`inbox-sidebar__tab${isActive ? " active" : ""}`}
+                                className={clsx("inbox-sidebar__tab", isActive && "active")}
                                 onClick={() => setActiveTab(i)}
                             >
-                                <span className={`inbox-sidebar__tab-name${IconToRender ? " inbox-sidebar__tab-name--icon" : ""}`}>
+                                <span className={clsx("inbox-sidebar__tab-name", IconToRender && "inbox-sidebar__tab-name--icon")}>
                                     {IconToRender && <IconToRender />}
                                     {tab.name}
                                 </span>
@@ -117,7 +118,7 @@ function InboxPage() {
                     </div>
                 </div>
             </div>
-            <div className={`inbox-content${isContentOpen ? " inbox-content--active" : ""}`}>
+            <div className={clsx("inbox-content", isContentOpen && "inbox-content--active")}>
                 {isComposing
                 ? <MessageCreate onClose={handleComposeClose} />
                 : currentMessageId !== null

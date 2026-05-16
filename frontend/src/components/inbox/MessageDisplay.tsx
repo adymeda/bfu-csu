@@ -1,3 +1,4 @@
+import clsx from "clsx"
 import "@styles/components/inbox/MessageDisplay.scss"
 import type { MessageProps } from "./types";
 import { ArrowDownTrayIcon, ArrowTurnUpRightIcon, ArrowUpRightIcon, ArrowUturnLeftIcon, ChevronDownIcon, ChevronLeftIcon, ClipboardDocumentListIcon, EllipsisVerticalIcon, GlobeAltIcon, PaperClipIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -61,7 +62,7 @@ function MessageDisplay({ title, text, onClose }: MessageProps) {
                     </div>
                     {hasOverflow && (
                         <button
-                            className={`message-display__text-recipients-extend${expanded ? ' expanded' : ''}`}
+                            className={clsx("message-display__text-recipients-extend", expanded && "expanded")}
                             onClick={() => setExpanded(v => !v)}>
                             <ChevronDownIcon />
                         </button>
