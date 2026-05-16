@@ -1,0 +1,12 @@
+{
+    "logOut": "Выйти",
+    "navigation": {
+        "calendar": "Календарь",
+        "inbox": "Сообщения",
+        "settings": "Настройки"
+    },
+    "semesterType": {
+        "autumn": "Осенний семестр",
+        "spring": "Весенний семестр"
+    }
+}

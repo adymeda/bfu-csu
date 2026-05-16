@@ -1,0 +1,12 @@
+{
+    "logOut": "Log out",
+    "navigation": {
+        "calendar": "Calendar",
+        "inbox": "Inbox",
+        "settings": "Settings"
+    },
+    "semesterType": {
+        "autumn": "Autumn semester",
+        "spring": "Spring semester"
+    }
+}

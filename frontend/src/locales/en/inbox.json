@@ -1,0 +1,21 @@
+{
+    "inboxSearchPlaceholder": "Search by name, content...",
+    "tabs": {
+        "incoming": "Inbox",
+        "sent": "Sent",
+        "important": "Important",
+        "events": "With events"
+    },
+    "message": {
+        "topic": "Message topic",
+        "toRecipients": "To",
+        "text": "Message text...",
+        "attachments": "Attachments",
+        "attachmentsEmpty": "No attachments added",
+        "send": "Send",
+        "reply": "Reply",
+        "replyAll": "Reply to all",
+        "forward": "Forward",
+        "copyText": "Copy text"
+    }
+}

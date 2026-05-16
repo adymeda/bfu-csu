@@ -1,0 +1,7 @@
+{
+    "eventsTodayCount": {
+        "one": "%count% event today",
+        "two": "%count% events today",
+        "many": "%count% events today"
+    }
+}
