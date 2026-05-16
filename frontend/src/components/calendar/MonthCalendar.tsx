@@ -1,18 +1,10 @@
 import clsx from "clsx"
 import { useTranslation } from "react-i18next"
 import type { MonthCalendarProps } from "./types"
-import { toISODate, hexToRgba } from "@helpers"
+import { toISODate, hexToRgba, isSameDay } from "@helpers"
 import "@styles/components/calendar/MonthCalendar.scss"
 
 const MAX_VISIBLE_EVENTS = 3
-
-function isSameDay(a: Date, b: Date): boolean {
-	return (
-		a.getFullYear() === b.getFullYear() &&
-		a.getMonth() === b.getMonth() &&
-		a.getDate() === b.getDate()
-	)
-}
 
 function buildGrid(monthStart: Date): Date[] {
 	const offset = (monthStart.getDay() + 6) % 7

@@ -39,14 +39,12 @@ function getNowLeft(): number {
     return (minutes / TOTAL_MINUTES) * CELL_WIDTH * HOURS_COUNT
 }
 
-function DayCalendar({ events, date: initialDate, selectedEventId, onEventSelect }: DayCalendarProps) {
+function DayCalendar({ events, date, selectedEventId, onEventSelect }: DayCalendarProps) {
     const timelineRef = useRef<HTMLDivElement>(null)
-    const [selectedDate, setSelectedDate] = useState(() => initialDate ?? new Date())
     const [nowLeft, setNowLeft] = useState(getNowLeft)
     const [shadows, setShadows] = useState({ left: false, right: false })
 
-    const today = new Date()
-    const isToday = isSameDay(selectedDate, today)
+    const isToday = isSameDay(date ?? new Date(), new Date())
 
     const updateShadows = useCallback(() => {
         const el = timelineRef.current
@@ -56,10 +54,6 @@ function DayCalendar({ events, date: initialDate, selectedEventId, onEventSelect
             right: el.scrollLeft < el.scrollWidth - el.clientWidth - 1,
         })
     }, [])
-
-    useEffect(() => {
-        if (initialDate) setSelectedDate(initialDate)
-    }, [initialDate])
 
     useEffect(() => {
         const interval = setInterval(() => setNowLeft(getNowLeft()), 30000)
@@ -97,7 +91,7 @@ function DayCalendar({ events, date: initialDate, selectedEventId, onEventSelect
             el.scrollLeft = 0
         }
         updateShadows()
-    }, [selectedDate, isToday, nowLeft, updateShadows])
+    }, [date, isToday, nowLeft, updateShadows])
 
     const positionedEvents = assignRows(events)
     const usedRows = positionedEvents.length > 0 ? Math.max(...positionedEvents.map(p => p.row)) + 1 : 0
