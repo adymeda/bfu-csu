@@ -1,7 +1,10 @@
 {
     "eventsTodayCount": {
-        "one": "%count% event today",
-        "two": "%count% events today",
-        "many": "%count% events today"
-    }
+        "one": "{{count}} event today",
+        "two": "{{count}} events today",
+        "many": "{{count}} events today"
+    },
+    "today": "Today",
+    "prevDay": "Previous day",
+    "nextDay": "Next day"
 }

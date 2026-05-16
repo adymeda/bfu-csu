@@ -1,5 +1,6 @@
 {
     "inboxSearchPlaceholder": "Search by name, content...",
+    "selectMessage": "Click on a message on the left to open it",
     "tabs": {
         "incoming": "Inbox",
         "sent": "Sent",
@@ -8,7 +9,7 @@
     },
     "message": {
         "topic": "Message topic",
-        "toRecipients": "To",
+        "toRecipients": "To:",
         "text": "Message text...",
         "attachments": "Attachments",
         "attachmentsEmpty": "No attachments added",
@@ -17,5 +18,13 @@
         "replyAll": "Reply to all",
         "forward": "Forward",
         "copyText": "Copy text"
+    },
+    "recipients": {
+        "searchPlaceholder": "Search for a recipient...",
+        "allAdded": "All recipients added"
+    },
+    "attachments": {
+        "addFile": "Add file",
+        "createEvent": "Create event"
     }
 }

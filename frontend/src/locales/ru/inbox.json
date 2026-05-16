@@ -1,5 +1,6 @@
 {
     "inboxSearchPlaceholder": "Поиск по имени, содержанию...",
+    "selectMessage": "Нажмите на сообщение слева, чтобы открыть его",
     "tabs": {
         "incoming": "Входящие",
         "sent": "Отправленные",
@@ -8,7 +9,7 @@
     },
     "message": {
         "topic": "Тема сообщения",
-        "toRecipients": "Кому",
+        "toRecipients": "Кому:",
         "text": "Текст сообщения...",
         "attachments": "Вложения",
         "attachmentsEmpty": "Пока что не добавлено ни одного вложения",
@@ -17,5 +18,13 @@
         "replyAll": "Ответить всем",
         "forward": "Переслать",
         "copyText": "Скопировать текст"
+    },
+    "recipients": {
+        "searchPlaceholder": "Поиск получателя...",
+        "allAdded": "Все получатели добавлены"
+    },
+    "attachments": {
+        "addFile": "Добавить файл",
+        "createEvent": "Создать мероприятие"
     }
 }

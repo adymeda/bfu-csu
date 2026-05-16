@@ -8,5 +8,11 @@
     "semesterType": {
         "autumn": "Осенний семестр",
         "spring": "Весенний семестр"
-    }
+    },
+    "weekParity": {
+        "upper": "верхняя",
+        "lower": "нижняя"
+    },
+    "weekInfo": "Неделя {{week}} ({{parity}}) • {{semester}}",
+    "searchPlaceholder": "Поиск по мероприятиям..."
 }

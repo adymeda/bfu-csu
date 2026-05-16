@@ -1,5 +1,6 @@
 import clsx from "clsx"
 import { useRef, useEffect, useState, useCallback } from "react"
+import { useTranslation } from "react-i18next"
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
 import type { DayCalendarProps, CalendarEvent, PositionedEvent } from "./types"
 import { timeToMinutes, hexToRgba } from "@helpers"
@@ -48,12 +49,14 @@ function isSameDay(a: Date, b: Date): boolean {
     )
 }
 
-function formatDate(date: Date): string {
-    return new Intl.DateTimeFormat("ru-RU", {
+function formatDate(date: Date, lng: string): string {
+    const locale = lng === 'ru' ? 'ru-RU' : 'en-US'
+    const formatted = new Intl.DateTimeFormat(locale, {
         day: "numeric",
         month: "long",
         year: "numeric",
-    }).format(date).replace(" г.", "")
+    }).format(date)
+    return lng === 'ru' ? formatted.replace(" г.", "") : formatted
 }
 
 function addDays(date: Date, days: number): Date {
@@ -63,6 +66,7 @@ function addDays(date: Date, days: number): Date {
 }
 
 function DayCalendar({ events, date: initialDate, onDateChange }: DayCalendarProps) {
+    const { t, i18n } = useTranslation('calendar')
     const timelineRef = useRef<HTMLDivElement>(null)
     const [selectedDate, setSelectedDate] = useState(() => initialDate ?? new Date())
     const [nowLeft, setNowLeft] = useState(getNowLeft)
@@ -155,24 +159,20 @@ function DayCalendar({ events, date: initialDate, onDateChange }: DayCalendarPro
                     {!isToday && (
                         <button className="day-calendar__today-btn"
                           onClick={handleToday}>
-                            Сегодня
+                            {t('today')}
                         </button>
                     )}
-                    <button
-                        className="day-calendar__nav-btn"
+                    <button className="day-calendar__nav-btn"
                         onClick={handlePrev}
-                        aria-label="Предыдущий день"
-                    >
+                        aria-label={t('prevDay')}>
                         <ChevronLeftIcon />
                     </button>
                     <span className="day-calendar__nav-date">
-                        {formatDate(selectedDate)}
+                        {formatDate(selectedDate, i18n.language)}
                     </span>
-                    <button
-                        className="day-calendar__nav-btn"
+                    <button className="day-calendar__nav-btn"
                         onClick={handleNext}
-                        aria-label="Следующий день"
-                    >
+                        aria-label={t('nextDay')}>
                         <ChevronRightIcon />
                     </button>
                 </div>
@@ -192,10 +192,8 @@ function DayCalendar({ events, date: initialDate, onDateChange }: DayCalendarPro
                             ))}
                         </div>
 
-                        <div
-                            className="day-calendar__events"
-                            style={{ height: rowCount * EVENT_ROW_HEIGHT }}
-                        >
+                        <div className="day-calendar__events"
+                            style={{ height: rowCount * EVENT_ROW_HEIGHT }}>
                             {Array.from({ length: HOURS_COUNT }, (_, i) => (
                                 <div key={i} className="day-calendar__events-column" />
                             ))}
@@ -216,8 +214,7 @@ function DayCalendar({ events, date: initialDate, onDateChange }: DayCalendarPro
                                             height: EVENT_ROW_HEIGHT - EVENT_PADDING * 2,
                                             backgroundColor: hexToRgba(event.color, 0.13),
                                             borderLeftColor: event.color,
-                                        }}
-                                    >
+                                        }}>
                                         <span className="day-calendar__event-title">
                                             {event.title}
                                         </span>
@@ -230,10 +227,8 @@ function DayCalendar({ events, date: initialDate, onDateChange }: DayCalendarPro
                         </div>
 
                         {isToday && (
-                            <div
-                                className="day-calendar__now-line"
-                                style={{ left: nowLeft }}
-                            />
+                            <div className="day-calendar__now-line"
+                                style={{ left: nowLeft }}/>
                         )}
 
                     </div>

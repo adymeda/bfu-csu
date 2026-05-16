@@ -8,5 +8,11 @@
     "semesterType": {
         "autumn": "Autumn semester",
         "spring": "Spring semester"
-    }
+    },
+    "weekParity": {
+        "upper": "upper",
+        "lower": "lower"
+    },
+    "weekInfo": "Week {{week}} ({{parity}}) • {{semester}}",
+    "searchPlaceholder": "Search events..."
 }

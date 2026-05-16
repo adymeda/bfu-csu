@@ -96,6 +96,10 @@
             user-select: none;
             cursor: pointer;
 
+            &-name {
+                text-wrap: nowrap;
+            }
+
             &-name--icon {
                 display: flex;
                 align-items: center;
