@@ -1,4 +1,4 @@
-import type { MouseEventHandler } from "react";
+import type { MouseEventHandler } from "react"
 
 export interface ButtonProps {
     onClick: MouseEventHandler,
@@ -19,8 +19,8 @@ export interface NavButtonProps {
     text: string,
     path: string,
     Icon?: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, "ref"> & {
-            title?: string;
-            titleId?: string;
+            title?: string
+            titleId?: string
         } & React.RefAttributes<SVGSVGElement>>,
     className?: string
 }

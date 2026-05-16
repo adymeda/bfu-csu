@@ -1,7 +1,7 @@
-import "@styles/components/inbox/MessageRecipient.scss";
-import type { MessageRecipientProps } from "./types";
-import { UsersIcon } from "@heroicons/react/24/outline";
-import Avatar from "@components/ui/Avatar";
+import "@styles/components/inbox/MessageRecipient.scss"
+import type { MessageRecipientProps } from "./types"
+import { UsersIcon } from "@heroicons/react/24/outline"
+import Avatar from "@components/ui/Avatar"
 
 function MessageRecipient({ name, isGroup, icon, color, children }: MessageRecipientProps) {
     return (
@@ -13,7 +13,7 @@ function MessageRecipient({ name, isGroup, icon, color, children }: MessageRecip
             <span>{name}</span>
             {children}
         </div>
-    );
+    )
 }
 
-export default MessageRecipient;
+export default MessageRecipient

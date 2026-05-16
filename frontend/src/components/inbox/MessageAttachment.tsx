@@ -1,14 +1,14 @@
-import "@styles/components/inbox/MessageAttachment.scss";
-import type { ReactNode } from "react";
+import "@styles/components/inbox/MessageAttachment.scss"
+import type { ReactNode } from "react"
 
 type MessageAttachmentProps = {
-    name: string;
-    description?: string;
-    icon: ReactNode;
-    action?: ReactNode;
-    accentColor?: string;
-    children?: ReactNode;
-};
+    name: string
+    description?: string
+    icon: ReactNode
+    action?: ReactNode
+    accentColor?: string
+    children?: ReactNode
+}
 
 function MessageAttachment({ name, description, icon, action, accentColor, children }: MessageAttachmentProps) {
     return (
@@ -29,8 +29,8 @@ function MessageAttachment({ name, description, icon, action, accentColor, child
                 </div>
             )}
         </div>
-    );
+    )
 }
 
-export default MessageAttachment;
-export type { MessageAttachmentProps };
+export default MessageAttachment
+export type { MessageAttachmentProps }

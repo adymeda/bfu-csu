@@ -69,7 +69,10 @@ function InboxPage() {
 	useEffect(() => {
 		function onKeyDown(e: KeyboardEvent) {
 			if (e.key !== "Escape") return
-			if (isComposing) { handleComposeClose(); return }
+			if (isComposing) {
+				handleComposeClose()
+				return
+			}
 			if (currentMessageId !== null) handleMessageClose()
 		}
 		document.addEventListener("keydown", onKeyDown)

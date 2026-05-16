@@ -1,31 +1,31 @@
 import clsx from "clsx"
 import "@styles/components/inbox/MessageDisplay.scss"
-import type { MessageProps } from "./types";
-import { ArrowDownTrayIcon, ArrowTurnUpRightIcon, ArrowUpRightIcon, ArrowUturnLeftIcon, ChevronDownIcon, ChevronLeftIcon, ClipboardDocumentListIcon, EllipsisVerticalIcon, GlobeAltIcon, PaperClipIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { useTranslation } from "react-i18next";
-import Avatar from "@components/ui/Avatar";
-import MessageRecipient from "./MessageRecipient";
-import MessageAttachment from "./MessageAttachment";
-import { useLayoutEffect, useRef, useState } from "react";
+import type { MessageProps } from "./types"
+import { ArrowDownTrayIcon, ArrowTurnUpRightIcon, ArrowUpRightIcon, ArrowUturnLeftIcon, ChevronDownIcon, ChevronLeftIcon, ClipboardDocumentListIcon, EllipsisVerticalIcon, GlobeAltIcon, PaperClipIcon, StarIcon, XMarkIcon } from "@heroicons/react/24/outline"
+import { useTranslation } from "react-i18next"
+import Avatar from "@components/ui/Avatar"
+import MessageRecipient from "./MessageRecipient"
+import MessageAttachment from "./MessageAttachment"
+import { useLayoutEffect, useRef, useState } from "react"
 
 function MessageDisplay({ title, text, onClose }: MessageProps) {
 	const { t } = useTranslation('inbox')
-	const [expanded, setExpanded] = useState(false);
-	const [hasOverflow, setHasOverflow] = useState(false);
-	const [rowHeight, setRowHeight] = useState(0);
-	const listRef = useRef<HTMLDivElement>(null);
+	const [expanded, setExpanded] = useState(false)
+	const [hasOverflow, setHasOverflow] = useState(false)
+	const [rowHeight, setRowHeight] = useState(0)
+	const listRef = useRef<HTMLDivElement>(null)
 
 	useLayoutEffect(() => {
-		const el = listRef.current;
-		if (!el) return;
+		const el = listRef.current
+		if (!el) return
 
-		const firstChild = el.firstElementChild as HTMLElement | null;
-		if (!firstChild) return;
+		const firstChild = el.firstElementChild as HTMLElement | null
+		if (!firstChild) return
 
-		const h = firstChild.offsetHeight;
-		setRowHeight(h);
-		setHasOverflow(el.scrollHeight > h + 2);
-	}, []);
+		const h = firstChild.offsetHeight
+		setRowHeight(h)
+		setHasOverflow(el.scrollHeight > h + 2)
+	}, [])
 
 	return (
 		<>
@@ -59,7 +59,7 @@ function MessageDisplay({ title, text, onClose }: MessageProps) {
 						{Array.from({ length: 30 }, (_, i) => {
 							return (
 								<MessageRecipient name={`Test ${i + 1}`} isGroup={i === 1} />
-							);
+							)
 						})}
 					</div>
 					{hasOverflow && (
