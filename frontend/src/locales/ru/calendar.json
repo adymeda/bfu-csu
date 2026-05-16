@@ -5,8 +5,14 @@
         "many": "{{count}} мероприятий сегодня"
     },
     "today": "Сегодня",
+    "currentMonth": "Текущий месяц",
     "prevDay": "Предыдущий день",
     "nextDay": "Следующий день",
+    "prevMonth": "Предыдущий месяц",
+    "nextMonth": "Следующий месяц",
+    "monthView": "Вид: месяц",
+    "dayView": "Вид: день",
+    "moreEvents": "Ещё {{count}}",
     "selectEvent": "Выберите мероприятие",
     "noEvents": "Нет мероприятий",
     "linkedMessage": "Связанное сообщение"

@@ -146,7 +146,7 @@ body {
     }
 }
 
-.mobile-profile-btn.nav-button {
+.mobile-profile-button.nav-button {
     display: none;
 }
 
@@ -197,9 +197,10 @@ body {
 
     .top-bar {
         display: none;
+        flex-shrink: 0;
     }
 
-    .mobile-profile-btn.nav-button {
+    .mobile-profile-button.nav-button {
         display: flex;
     }
 }

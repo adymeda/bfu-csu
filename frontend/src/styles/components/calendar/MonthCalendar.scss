@@ -1,0 +1,126 @@
+$cell-min-height: 120px;
+$event-row-height: 18px;
+
+.month-calendar {
+	display: flex;
+	flex-direction: column;
+	border-bottom: 1px solid var(--border-primary-color);
+
+	&__grid-wrapper {
+		overflow-x: auto;
+	}
+
+	&__grid {
+		display: grid;
+		grid-template-columns: repeat(7, minmax(0, 1fr));
+		min-width: 420px;
+	}
+
+	&__weekday {
+		padding: 6px 10px;
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--text-info-color);
+		text-transform: uppercase;
+		letter-spacing: .04em;
+		user-select: none;
+		border-bottom: 1px solid var(--border-primary-color);
+		border-right: 1px solid var(--border-primary-color);
+		box-sizing: border-box;
+
+		&:nth-child(7n) {
+			border-right: none;
+		}
+	}
+
+	&__cell {
+		min-height: $cell-min-height;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		border-right: 1px solid var(--border-primary-color);
+		border-bottom: 1px solid var(--border-primary-color);
+		box-sizing: border-box;
+		transition: background .2s;
+		background: #fafafa;
+		cursor: pointer;
+
+		&:nth-child(7n) {
+			border-right: none;
+		}
+
+		&:hover {
+			background: rgba(0, 0, 0, .025);
+		}
+
+		&--outside {
+			background: none;
+
+			&:hover {
+				background: none;
+			}
+
+			.month-calendar__day {
+				color: var(--text-info-color);
+			}
+		}
+	}
+
+	&__day {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 26px;
+		height: 26px;
+		margin: .5rem;
+		margin-bottom: .25rem;
+		border-radius: 50%;
+		font-size: 13px;
+		font-weight: 500;
+		color: var(--text-primary-color);
+		user-select: none;
+		flex-shrink: 0;
+
+		&--today {
+			background: var(--accent-color);
+			color: white;
+		}
+
+		&--selected:not(&--today) {
+			outline: 2px solid var(--accent-hover-color);
+		}
+	}
+
+	&__cell-events {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		min-width: 0;
+	}
+
+	&__event {
+		display: flex;
+		align-items: center;
+		height: $event-row-height;
+		min-width: 0;
+		border-left: 3px solid transparent;
+		border-radius: 3px;
+		padding: 0 5px;
+		overflow: hidden;
+	}
+
+	&__event-title {
+		font-size: 12px;
+		color: var(--text-primary-color);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		line-height: 1.3;
+	}
+
+	&__more {
+		font-size: 12px;
+		color: var(--text-info-color);
+		padding-left: 12px;
+	}
+}

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import "@styles/components/calendar/EventDetail.scss"
 import Message from "@components/inbox/Message"
 import type { CalendarEvent } from "./types"
+import { formatTime } from "@helpers"
 
 interface EventDetailProps {
 	event: CalendarEvent
@@ -19,7 +20,7 @@ function EventDetail({ event }: EventDetailProps) {
 				<div className="event-detail__meta">
 					<div className="event-detail__meta-row">
 						<ClockIcon />
-						<span>{event.startTime}-{event.endTime}</span>
+						<span>{formatTime(event.startDate)}-{formatTime(event.endDate)}</span>
 					</div>
 					<div className="event-detail__meta-row">
 						<MapPinIcon />

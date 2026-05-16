@@ -5,8 +5,14 @@
         "many": "{{count}} events today"
     },
     "today": "Today",
+    "currentMonth": "Current month",
     "prevDay": "Previous day",
     "nextDay": "Next day",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "monthView": "Month view",
+    "dayView": "Day view",
+    "moreEvents": "{{count}} more",
     "selectEvent": "Select an event",
     "noEvents": "No events",
     "linkedMessage": "Linked message"

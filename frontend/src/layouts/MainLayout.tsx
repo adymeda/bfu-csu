@@ -58,7 +58,7 @@ function MainLayout() {
 					<NavButton text={t('navigation.inbox')}
 					path="/inbox"
 					Icon={InboxIcon} />
-					<button className="mobile-profile-btn nav-button" onClick={() => {}}>
+					<button className="mobile-profile-button nav-button" onClick={() => {}}>
 						<Avatar placeholder="Джатус Турбированный" color="#0051ff" />
 						Профиль
 					</button>

@@ -6,8 +6,10 @@
 	&__titlebar {
 		display: flex;
 		align-items: center;
+		justify-content: flex-end;
+		gap: 1rem;
 		flex-shrink: 0;
-		
+
 		background: white;
 		padding: 1rem 1.5rem;
 		border-bottom: 1px solid var(--border-primary-color);
@@ -16,6 +18,7 @@
 	&__title {
 		display: flex;
 		flex-direction: column;
+		margin-right: auto;
 
 		&-text {
 			font-size: 28px;
@@ -25,6 +28,104 @@
 		&-info {
 			color: #a8a8a8;
 			font-size: 16px;
+		}
+	}
+
+	&__nav {
+		display: flex;
+		align-items: center;
+	}
+
+	&__nav-button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		border: none;
+		background: none;
+		border-radius: 6px;
+		color: var(--text-secondary-color);
+		cursor: pointer;
+		transition: .15s;
+
+		svg {
+			width: 16px;
+			height: 16px;
+			stroke-width: 2.5;
+		}
+
+		&:hover {
+			background: var(--border-primary-color);
+			color: var(--text-primary-color);
+		}
+	}
+
+	&__nav-date {
+		font-size: 14px;
+		font-weight: 500;
+		color: var(--text-primary-color);
+		min-width: 160px;
+		text-align: center;
+		user-select: none;
+	}
+
+	&__nav-today {
+		margin-right: 4px;
+		padding: 4px 10px;
+		border: 1px solid var(--border-primary-color);
+		background: none;
+		border-radius: 6px;
+		font-size: 13px;
+		font-weight: 500;
+		color: var(--text-secondary-color);
+		cursor: pointer;
+		transition: .15s;
+
+		&:hover {
+			background: var(--border-primary-color);
+			color: var(--text-primary-color);
+		}
+	}
+
+	&__view-switch {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	&__view-button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 42px;
+		height: 42px;
+		border: none;
+		background: none;
+		border-radius: 6px;
+		color: var(--text-secondary-color);
+		cursor: pointer;
+		transition: .15s;
+
+		svg {
+			width: 16px;
+			height: 16px;
+			stroke-width: 2;
+		}
+
+		&:hover {
+			background: var(--border-primary-color);
+			color: var(--text-primary-color);
+		}
+
+		&--active {
+			background: var(--accent-color);
+			color: white;
+
+			&:hover {
+				background: var(--accent-hover-button);
+				color: white;
+			}
 		}
 	}
 

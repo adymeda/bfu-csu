@@ -1,9 +1,7 @@
 import clsx from "clsx"
 import { useRef, useEffect, useState, useCallback } from "react"
-import { useTranslation } from "react-i18next"
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
 import type { DayCalendarProps, CalendarEvent, PositionedEvent } from "./types"
-import { timeToMinutes, hexToRgba } from "@helpers"
+import { hexToRgba, formatTime, dateToMinutes, isSameDay } from "@helpers"
 import "@styles/components/calendar/DayCalendar.scss"
 
 const CELL_WIDTH = 100
@@ -15,13 +13,13 @@ const NOW_LINE_SCROLL_OFFSET = 24
 
 function assignRows(events: CalendarEvent[]): PositionedEvent[] {
     const sorted = [...events].sort(
-        (a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime)
+        (a, b) => dateToMinutes(a.startDate) - dateToMinutes(b.startDate)
     )
     const rowEndTimes: number[] = []
 
     return sorted.map(event => {
-        const startMin = timeToMinutes(event.startTime)
-        const endMin = timeToMinutes(event.endTime)
+        const startMin = dateToMinutes(event.startDate)
+        const endMin = dateToMinutes(event.endDate)
 
         const rowIndex = rowEndTimes.findIndex(t => t + 60 <= startMin)
 
@@ -41,32 +39,7 @@ function getNowLeft(): number {
     return (minutes / TOTAL_MINUTES) * CELL_WIDTH * HOURS_COUNT
 }
 
-function isSameDay(a: Date, b: Date): boolean {
-    return (
-        a.getFullYear() === b.getFullYear() &&
-        a.getMonth() === b.getMonth() &&
-        a.getDate() === b.getDate()
-    )
-}
-
-function formatDate(date: Date, lng: string): string {
-    const locale = lng === 'ru' ? 'ru-RU' : 'en-US'
-    const formatted = new Intl.DateTimeFormat(locale, {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    }).format(date)
-    return lng === 'ru' ? formatted.replace(" г.", "") : formatted
-}
-
-function addDays(date: Date, days: number): Date {
-    const d = new Date(date)
-    d.setDate(d.getDate() + days)
-    return d
-}
-
-function DayCalendar({ events, date: initialDate, onDateChange, selectedEventId, onEventSelect }: DayCalendarProps) {
-    const { t, i18n } = useTranslation('calendar')
+function DayCalendar({ events, date: initialDate, selectedEventId, onEventSelect }: DayCalendarProps) {
     const timelineRef = useRef<HTMLDivElement>(null)
     const [selectedDate, setSelectedDate] = useState(() => initialDate ?? new Date())
     const [nowLeft, setNowLeft] = useState(getNowLeft)
@@ -83,6 +56,10 @@ function DayCalendar({ events, date: initialDate, onDateChange, selectedEventId,
             right: el.scrollLeft < el.scrollWidth - el.clientWidth - 1,
         })
     }, [])
+
+    useEffect(() => {
+        if (initialDate) setSelectedDate(initialDate)
+    }, [initialDate])
 
     useEffect(() => {
         const interval = setInterval(() => setNowLeft(getNowLeft()), 30000)
@@ -122,28 +99,9 @@ function DayCalendar({ events, date: initialDate, onDateChange, selectedEventId,
         updateShadows()
     }, [selectedDate, isToday, nowLeft, updateShadows])
 
-    const handlePrev = () => {
-        const next = addDays(selectedDate, -1)
-        setSelectedDate(next)
-        onDateChange?.(next)
-    }
-
-    const handleNext = () => {
-        const next = addDays(selectedDate, 1)
-        setSelectedDate(next)
-        onDateChange?.(next)
-    }
-
-    const handleToday = () => {
-        const next = new Date()
-        setSelectedDate(next)
-        onDateChange?.(next)
-    }
-
     const positionedEvents = assignRows(events)
-    const rowCount = positionedEvents.length > 0
-        ? Math.max(...positionedEvents.map(p => p.row)) + 1
-        : 0
+    const usedRows = positionedEvents.length > 0 ? Math.max(...positionedEvents.map(p => p.row)) + 1 : 0
+    const rowCount = Math.max(2, usedRows)
     const totalWidth = CELL_WIDTH * HOURS_COUNT
 
     const timelineWrapperClass = clsx(
@@ -154,30 +112,6 @@ function DayCalendar({ events, date: initialDate, onDateChange, selectedEventId,
 
     return (
         <div className="day-calendar">
-            <div className="day-calendar__header">
-                <div className="day-calendar__header-nav">
-                    {!isToday && (
-                        <button className="day-calendar__today-btn"
-                          onClick={handleToday}>
-                            {t('today')}
-                        </button>
-                    )}
-                    <button className="day-calendar__nav-btn"
-                        onClick={handlePrev}
-                        aria-label={t('prevDay')}>
-                        <ChevronLeftIcon />
-                    </button>
-                    <span className="day-calendar__nav-date">
-                        {formatDate(selectedDate, i18n.language)}
-                    </span>
-                    <button className="day-calendar__nav-btn"
-                        onClick={handleNext}
-                        aria-label={t('nextDay')}>
-                        <ChevronRightIcon />
-                    </button>
-                </div>
-            </div>
-
             <div className={timelineWrapperClass}>
                 <div className="day-calendar__timeline" ref={timelineRef}>
                     <div className="day-calendar__track">
@@ -199,8 +133,8 @@ function DayCalendar({ events, date: initialDate, onDateChange, selectedEventId,
                             ))}
 
                             {positionedEvents.map(({ event, row }) => {
-                                const startMin = timeToMinutes(event.startTime)
-                                const endMin = timeToMinutes(event.endTime)
+                                const startMin = dateToMinutes(event.startDate)
+                                const endMin = dateToMinutes(event.endDate)
                                 const left = (startMin / TOTAL_MINUTES) * totalWidth
                                 const width = ((endMin - startMin) / TOTAL_MINUTES) * totalWidth
 
@@ -220,7 +154,7 @@ function DayCalendar({ events, date: initialDate, onDateChange, selectedEventId,
                                             {event.title}
                                         </span>
                                         <span className="day-calendar__event-time">
-                                            {event.startTime}-{event.endTime}
+                                            {formatTime(event.startDate)}-{formatTime(event.endDate)}
                                         </span>
                                     </div>
                                 )
