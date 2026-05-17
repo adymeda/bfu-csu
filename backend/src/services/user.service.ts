@@ -1,14 +1,14 @@
-const repo = require("../repositories/user.repo")
+import repo from "../repositories/user.repo.js"
 
 class UsersService {
     async getAllUsers() {
         const users = await repo.getAll()
         return users
     }
-    
-    async registerUser() {
 
+    async registerUser() {
+        
     }
 }
 
-module.exports = new UsersService()
+export default new UsersService()

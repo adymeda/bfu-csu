@@ -1,10 +1,11 @@
-require("dotenv").config({ quiet: true })
+import { config as dotenv } from "dotenv"
+dotenv({ quiet: true })
 
-const express = require("express")
+import express from "express"
 const app = express()
 app.use(express.json())
 
-const router = require("./routes")
+import router from "./routes"
 app.use("/api", router)
 
 const PORT = process.env.PORT || 3909
