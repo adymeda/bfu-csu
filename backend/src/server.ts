@@ -1,5 +1,4 @@
-import { config as dotenv } from "dotenv"
-dotenv({ quiet: true })
+import 'dotenv/config'
 
 import express from "express"
 const app = express()
