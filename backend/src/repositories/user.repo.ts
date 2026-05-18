@@ -41,7 +41,7 @@ class UsersRepository {
         return (rowCount ?? 0) > 0
     }
 
-    async findByEmailWithPassword(email: string): Promise<(User & { password: string }) | null> {
+    async getLoginData(email: string): Promise<(User & { password: string }) | null> {
         const { rows } = await pool.query<User & { password: string }>(
             `SELECT id, email, display_name, accent_color, created_at, last_login_at, password
                 FROM users WHERE email = $1`,
@@ -50,7 +50,7 @@ class UsersRepository {
         return rows[0] ?? null
     }
 
-    async touchLastLogin(id: number): Promise<void> {
+    async updateLastLogin(id: number): Promise<void> {
         await pool.query(
             `UPDATE users SET last_login_at = now() WHERE id = $1`,
             [id]
