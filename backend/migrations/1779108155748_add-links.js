@@ -9,26 +9,26 @@ exports.shorthands = undefined
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
-	pgm.createTable('links', {
-		user_id: {
-			type: 'integer',
-			notNull: true,
-			references: '"users"(id)',
-			onDelete: 'CASCADE',
-		},
-		link_type: {
-			type: 'integer',
-			notNull: true,
-		},
-		link_value: {
-			type: 'varchar(255)',
-			notNull: true,
-		},
-	}, {
-		constraints: {
-			primaryKey: ['user_id', 'link_type'],
-		},
-	})
+    pgm.createTable('links', {
+        user_id: {
+            type: 'integer',
+            notNull: true,
+            references: '"users"(id)',
+            onDelete: 'CASCADE',
+        },
+        link_type: {
+            type: 'integer',
+            notNull: true,
+        },
+        link_value: {
+            type: 'varchar(255)',
+            notNull: true,
+        },
+    }, {
+        constraints: {
+            primaryKey: ['user_id', 'link_type'],
+        },
+    })
 }
 
 /**
@@ -37,5 +37,5 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-	pgm.dropTable('links')
+    pgm.dropTable('links')
 }

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import service from "../services/group.service"
 import type { CreateGroupDto, AddAdminDto } from "../types/group"
+import { parseId } from "../utils/parseId"
 
 class GroupsController {
     async create(req: Request, res: Response, next: NextFunction) {
@@ -54,8 +55,8 @@ class GroupsController {
     }
 
     async getById(req: Request, res: Response, next: NextFunction) {
-        const id = parseInt(req.params["id"] as string)
-        if(isNaN(id)) return res.status(400).json({
+        const id = parseId(req.params["id"])
+        if(id === null) return res.status(400).json({
             error: "id should be an integer"
         })
 
@@ -77,8 +78,8 @@ class GroupsController {
     }
 
     async update(req: Request, res: Response, next: NextFunction) {
-        const id = parseInt(req.params["id"] as string)
-        if(isNaN(id)) return res.status(400).json({
+        const id = parseId(req.params["id"])
+        if(id === null) return res.status(400).json({
             error: "id should be an integer"
         })
 
@@ -117,8 +118,8 @@ class GroupsController {
     }
 
     async remove(req: Request, res: Response, next: NextFunction) {
-        const id = parseInt(req.params["id"] as string)
-        if(isNaN(id)) return res.status(400).json({
+        const id = parseId(req.params["id"])
+        if(id === null) return res.status(400).json({
             error: "id should be an integer"
         })
 
@@ -141,8 +142,8 @@ class GroupsController {
     }
 
     async getChildren(req: Request, res: Response, next: NextFunction) {
-        const id = parseInt(req.params["id"] as string)
-        if(isNaN(id)) return res.status(400).json({
+        const id = parseId(req.params["id"])
+        if(id === null) return res.status(400).json({
             error: "id should be an integer"
         })
 
@@ -160,8 +161,8 @@ class GroupsController {
     }
 
     async getAncestors(req: Request, res: Response, next: NextFunction) {
-        const id = parseInt(req.params["id"] as string)
-        if(isNaN(id)) return res.status(400).json({
+        const id = parseId(req.params["id"])
+        if(id === null) return res.status(400).json({
             error: "id should be an integer"
         })
 
@@ -179,8 +180,8 @@ class GroupsController {
     }
 
     async getMembers(req: Request, res: Response, next: NextFunction) {
-        const id = parseInt(req.params["id"] as string)
-        if(isNaN(id)) return res.status(400).json({
+        const id = parseId(req.params["id"])
+        if(id === null) return res.status(400).json({
             error: "id should be an integer"
         })
 
@@ -200,8 +201,8 @@ class GroupsController {
     }
 
     async addMember(req: Request, res: Response, next: NextFunction) {
-        const id = parseInt(req.params["id"] as string)
-        if(isNaN(id)) return res.status(400).json({
+        const id = parseId(req.params["id"])
+        if(id === null) return res.status(400).json({
             error: "id should be an integer"
         })
 
@@ -236,9 +237,9 @@ class GroupsController {
     }
 
     async removeMember(req: Request, res: Response, next: NextFunction) {
-        const id = parseInt(req.params["id"] as string)
-        const userId = parseInt(req.params["userId"] as string)
-        if(isNaN(id) || isNaN(userId))
+        const id = parseId(req.params["id"])
+        const userId = parseId(req.params["userId"])
+        if(id === null || userId === null)
             return res.status(400).json({
                 error: "id should be an integer"
             })
@@ -266,8 +267,8 @@ class GroupsController {
     }
 
     async getAdmins(req: Request, res: Response, next: NextFunction) {
-        const id = parseInt(req.params["id"] as string)
-        if(isNaN(id)) return res.status(400).json({
+        const id = parseId(req.params["id"])
+        if(id === null) return res.status(400).json({
             error: "id should be an integer"
         })
 
@@ -285,8 +286,8 @@ class GroupsController {
     }
 
     async addAdmin(req: Request, res: Response, next: NextFunction) {
-        const id = parseInt(req.params["id"] as string)
-        if(isNaN(id)) return res.status(400).json({
+        const id = parseId(req.params["id"])
+        if(id === null) return res.status(400).json({
             error: "id should be an integer"
         })
 
@@ -329,9 +330,9 @@ class GroupsController {
     }
 
     async removeAdmin(req: Request, res: Response, next: NextFunction) {
-        const id = parseInt(req.params["id"] as string)
-        const userId = parseInt(req.params["userId"] as string)
-        if(isNaN(id) || isNaN(userId))
+        const id = parseId(req.params["id"])
+        const userId = parseId(req.params["userId"])
+        if(id === null || userId === null)
             return res.status(400).json({
                 error: "id should be an integer"
             })

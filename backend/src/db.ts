@@ -1,4 +1,6 @@
-import { Pool } from "pg"
+import { Pool, types } from "pg"
+
+types.setTypeParser(20, (v: string) => parseInt(v, 10))
 
 const ENV_PORT = process.env.DB_PORT
 

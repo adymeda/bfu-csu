@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import service from "../services/user.service"
 import type { CreateUserDto } from "../types/user"
+import { parseId } from "../utils/parseId"
 
 class UsersController {
     async register(req: Request, res: Response, next: NextFunction) {
@@ -30,9 +31,9 @@ class UsersController {
     }
 
     async getById(req: Request, res: Response, next: NextFunction) {
-        const id = parseInt(req.params['id'] as string)
+        const id = parseId(req.params["id"])
 
-        if(isNaN(id)) return res.status(400).json({
+        if(id === null) return res.status(400).json({
             error: "id should be a number"
         })
 
@@ -49,9 +50,9 @@ class UsersController {
     }
 
     async update(req: Request, res: Response, next: NextFunction) {
-        const id = parseInt(req.params['id'] as string)
+        const id = parseId(req.params["id"])
 
-        if(isNaN(id)) return res.status(400).json({
+        if(id === null) return res.status(400).json({
             error: "id should be a number"
         })
 
@@ -68,9 +69,9 @@ class UsersController {
     }
 
     async delete(req: Request, res: Response, next: NextFunction) {
-        const id = parseInt(req.params['id'] as string)
+        const id = parseId(req.params["id"])
 
-        if(isNaN(id)) return res.status(400).json({
+        if(id === null) return res.status(400).json({
             error: "id should be a number"
         })
 
