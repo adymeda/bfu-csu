@@ -24,7 +24,7 @@ class UsersController {
             res.status(201).json(user)
         } catch (err: unknown) {
             const pg = err as { code?: string }
-            if (pg.code === '23505') res.status(409).json({ error: "email already claimed" })
+            if(pg.code === '23505') res.status(409).json({ error: "email already claimed" })
             else res.status(500).json({ error: "Internal Server Error" })
         }
     }
@@ -32,13 +32,13 @@ class UsersController {
     async getById(req: Request, res: Response) {
         const id = parseInt(req.params['id'] as string)
 
-        if (isNaN(id)) return res.status(400).json({
+        if(isNaN(id)) return res.status(400).json({
             error: "id should be a number"
         })
 
         try {
             const user = await service.getById(id)
-            if (!user) return res.status(404).json({
+            if(!user) return res.status(404).json({
                 error: "User not found"
             })
 
@@ -53,13 +53,13 @@ class UsersController {
     async update(req: Request, res: Response) {
         const id = parseInt(req.params['id'] as string)
 
-        if (isNaN(id)) return res.status(400).json({
+        if(isNaN(id)) return res.status(400).json({
             error: "id should be a number"
         })
 
         try {
             const user = await service.update(id, req.body as Record<string, unknown>)
-            if (!user) return res.status(400).json({
+            if(!user) return res.status(400).json({
                 error: "No fields to update"
             })
 
@@ -74,13 +74,13 @@ class UsersController {
     async delete(req: Request, res: Response) {
         const id = parseInt(req.params['id'] as string)
 
-        if (isNaN(id)) return res.status(400).json({
+        if(isNaN(id)) return res.status(400).json({
             error: "id should be a number"
         })
 
         try {
             const deleted = await service.delete(id)
-            if (!deleted) return res.status(404).json({
+            if(!deleted) return res.status(404).json({
                 error: "User not found"
             })
 

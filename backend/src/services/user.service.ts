@@ -20,8 +20,8 @@ class UsersService {
         const data: UpdateUserDto = {}
 
         for (const key of UPDATABLE_FIELDS) {
-            if (key in body && typeof body[key] === 'string') {
-                if (key === 'password') {
+            if(key in body && typeof body[key] === 'string') {
+                if(key === 'password') {
                     data[key] = await bcrypt.hash(body[key] as string, 10)
                 } else {
                     data[key] = body[key] as string
@@ -29,7 +29,7 @@ class UsersService {
             }
         }
 
-        if (Object.keys(data).length === 0) return null
+        if(Object.keys(data).length === 0) return null
 
         return repo.update(id, data)
     }
