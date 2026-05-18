@@ -1,20 +1,18 @@
-import { Request, Response } from "express"
+import { Request, Response, NextFunction } from "express"
 import service from "../services/link.service"
 import type { CreateLinkDto } from "../types/link"
 
 class LinksController {
-    async getAll(req: Request, res: Response) {
+    async getAll(req: Request, res: Response, next: NextFunction) {
         try {
             const links = await service.getAll(res.locals.userId as number)
             res.json(links)
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async create(req: Request, res: Response) {
+    async create(req: Request, res: Response, next: NextFunction) {
         const { link_type, link_value } = req.body as CreateLinkDto
 
         if(typeof link_type !== 'number' || !Number.isInteger(link_type))
@@ -35,13 +33,11 @@ class LinksController {
             if(pg.code === '23505') res.status(409).json({
                 error: "Link already exists"
             })
-            else res.status(500).json({
-                error: "Internal Server Error" 
-            })
+            else next(err)
         }
     }
 
-    async delete(req: Request, res: Response) {
+    async delete(req: Request, res: Response, next: NextFunction) {
         const { link_type } = req.body as { link_type: unknown }
 
         if(typeof link_type !== 'number' || !Number.isInteger(link_type))
@@ -56,10 +52,8 @@ class LinksController {
             })
 
             res.status(204).send()
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 }

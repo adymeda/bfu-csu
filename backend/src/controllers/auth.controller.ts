@@ -1,10 +1,10 @@
-import { Request, Response } from "express"
+import { Request, Response, NextFunction } from "express"
 import service from "../services/auth.service"
 import { parseBearer } from "../utils/token"
 import type { RegisterDto, LoginDto } from "../types/auth"
 
 class AuthController {
-    async register(req: Request, res: Response) {
+    async register(req: Request, res: Response, next: NextFunction) {
         const { email, password, display_name } = req.body as RegisterDto
 
         if(!email) return res.status(400).json({
@@ -30,13 +30,11 @@ class AuthController {
                 res.status(409).json({
                     error: "email already claimed"
                 })
-            } else res.status(500).json({
-                error: "Internal Server Error"
-            })
+            } else next(err)
         }
     }
 
-    async login(req: Request, res: Response) {
+    async login(req: Request, res: Response, next: NextFunction) {
         const { email, password } = req.body as LoginDto
 
         if(!email) return res.status(400).json({
@@ -55,14 +53,12 @@ class AuthController {
                 error: "invalid credentials"
             })
             res.json(result)
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async logout(req: Request, res: Response) {
+    async logout(req: Request, res: Response, next: NextFunction) {
         const token = parseBearer(req.headers.authorization)
         if(!token) return res.status(401).json({
             error: "No token provided"
@@ -71,8 +67,8 @@ class AuthController {
         try {
             await service.logout(token)
             res.status(204).send()
-        } catch {
-            res.status(500).json({ error: "Internal Server Error" })
+        } catch(err) {
+            next(err)
         }
     }
 }

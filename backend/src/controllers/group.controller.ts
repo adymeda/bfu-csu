@@ -1,9 +1,9 @@
-import { Request, Response } from "express"
+import { Request, Response, NextFunction } from "express"
 import service from "../services/group.service"
 import type { CreateGroupDto, AddAdminDto } from "../types/group"
 
 class GroupsController {
-    async create(req: Request, res: Response) {
+    async create(req: Request, res: Response, next: NextFunction) {
         const { name, parent_id } = req.body as CreateGroupDto
 
         if(typeof name !== "string" || name.length === 0)
@@ -23,14 +23,12 @@ class GroupsController {
             })
 
             res.status(201).json(group)
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async search(req: Request, res: Response) {
+    async search(req: Request, res: Response, next: NextFunction) {
         const q = req.query["q"]
 
         if(typeof q !== "string" || q.length === 0)
@@ -41,25 +39,21 @@ class GroupsController {
         try {
             const groups = await service.search(res.locals.userId as number, q)
             res.json(groups)
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async getSuggested(req: Request, res: Response) {
+    async getSuggested(req: Request, res: Response, next: NextFunction) {
         try {
             const groups = await service.suggested(res.locals.userId as number)
             res.json(groups)
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async getById(req: Request, res: Response) {
+    async getById(req: Request, res: Response, next: NextFunction) {
         const id = parseInt(req.params["id"] as string)
         if(isNaN(id)) return res.status(400).json({
             error: "id should be an integer"
@@ -77,14 +71,12 @@ class GroupsController {
             })
 
             res.json(group)
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async update(req: Request, res: Response) {
+    async update(req: Request, res: Response, next: NextFunction) {
         const id = parseInt(req.params["id"] as string)
         if(isNaN(id)) return res.status(400).json({
             error: "id should be an integer"
@@ -119,14 +111,12 @@ class GroupsController {
             })
 
             res.json(group)
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async remove(req: Request, res: Response) {
+    async remove(req: Request, res: Response, next: NextFunction) {
         const id = parseInt(req.params["id"] as string)
         if(isNaN(id)) return res.status(400).json({
             error: "id should be an integer"
@@ -145,14 +135,12 @@ class GroupsController {
 
             await service.delete(id)
             res.status(204).send()
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async getChildren(req: Request, res: Response) {
+    async getChildren(req: Request, res: Response, next: NextFunction) {
         const id = parseInt(req.params["id"] as string)
         if(isNaN(id)) return res.status(400).json({
             error: "id should be an integer"
@@ -166,14 +154,12 @@ class GroupsController {
 
             const children = await service.findChildren(id)
             res.json(children)
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async getAncestors(req: Request, res: Response) {
+    async getAncestors(req: Request, res: Response, next: NextFunction) {
         const id = parseInt(req.params["id"] as string)
         if(isNaN(id)) return res.status(400).json({
             error: "id should be an integer"
@@ -187,14 +173,12 @@ class GroupsController {
 
             const ancestors = await service.findAncestors(id)
             res.json(ancestors)
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async getMembers(req: Request, res: Response) {
+    async getMembers(req: Request, res: Response, next: NextFunction) {
         const id = parseInt(req.params["id"] as string)
         if(isNaN(id)) return res.status(400).json({
             error: "id should be an integer"
@@ -210,14 +194,12 @@ class GroupsController {
 
             const members = await service.findMembers(id, deep)
             res.json(members)
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async addMember(req: Request, res: Response) {
+    async addMember(req: Request, res: Response, next: NextFunction) {
         const id = parseInt(req.params["id"] as string)
         if(isNaN(id)) return res.status(400).json({
             error: "id should be an integer"
@@ -249,13 +231,11 @@ class GroupsController {
             if(pg.code === "23505") res.status(409).json({
                 error: "User is already a member of this group"
             })
-            else res.status(500).json({
-                error: "Internal Server Error"
-            })
+            else next(err)
         }
     }
 
-    async removeMember(req: Request, res: Response) {
+    async removeMember(req: Request, res: Response, next: NextFunction) {
         const id = parseInt(req.params["id"] as string)
         const userId = parseInt(req.params["userId"] as string)
         if(isNaN(id) || isNaN(userId))
@@ -280,14 +260,12 @@ class GroupsController {
             })
 
             res.status(204).send()
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async getAdmins(req: Request, res: Response) {
+    async getAdmins(req: Request, res: Response, next: NextFunction) {
         const id = parseInt(req.params["id"] as string)
         if(isNaN(id)) return res.status(400).json({
             error: "id should be an integer"
@@ -301,14 +279,12 @@ class GroupsController {
 
             const admins = await service.findAdmins(id)
             res.json(admins)
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async addAdmin(req: Request, res: Response) {
+    async addAdmin(req: Request, res: Response, next: NextFunction) {
         const id = parseInt(req.params["id"] as string)
         if(isNaN(id)) return res.status(400).json({
             error: "id should be an integer"
@@ -348,13 +324,11 @@ class GroupsController {
             if(pg.code === "23505") res.status(409).json({
                 error: "User is already an admin"
             })
-            else res.status(500).json({
-                error: "Internal Server Error"
-            })
+            else next(err)
         }
     }
 
-    async removeAdmin(req: Request, res: Response) {
+    async removeAdmin(req: Request, res: Response, next: NextFunction) {
         const id = parseInt(req.params["id"] as string)
         const userId = parseInt(req.params["userId"] as string)
         if(isNaN(id) || isNaN(userId))
@@ -379,10 +353,8 @@ class GroupsController {
             })
 
             res.status(204).send()
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 }

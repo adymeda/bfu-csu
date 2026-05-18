@@ -1,9 +1,9 @@
-import { Request, Response } from "express"
+import { Request, Response, NextFunction } from "express"
 import service from "../services/user.service"
 import type { CreateUserDto } from "../types/user"
 
 class UsersController {
-    async register(req: Request, res: Response) {
+    async register(req: Request, res: Response, next: NextFunction) {
         const { email, password, display_name } = req.body as CreateUserDto
 
         if(!email) return res.status(400).json({
@@ -25,11 +25,11 @@ class UsersController {
         } catch (err: unknown) {
             const pg = err as { code?: string }
             if(pg.code === '23505') res.status(409).json({ error: "email already claimed" })
-            else res.status(500).json({ error: "Internal Server Error" })
+            else next(err)
         }
     }
 
-    async getById(req: Request, res: Response) {
+    async getById(req: Request, res: Response, next: NextFunction) {
         const id = parseInt(req.params['id'] as string)
 
         if(isNaN(id)) return res.status(400).json({
@@ -43,14 +43,12 @@ class UsersController {
             })
 
             res.json(user)
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async update(req: Request, res: Response) {
+    async update(req: Request, res: Response, next: NextFunction) {
         const id = parseInt(req.params['id'] as string)
 
         if(isNaN(id)) return res.status(400).json({
@@ -64,14 +62,12 @@ class UsersController {
             })
 
             res.json(user)
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 
-    async delete(req: Request, res: Response) {
+    async delete(req: Request, res: Response, next: NextFunction) {
         const id = parseInt(req.params['id'] as string)
 
         if(isNaN(id)) return res.status(400).json({
@@ -85,10 +81,8 @@ class UsersController {
             })
 
             res.status(204).send()
-        } catch {
-            res.status(500).json({
-                error: "Internal Server Error"
-            })
+        } catch(err) {
+            next(err)
         }
     }
 }
