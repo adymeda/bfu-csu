@@ -1,24 +1,24 @@
 .dropdown {
-	position: relative;
-	display: inline-block;
+    position: relative;
+    display: inline-block;
 
-	&__trigger {
-		cursor: pointer;
-		user-select: none;
-	}
+    &__trigger {
+        cursor: pointer;
+        user-select: none;
+    }
 
-	&__menu {
-		position: absolute;
-		top: 100%;
-		left: var(--dropdown-left, 0);
-		right: var(--dropdown-right, auto);
-		z-index: 100;
-		min-width: 100%;
-		margin-top: 0.25rem;
-		padding: 0.25rem 0;
-		background: #fff;
-		border: 1px solid var(--border-primary-color);
-		border-radius: 0.5rem;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-	}
+    &__menu {
+        position: absolute;
+        top: 100%;
+        left: var(--dropdown-left, 0);
+        right: var(--dropdown-right, auto);
+        z-index: 100;
+        min-width: 100%;
+        margin-top: 0.25rem;
+        padding: 0.25rem 0;
+        background: #fff;
+        border: 1px solid var(--border-primary-color);
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
 }

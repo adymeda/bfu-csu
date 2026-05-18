@@ -15,36 +15,36 @@ import ruInbox from './ru/inbox.json'
 import ruSettings from './ru/settings.json'
 
 i18n
-	.use(LanguageDetector)
-	.use(initReactI18next)
-	.init({
-		resources: {
-			en: {
-				auth: enAuth,
-				calendar: enCalendar,
-				common: enCommon,
-				inbox: enInbox,
-				settings: enSettings,
-			},
-			ru: {
-				auth: ruAuth,
-				calendar: ruCalendar,
-				common: ruCommon,
-				inbox: ruInbox,
-				settings: ruSettings,
-			},
-		},
-		defaultNS: 'common',
-		fallbackLng: 'ru',
-		supportedLngs: ['en', 'ru'],
-		detection: {
-			order: ['localStorage', 'navigator'],
-			lookupLocalStorage: 'i18n_language',
-			caches: ['localStorage'],
-		},
-		interpolation: {
-			escapeValue: false,
-		},
-	})
+    .use(LanguageDetector)
+    .use(initReactI18next)
+    .init({
+        resources: {
+            en: {
+                auth: enAuth,
+                calendar: enCalendar,
+                common: enCommon,
+                inbox: enInbox,
+                settings: enSettings,
+            },
+            ru: {
+                auth: ruAuth,
+                calendar: ruCalendar,
+                common: ruCommon,
+                inbox: ruInbox,
+                settings: ruSettings,
+            },
+        },
+        defaultNS: 'common',
+        fallbackLng: 'ru',
+        supportedLngs: ['en', 'ru'],
+        detection: {
+            order: ['localStorage', 'navigator'],
+            lookupLocalStorage: 'i18n_language',
+            caches: ['localStorage'],
+        },
+        interpolation: {
+            escapeValue: false,
+        },
+    })
 
 export default i18n

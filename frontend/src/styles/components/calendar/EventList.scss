@@ -1,62 +1,62 @@
 .event-list {
-	display: flex;
-	flex-direction: column;
-	padding: .75rem;
-	gap: .25rem;
+    display: flex;
+    flex-direction: column;
+    padding: .75rem;
+    gap: .25rem;
 
-	&--empty {
-		align-items: center;
-		justify-content: center;
-		padding: 2rem;
-		color: var(--text-info-color);
-		font-size: 14px;
-	}
+    &--empty {
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        color: var(--text-info-color);
+        font-size: 14px;
+    }
 
-	&__item {
-		display: flex;
-		align-items: center;
-		gap: .75rem;
-		padding: .625rem .75rem;
-		border-radius: .5rem;
-		cursor: pointer;
-		border: 1px solid transparent;
-		transition: background .15s, border-color .15s;
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        padding: .625rem .75rem;
+        border-radius: .5rem;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: background .15s, border-color .15s;
 
-		&:hover {
-			background: #f5f5f5;
-		}
+        &:hover {
+            background: #f5f5f5;
+        }
 
-		&--active {
-			background: #f0eeff;
-			border-color: #d0c8ff;
-		}
-	}
+        &--active {
+            background: #f0eeff;
+            border-color: #d0c8ff;
+        }
+    }
 
-	&__item-dot {
-		flex-shrink: 0;
-		width: 10px;
-		height: 10px;
-		border-radius: 50%;
-	}
+    &__item-dot {
+        flex-shrink: 0;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
 
-	&__item-body {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-		min-width: 0;
-	}
+    &__item-body {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
 
-	&__item-title {
-		font-size: 14px;
-		font-weight: 600;
-		color: var(--text-primary-color);
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
+    &__item-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
-	&__item-info {
-		font-size: 12px;
-		color: var(--text-secondary-color);
-	}
+    &__item-info {
+        font-size: 12px;
+        color: var(--text-secondary-color);
+    }
 }
