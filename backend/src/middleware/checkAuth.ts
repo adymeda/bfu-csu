@@ -8,7 +8,6 @@ export async function checkAuth(req: Request, res: Response, next: NextFunction)
         error: "No token provided"
     })
 
-
     try {
         const session = await authRepo.findByTokenHash(hashToken(raw))
         if(!session || session.expires_at < new Date()) return res.status(401).json({

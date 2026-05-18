@@ -56,6 +56,11 @@ class UsersController {
             error: "id should be a number"
         })
 
+        const userId = res.locals.userId as number
+        if(id !== userId) return res.status(403).json({
+            error: "Forbidden"
+        })
+
         try {
             const user = await service.update(id, req.body as Record<string, unknown>)
             if(!user) return res.status(400).json({
@@ -73,6 +78,11 @@ class UsersController {
 
         if(id === null) return res.status(400).json({
             error: "id should be a number"
+        })
+
+        const userId = res.locals.userId as number
+        if(id !== userId) return res.status(403).json({
+            error: "Forbidden"
         })
 
         try {
