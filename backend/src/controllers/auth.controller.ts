@@ -71,6 +71,17 @@ class AuthController {
             next(err)
         }
     }
+
+    async me(req: Request, res: Response, next: NextFunction) {
+        const userId = res.locals.userId as number
+        try {
+            const user = await service.me(userId)
+            if(!user) return res.status(404).json({ error: "User not found" })
+            res.json(user)
+        } catch(err) {
+            next(err)
+        }
+    }
 }
 
 export default new AuthController()

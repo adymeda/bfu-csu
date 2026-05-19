@@ -16,6 +16,10 @@ class UsersService {
         return repo.findById(id)
     }
 
+    async getUserById(id: number): Promise<User | null> {
+        return repo.findUserById(id)
+    }
+
     async update(id: number, body: Record<string, unknown>): Promise<User | null> {
         const data: UpdateUserDto = {}
 

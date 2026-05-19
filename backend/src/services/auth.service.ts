@@ -4,6 +4,7 @@ import authRepo from "../repositories/auth.repo"
 import userService from "./user.service"
 import { generateToken, hashToken } from "../utils/token"
 import type { LoginDto, RegisterDto, AuthResponse } from "../types/auth"
+import type { User } from "../types/user"
 
 const DAY = 86_400_000
 const REMEMBER_TTL = 30 * DAY
@@ -45,6 +46,10 @@ class AuthService {
 
     async logout(rawToken: string): Promise<boolean> {
         return authRepo.deleteByTokenHash(hashToken(rawToken))
+    }
+
+    async me(userId: number): Promise<User | null> {
+        return userService.getUserById(userId)
     }
 }
 

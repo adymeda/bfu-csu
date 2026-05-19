@@ -20,6 +20,15 @@ class UsersRepository {
         return rows[0] ?? null
     }
 
+    async findUserById(id: number): Promise<User | null> {
+        const { rows } = await pool.query<User>(
+            `SELECT id, email, display_name, accent_color, created_at, last_login_at
+                FROM users WHERE id = $1`,
+            [id]
+        )
+        return rows[0] ?? null
+    }
+
     async update(id: number, data: UpdateUserDto): Promise<User | null> {
         const entries = Object.entries(data) as [string, string][]
         const set = entries.map(([key], i) => `${key} = $${i + 2}`).join(', ')
