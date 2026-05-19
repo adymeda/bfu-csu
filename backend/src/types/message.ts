@@ -1,6 +1,7 @@
 import type { UserPublic } from "./user"
 import type { EventResolved, CreateEventDto } from "./event"
 import type { DeadlineResolved, CreateDeadlineDto } from "./deadline"
+import type { AttachmentPublic } from "./attachment"
 
 export type { EventResolved, DeadlineResolved }
 
@@ -46,6 +47,7 @@ export interface CreateMessageDto {
     recipients: RecipientInput[]
     events?: CreateEventDto[]
     deadlines?: CreateDeadlineDto[]
+    attachments?: number[]
 }
 
 export interface ForwardMessageDto {
@@ -87,4 +89,5 @@ export interface MessageDetail extends MessageListItem {
     recipients: MessageRecipientResolved[]
     events: EventResolved[]
     deadlines: DeadlineResolved[]
+    attachments: AttachmentPublic[]
 }

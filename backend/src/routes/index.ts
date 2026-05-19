@@ -8,6 +8,7 @@ import groupsRouter from "./groups"
 import messagesRouter from "./messages"
 import eventsRouter from "./events"
 import deadlinesRouter from "./deadlines"
+import attachmentsRouter from "./attachments"
 
 router.use("/users/link", linksRouter)
 router.use("/users", usersRouter)
@@ -16,5 +17,6 @@ router.use("/groups", groupsRouter)
 router.use("/messages", messagesRouter)
 router.use("/events", eventsRouter)
 router.use("/deadlines", deadlinesRouter)
+router.use("/attachments", attachmentsRouter)
 
 export default router

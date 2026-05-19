@@ -75,7 +75,7 @@ class EventsController {
                 return res.status(400).json({
                     error: "end_at must be a valid ISO date string or null"
                 })
-            if(new Date(end_at) < new Date(start_at))
+            if(new Date(end_at as string) < new Date(start_at as string))
                 return res.status(400).json({
                     error: "end_at must be >= start_at"
                 })

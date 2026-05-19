@@ -13,7 +13,8 @@ class MessagesService {
             },
             dto.recipients,
             dto.events ?? [],
-            dto.deadlines ?? []
+            dto.deadlines ?? [],
+            dto.attachments ?? []
         )
     }
 

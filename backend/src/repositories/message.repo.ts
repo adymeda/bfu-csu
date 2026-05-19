@@ -3,6 +3,7 @@ import type { Message, MessageListItem, MessageDetail, RecipientInput, MessageRe
 import { RECIPIENT_TYPE } from "../types/message"
 import type { CreateEventDto } from "../types/event"
 import type { CreateDeadlineDto } from "../types/deadline"
+import attachmentRepo from "./attachment.repo"
 
 interface MessageListRow {
     id: number
@@ -64,7 +65,8 @@ class MessagesRepository {
         data: { sender_id: number, title: string, content: string, reply_to: number | null, forwarded_from: number | null },
         recipients: RecipientInput[],
         events: CreateEventDto[],
-        deadlines: CreateDeadlineDto[]
+        deadlines: CreateDeadlineDto[],
+        attachmentIds: number[] = []
     ): Promise<Message> {
         const client = await pool.connect()
         try {
@@ -128,6 +130,14 @@ class MessagesRepository {
                     VALUES ($1, $2, $3, $4, $5)`,
                     [deadline.title, data.sender_id, deadline.assignee_id, message.id, deadline.due_at]
                 )
+            }
+
+            if(attachmentIds.length > 0) {
+                await attachmentRepo.linkToMessage(client, attachmentIds, data.sender_id, message.id)
+            }
+
+            if(data.forwarded_from !== null) {
+                await attachmentRepo.copyAttachments(client, data.forwarded_from, message.id)
             }
 
             await client.query("COMMIT")
@@ -266,6 +276,8 @@ class MessagesRepository {
             [messageId]
         )
 
+        const attachments = await attachmentRepo.findByMessageId(messageId)
+
         return {
             id: msg.id,
             title: msg.title,
@@ -305,6 +317,7 @@ class MessagesRepository {
                 created_by: { id: r.cb_id, display_name: r.cb_name, accent_color: r.cb_color },
                 assignee: { id: r.a_id, display_name: r.a_name, accent_color: r.a_color },
             } satisfies DeadlineResolved)),
+            attachments,
         }
     }
 

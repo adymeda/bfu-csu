@@ -7,6 +7,7 @@ import type { CreateEventDto } from "../types/event"
 import type { CreateDeadlineDto } from "../types/deadline"
 import { parseId } from "../utils/parseId"
 import { isValidDate } from "../utils/isValidDate"
+import { AttachmentLinkError } from "../repositories/attachment.repo"
 
 function validateRecipients(recipients: unknown): recipients is RecipientInput[] {
     if(!Array.isArray(recipients) || recipients.length === 0) return false
@@ -108,6 +109,23 @@ class MessagesController {
             }
         }
 
+        const rawAttachments = body["attachments"]
+        let validatedAttachments: number[] = []
+        if(rawAttachments !== undefined) {
+            if(!Array.isArray(rawAttachments)) return res.status(400).json({
+                error: "attachments must be an array"
+            })
+            if(rawAttachments.length > 5) return res.status(400).json({
+                error: "attachments must contain at most 5 items"
+            })
+            for(const a of rawAttachments) {
+                if(!Number.isInteger(a) || (a as number) < 1) return res.status(400).json({
+                    error: "each attachment must be a positive integer id"
+                })
+            }
+            validatedAttachments = rawAttachments as number[]
+        }
+
         try {
             for (const e of validatedEvents) {
                 if(e.assignee_id !== userId) {
@@ -140,10 +158,14 @@ class MessagesController {
                 recipients,
                 events: validatedEvents,
                 deadlines: validatedDeadlines,
+                attachments: validatedAttachments,
             }
             const msg = await service.create(dto, userId)
             res.status(201).json(msg)
         } catch (err: unknown) {
+            if(err instanceof AttachmentLinkError) return res.status(400).json({
+                error: "Invalid attachment id"
+            })
             const pg = err as { code?: string }
             if(pg.code === "23503") return res.status(400).json({
                 error: "Invalid recipient id"
