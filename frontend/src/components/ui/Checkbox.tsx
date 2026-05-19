@@ -3,12 +3,11 @@ import { CheckIcon } from "@heroicons/react/24/outline"
 import type { CheckboxProps } from "./types"
 
 function Checkbox(props: CheckboxProps) {
-    let { text } = props
+    const { text, checked, onChange } = props
     return (
         <label className="checkbox">
-            <input type="checkbox"/>
+            <input type="checkbox" checked={checked} onChange={onChange} />
             <div className="checkbox__skin">
-                {/* TODO Add check icon */}
                 <CheckIcon />
             </div>
             <span>{ text }</span>

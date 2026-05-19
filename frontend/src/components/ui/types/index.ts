@@ -1,14 +1,17 @@
 import type { MouseEventHandler } from "react"
 
 export interface ButtonProps {
-    onClick: MouseEventHandler,
+    onClick?: MouseEventHandler,
     buttonLevel?: 1 | 2 | 3,
     buttonType?: "submit" | "button" | "reset",
+    disabled?: boolean,
     children?: any
 }
 
 export interface CheckboxProps {
-    text: string
+    text: string,
+    checked?: boolean,
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 export interface LogoProps {
@@ -17,7 +20,8 @@ export interface LogoProps {
 
 export interface NavButtonProps {
     text: string,
-    path: string,
+    path?: string,
+    onClick?: () => void,
     Icon?: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, "ref"> & {
             title?: string
             titleId?: string

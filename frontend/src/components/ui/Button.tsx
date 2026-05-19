@@ -9,13 +9,13 @@ const buttonLevels = {
 }
 
 function Button(props: ButtonProps) {
-    let { buttonLevel, children, onClick, buttonType } = props
+    let { buttonLevel, children, onClick, buttonType, disabled } = props
     if(!buttonType) buttonType = "button"
     if(!buttonLevel) buttonLevel = 1
     const className = clsx("button", `button-${buttonLevels[buttonLevel]}`)
-    
+
     return (
-        <button type={buttonType} className={className} onClick={onClick}>
+        <button type={buttonType} className={className} onClick={onClick} disabled={disabled}>
             { children }
         </button>
     )

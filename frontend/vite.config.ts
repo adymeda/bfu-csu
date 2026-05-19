@@ -13,5 +13,13 @@ export default defineConfig({
       "@components": path.resolve(__dirname, "src/components"),
       "@helpers": path.resolve(__dirname, "src/helpers")
     }
+  },
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:3909",
+        changeOrigin: true
+      }
+    }
   }
 })

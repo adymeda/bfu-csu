@@ -1,11 +1,12 @@
 import "@styles/layouts/MainLayout.scss"
-import { Outlet } from "react-router"
+import { Outlet, useNavigate } from "react-router"
 import { useTranslation } from "react-i18next"
 import Logo from "../components/ui/Logo"
 import { ArrowLeftEndOnRectangleIcon, CalendarIcon, InboxIcon, MagnifyingGlassIcon, Cog6ToothIcon } from "@heroicons/react/24/outline"
 import NavButton from "../components/ui/NavButton"
 import Avatar from "../components/ui/Avatar"
 import Dropdown from "../components/ui/Dropdown"
+import { useAuth } from "../contexts/AuthContext"
 import type { TFunction } from "i18next"
 
 function getDateInfo(t: TFunction, lng: string) {
@@ -43,6 +44,16 @@ function MainLayout() {
     const { t } = useTranslation('common')
     const { i18n } = useTranslation()
     const { dateStr, semesterInfo } = getDateInfo(t, i18n.language)
+    const { user, logout } = useAuth()
+    const navigate = useNavigate()
+
+    async function handleLogout() {
+        await logout()
+        navigate("/auth")
+    }
+
+    const username = user?.display_name ?? ""
+    const avatarColor = user ? "#" + user.accent_color : undefined
 
     return (
         <div className="main-layout">
@@ -59,7 +70,7 @@ function MainLayout() {
                     path="/inbox"
                     Icon={InboxIcon} />
                     <button className="mobile-profile-button nav-button" onClick={() => {}}>
-                        <Avatar placeholder="Джатус Турбированный" color="#0051ff" />
+                        <Avatar placeholder={username} color={avatarColor} />
                         Профиль
                     </button>
                 </nav>
@@ -77,14 +88,14 @@ function MainLayout() {
                     </div>
 
                     <Dropdown
-                    trigger={<Avatar placeholder="Джатус Турбированный" color="#0051ff"/>}
+                    trigger={<Avatar placeholder={username} color={avatarColor}/>}
                     triggerClassName="top-bar__profile">
                         <NavButton text={t('navigation.settings')}
                             Icon={Cog6ToothIcon}
                             path="/settings"/>
                         <NavButton text={t('logOut')}
                             Icon={ArrowLeftEndOnRectangleIcon}
-                            path="/logout" />
+                            onClick={handleLogout} />
                     </Dropdown>
                 </div>
                 <div className="main-content">
