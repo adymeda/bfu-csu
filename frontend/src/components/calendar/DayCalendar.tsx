@@ -23,7 +23,7 @@ function assignRows(events: CalendarEvent[]): PositionedEvent[] {
 
         const rowIndex = rowEndTimes.findIndex(t => t + 60 <= startMin)
 
-        if (rowIndex === -1) {
+        if(rowIndex === -1) {
             rowEndTimes.push(endMin)
             return { event, row: rowEndTimes.length - 1 }
         }
@@ -48,7 +48,7 @@ function DayCalendar({ events, date, selectedEventId, onEventSelect }: DayCalend
 
     const updateShadows = useCallback(() => {
         const el = timelineRef.current
-        if (!el) return
+        if(!el) return
         setShadows({
             left: el.scrollLeft > 0,
             right: el.scrollLeft < el.scrollWidth - el.clientWidth - 1,
@@ -63,7 +63,7 @@ function DayCalendar({ events, date, selectedEventId, onEventSelect }: DayCalend
     useEffect(() => {
         updateShadows()
         const el = timelineRef.current
-        if (!el) return
+        if(!el) return
 
         const handleWheel = (e: WheelEvent) => {
             e.preventDefault()
@@ -83,9 +83,9 @@ function DayCalendar({ events, date, selectedEventId, onEventSelect }: DayCalend
 
     useEffect(() => {
         const el = timelineRef.current
-        if (!el) return
+        if(!el) return
 
-        if (isToday) {
+        if(isToday) {
             el.scrollLeft = Math.max(0, nowLeft - NOW_LINE_SCROLL_OFFSET)
         } else {
             el.scrollLeft = 0

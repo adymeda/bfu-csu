@@ -26,11 +26,11 @@ function getDateInfo(t: TFunction, lng: string) {
     let semesterInfo: string | null = null
     const msPerWeek = 7 * 24 * 60 * 60 * 1000
 
-    if (now >= autumnStart && now <= autumnEnd) {
+    if(now >= autumnStart && now <= autumnEnd) {
         const weekNum = Math.ceil((now.getTime() - autumnStart.getTime()) / msPerWeek)
         const parity = t(weekNum % 2 === 1 ? 'weekParity.upper' : 'weekParity.lower')
         semesterInfo = t('weekInfo', { week: weekNum, parity, semester: t('semesterType.autumn') })
-    } else if (now >= springStart && now <= springEnd) {
+    } else if(now >= springStart && now <= springEnd) {
         const weekNum = Math.ceil((now.getTime() - springStart.getTime()) / msPerWeek)
         const parity = t(weekNum % 2 === 1 ? 'weekParity.upper' : 'weekParity.lower')
         semesterInfo = t('weekInfo', { week: weekNum, parity, semester: t('semesterType.spring') })

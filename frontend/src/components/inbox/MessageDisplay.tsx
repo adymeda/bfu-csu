@@ -17,10 +17,10 @@ function MessageDisplay({ title, text, onClose }: MessageProps) {
 
     useLayoutEffect(() => {
         const el = listRef.current
-        if (!el) return
+        if(!el) return
 
         const firstChild = el.firstElementChild as HTMLElement | null
-        if (!firstChild) return
+        if(!firstChild) return
 
         const h = firstChild.offsetHeight
         setRowHeight(h)

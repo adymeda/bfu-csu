@@ -13,7 +13,7 @@ interface EventListProps {
 function EventList({ events, selectedId, onSelect }: EventListProps) {
     const { t } = useTranslation('calendar')
 
-    if (events.length === 0) {
+    if(events.length === 0) {
         return (
             <div className="event-list event-list--empty">
                 <span>{t('noEvents')}</span>

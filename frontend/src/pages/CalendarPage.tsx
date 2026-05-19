@@ -110,12 +110,12 @@ const EVENTS: CalendarEvent[] = [
 type View = "month" | "day"
 
 function getEventsPluralKey(count: number, lng: string): "one" | "two" | "many" {
-    if (lng === "ru") {
+    if(lng === "ru") {
         const mod10 = count % 10
         const mod100 = count % 100
-        if (mod100 >= 11 && mod100 <= 19) return "many"
-        if (mod10 === 1) return "one"
-        if (mod10 >= 2 && mod10 <= 4) return "two"
+        if(mod100 >= 11 && mod100 <= 19) return "many"
+        if(mod10 === 1) return "one"
+        if(mod10 >= 2 && mod10 <= 4) return "two"
         return "many"
     }
     return count === 1 ? "one" : "many"
@@ -158,7 +158,7 @@ function CalendarPage() {
         : isSameMonth(monthCursor, today)
 
     const handlePrev = () => {
-        if (view === "day") {
+        if(view === "day") {
             const next = addDays(selectedDate, -1)
             setSelectedDate(next)
             setSelectedEventId(null)
@@ -168,7 +168,7 @@ function CalendarPage() {
     }
 
     const handleNext = () => {
-        if (view === "day") {
+        if(view === "day") {
             const next = addDays(selectedDate, 1)
             setSelectedDate(next)
             setSelectedEventId(null)
@@ -178,7 +178,7 @@ function CalendarPage() {
     }
 
     const handleToday = () => {
-        if (view === "day") {
+        if(view === "day") {
             setSelectedDate(new Date())
             setSelectedEventId(null)
         } else {

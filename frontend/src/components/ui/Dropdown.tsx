@@ -10,7 +10,7 @@ export default function Dropdown({ trigger, children, className, triggerClassNam
 
     useEffect(() => {
         const handler = (e: MouseEvent) => {
-            if (ref.current && !ref.current.contains(e.target as Node)) {
+            if(ref.current && !ref.current.contains(e.target as Node)) {
                 setIsOpen(false)
             }
         }
@@ -19,7 +19,7 @@ export default function Dropdown({ trigger, children, className, triggerClassNam
     }, [])
 
     const toggle = () => {
-        if (!isOpen && ref.current) {
+        if(!isOpen && ref.current) {
             const { left, width } = ref.current.getBoundingClientRect()
             const triggerCenter = left + width / 2
             const alignRight = triggerCenter > window.innerWidth / 2

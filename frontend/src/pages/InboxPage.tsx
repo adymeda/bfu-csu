@@ -35,7 +35,7 @@ function InboxPage() {
     const isContentOpen = (currentMessageId !== null || isComposing) && !isClosing
 
     function handleWheel(e: React.WheelEvent<HTMLDivElement>) {
-        if (tabsRef.current) {
+        if(tabsRef.current) {
             tabsRef.current.scrollLeft += e.deltaY
         }
     }
@@ -55,7 +55,7 @@ function InboxPage() {
     }
 
     function handleMessageClose() {
-        if (window.matchMedia("(max-width: 768px)").matches) {
+        if(window.matchMedia("(max-width: 768px)").matches) {
             setIsClosing(true)
             setTimeout(() => {
                 setCurrentMessageId(null)
@@ -68,12 +68,12 @@ function InboxPage() {
 
     useEffect(() => {
         function onKeyDown(e: KeyboardEvent) {
-            if (e.key !== "Escape") return
-            if (isComposing) {
+            if(e.key !== "Escape") return
+            if(isComposing) {
                 handleComposeClose()
                 return
             }
-            if (currentMessageId !== null) handleMessageClose()
+            if(currentMessageId !== null) handleMessageClose()
         }
         document.addEventListener("keydown", onKeyDown)
         return () => document.removeEventListener("keydown", onKeyDown)
