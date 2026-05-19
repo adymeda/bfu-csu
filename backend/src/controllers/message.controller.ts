@@ -1,8 +1,12 @@
 import { Request, Response, NextFunction } from "express"
 import service from "../services/message.service"
-import type { RecipientInput } from "../types/message"
+import groupService from "../services/group.service"
+import type { RecipientInput, CreateMessageDto } from "../types/message"
 import { RECIPIENT_TYPE } from "../types/message"
+import type { CreateEventDto } from "../types/event"
+import type { CreateDeadlineDto } from "../types/deadline"
 import { parseId } from "../utils/parseId"
+import { isValidDate } from "../utils/isValidDate"
 
 function validateRecipients(recipients: unknown): recipients is RecipientInput[] {
     if(!Array.isArray(recipients) || recipients.length === 0) return false
@@ -45,7 +49,83 @@ class MessagesController {
 
         const userId = res.locals.userId as number
 
+        const rawEvents = body["events"]
+        const rawDeadlines = body["deadlines"]
+
+        const validatedEvents: CreateEventDto[] = []
+        const validatedDeadlines: CreateDeadlineDto[] = []
+
+        if(rawEvents !== undefined) {
+            if(!Array.isArray(rawEvents)) return res.status(400).json({
+                error: "events must be an array"
+            })
+            for (const e of rawEvents) {
+                if(typeof e !== "object" || e === null) return res.status(400).json({
+                    error: "each event must be an object"
+                })
+                const ev = e as Record<string, unknown>
+                if(typeof ev["title"] !== "string" || (ev["title"] as string).length === 0 || (ev["title"] as string).length > 255)
+                    return res.status(400).json({ error: "event title must be a non-empty string up to 255 characters" })
+                if(!Number.isInteger(ev["assignee_id"]) || (ev["assignee_id"] as number) < 1)
+                    return res.status(400).json({ error: "event assignee_id must be a positive integer" })
+                if(!isValidDate(ev["start_at"]))
+                    return res.status(400).json({ error: "event start_at must be a valid ISO date string" })
+                if(ev["end_at"] !== undefined && ev["end_at"] !== null) {
+                    if(!isValidDate(ev["end_at"]))
+                        return res.status(400).json({ error: "event end_at must be a valid ISO date string or null" })
+                    if(new Date(ev["end_at"] as string) < new Date(ev["start_at"] as string))
+                        return res.status(400).json({ error: "event end_at must be >= start_at" })
+                }
+                validatedEvents.push({
+                    title: ev["title"] as string,
+                    assignee_id: ev["assignee_id"] as number,
+                    start_at: ev["start_at"] as string,
+                    end_at: ev["end_at"] !== undefined ? (ev["end_at"] as string | null) : null,
+                })
+            }
+        }
+
+        if(rawDeadlines !== undefined) {
+            if(!Array.isArray(rawDeadlines)) return res.status(400).json({
+                error: "deadlines must be an array"
+            })
+            for (const d of rawDeadlines) {
+                if(typeof d !== "object" || d === null) return res.status(400).json({
+                    error: "each deadline must be an object"
+                })
+                const dl = d as Record<string, unknown>
+                if(typeof dl["title"] !== "string" || (dl["title"] as string).length === 0 || (dl["title"] as string).length > 255)
+                    return res.status(400).json({ error: "deadline title must be a non-empty string up to 255 characters" })
+                if(!Number.isInteger(dl["assignee_id"]) || (dl["assignee_id"] as number) < 1)
+                    return res.status(400).json({ error: "deadline assignee_id must be a positive integer" })
+                if(!isValidDate(dl["due_at"]))
+                    return res.status(400).json({ error: "deadline due_at must be a valid ISO date string" })
+                validatedDeadlines.push({
+                    title: dl["title"] as string,
+                    assignee_id: dl["assignee_id"] as number,
+                    due_at: dl["due_at"] as string,
+                })
+            }
+        }
+
         try {
+            for (const e of validatedEvents) {
+                if(e.assignee_id !== userId) {
+                    const ok = await groupService.canAssign(userId, e.assignee_id)
+                    if(!ok) return res.status(403).json({
+                        error: "Event assignee is not in your group or a subgroup"
+                    })
+                }
+            }
+            for (const d of validatedDeadlines) {
+                if(d.assignee_id !== userId) {
+                    const ok = await groupService.canAssign(userId, d.assignee_id)
+                    if(!ok) return res.status(403).json({
+                        error: "Deadline assignee is not in your group or a subgroup"
+                    })
+                }
+            }
+
             if(reply_to != null) {
                 const ok = await service.hasAccess(reply_to as number, userId)
                 if(!ok) return res.status(404).json({
@@ -53,22 +133,22 @@ class MessagesController {
                 })
             }
 
-            const msg = await service.create(
-                {
-                    title,
-                    content,
-                    reply_to: reply_to != null ? (reply_to as number) : null,
-                    recipients,
-                },
-                userId
-            )
+            const dto: CreateMessageDto = {
+                title,
+                content,
+                reply_to: reply_to != null ? (reply_to as number) : null,
+                recipients,
+                events: validatedEvents,
+                deadlines: validatedDeadlines,
+            }
+            const msg = await service.create(dto, userId)
             res.status(201).json(msg)
         } catch (err: unknown) {
             const pg = err as { code?: string }
             if(pg.code === "23503") return res.status(400).json({
                 error: "Invalid recipient id"
             })
-            
+
             next(err)
         }
     }

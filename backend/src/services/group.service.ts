@@ -69,6 +69,10 @@ class GroupsService {
         return repo.removeAdmin(groupId, userId)
     }
 
+    async canAssign(authorId: number, assigneeId: number): Promise<boolean> {
+        return repo.canAssign(authorId, assigneeId)
+    }
+
     async search(userId: number, q: string): Promise<GroupPublic[]> {
         return repo.search(userId, q)
     }

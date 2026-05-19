@@ -207,6 +207,32 @@ class GroupsRepository {
         return (rowCount ?? 0) > 0
     }
 
+    async canAssign(authorId: number, assigneeId: number): Promise<boolean> {
+        const { rows } = await pool.query<{ allowed: boolean }>(
+            `WITH RECURSIVE author_scope AS (
+                SELECT group_id AS id FROM group_members WHERE user_id = $1
+                UNION
+                SELECT group_id AS id FROM group_admins WHERE user_id = $1
+            ),
+            subtree AS (
+                SELECT id FROM author_scope
+                UNION
+                SELECT g.id FROM groups g JOIN subtree s ON g.parent_id = s.id
+            ),
+            assignee_scope AS (
+                SELECT group_id AS id FROM group_members WHERE user_id = $2
+                UNION
+                SELECT group_id AS id FROM group_admins WHERE user_id = $2
+            )
+            SELECT EXISTS (
+                SELECT 1 FROM assignee_scope a
+                JOIN subtree s ON a.id = s.id
+            ) AS allowed`,
+            [authorId, assigneeId]
+        )
+        return rows[0]?.allowed ?? false
+    }
+
     async search(userId: number, q: string): Promise<GroupPublic[]> {
         const { rows } = await pool.query<GroupPublic>(
             `${VISIBILITY_CTE},

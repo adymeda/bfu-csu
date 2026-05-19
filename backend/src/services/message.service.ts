@@ -11,7 +11,9 @@ class MessagesService {
                 reply_to: dto.reply_to,
                 forwarded_from: null,
             },
-            dto.recipients
+            dto.recipients,
+            dto.events ?? [],
+            dto.deadlines ?? []
         )
     }
 
@@ -44,7 +46,9 @@ class MessagesService {
                 reply_to: null,
                 forwarded_from: original.id,
             },
-            recipients
+            recipients,
+            [],
+            []
         )
     }
 }

@@ -1,4 +1,8 @@
 import type { UserPublic } from "./user"
+import type { EventResolved, CreateEventDto } from "./event"
+import type { DeadlineResolved, CreateDeadlineDto } from "./deadline"
+
+export type { EventResolved, DeadlineResolved }
 
 export const RECIPIENT_TYPE = {
     USER: 0,
@@ -40,6 +44,8 @@ export interface CreateMessageDto {
     content: string
     reply_to: number | null
     recipients: RecipientInput[]
+    events?: CreateEventDto[]
+    deadlines?: CreateDeadlineDto[]
 }
 
 export interface ForwardMessageDto {
@@ -79,4 +85,6 @@ export interface MessageRecipientResolved {
 
 export interface MessageDetail extends MessageListItem {
     recipients: MessageRecipientResolved[]
+    events: EventResolved[]
+    deadlines: DeadlineResolved[]
 }
