@@ -8,29 +8,29 @@ import CalendarPage from "../pages/CalendarPage"
 import InboxPage from "../pages/InboxPage"
 
 const router = createBrowserRouter([
-	{
-		path: "/",
-		element: <MainLayout />,
-		errorElement: <NotFoundPage />,
-		children: [
-			{ index: true, element: <CalendarPage /> },
-			{ path: "inbox", element: <InboxPage /> },
-			{ path: "settings" },
-		],
-	},
-	{
-		path: "/auth",
-		element: <AuthLayout />,
-		children: [
-			{ index: true, element: <AuthCard /> },
-			{ path: "reset", element: <ResetCard /> },
-		],
-	},
-	{ path: "*", element: <NotFoundPage /> },
+    {
+        path: "/",
+        element: <MainLayout />,
+        errorElement: <NotFoundPage />,
+        children: [
+            { index: true, element: <CalendarPage /> },
+            { path: "inbox", element: <InboxPage /> },
+            { path: "settings" },
+        ],
+    },
+    {
+        path: "/auth",
+        element: <AuthLayout />,
+        children: [
+            { index: true, element: <AuthCard /> },
+            { path: "reset", element: <ResetCard /> },
+        ],
+    },
+    { path: "*", element: <NotFoundPage /> },
 ])
 
 function AppRouter() {
-	return <RouterProvider router={router} />
+    return <RouterProvider router={router} />
 }
 
 export default AppRouter

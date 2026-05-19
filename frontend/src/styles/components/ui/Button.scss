@@ -1,37 +1,37 @@
 @use "@styles/variables";
 
 .button {
-	width: 100%;
-	background: none;
-	color: white;
-	font-size: 1rem;
-	border: none;
-	border-radius: 1rem;
-	padding: 1rem 0;
-	margin: .2rem 0;
+    width: 100%;
+    background: none;
+    color: white;
+    font-size: 1rem;
+    border: none;
+    border-radius: 1rem;
+    padding: 1rem 0;
+    margin: .2rem 0;
 
-	user-select: none;
-	cursor: pointer;
+    user-select: none;
+    cursor: pointer;
 
-	&-primary {
-		background: var(--accent-color);
+    &-primary {
+        background: var(--accent-color);
 
-		&:hover {
-			background: var(--accent-hover-button);
-		}
-	}
+        &:hover {
+            background: var(--accent-hover-button);
+        }
+    }
 
-	&-secondary, &-misc {
-		color: var(--accent-color);
+    &-secondary, &-misc {
+        color: var(--accent-color);
 
-		&:hover {
-			color: var(--accent-hover-color);
-		}
-	}
+        &:hover {
+            color: var(--accent-hover-color);
+        }
+    }
 
-	&-secondary {
-		&:hover {
-			background: #f0f0f0;
-		}
-	}
+    &-secondary {
+        &:hover {
+            background: #f0f0f0;
+        }
+    }
 }

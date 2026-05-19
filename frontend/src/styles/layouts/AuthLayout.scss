@@ -2,124 +2,124 @@
 @use "../variables";
 
 .auth {
-	@include mixins.full-size;
-	
-	display: flex;
-	text-align: center;
+    @include mixins.full-size;
+    
+    display: flex;
+    text-align: center;
 
-	> img {
-		position: absolute;
-		inset: 0;
-		z-index: 0;
-		@include mixins.full-size;
-		object-fit: cover;
-		user-select: none;
+    > img {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        @include mixins.full-size;
+        object-fit: cover;
+        user-select: none;
 
-		filter: blur(5px);
-	}
+        filter: blur(5px);
+    }
 
-	&__content {
-		@include mixins.full-size;
-		background: rgba(200,200,200,.4);
-		z-index: 1;
+    &__content {
+        @include mixins.full-size;
+        background: rgba(200,200,200,.4);
+        z-index: 1;
 
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		gap: 1rem;
-	}
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+    }
 }
 
 .lang-switch {
-	&__trigger {
-		display: flex;
-		align-items: center;
-		gap: .5rem;
-		padding: .4rem .75rem;
-		background: rgba(255,255,255,.85);
-		border-radius: 2rem;
-		cursor: pointer;
-		user-select: none;
-		font-size: .9rem;
-		color: #333;
-		backdrop-filter: blur(4px);
-		transition: background .15s;
+    &__trigger {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .4rem .75rem;
+        background: rgba(255,255,255,.85);
+        border-radius: 2rem;
+        cursor: pointer;
+        user-select: none;
+        font-size: .9rem;
+        color: #333;
+        backdrop-filter: blur(4px);
+        transition: background .15s;
 
-		&:hover {
-			background: rgba(255,255,255,1);
-		}
-	}
+        &:hover {
+            background: rgba(255,255,255,1);
+        }
+    }
 
-	&__flag {
-		width: 1.25rem;
-		height: 1.25rem;
-		border-radius: 100%;
-		object-fit: cover;
-		object-position: center;
-		flex-shrink: 0;
-	}
+    &__flag {
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: 100%;
+        object-fit: cover;
+        object-position: center;
+        flex-shrink: 0;
+    }
 
-	&__menu {
-		min-width: 8rem;
-	}
+    &__menu {
+        min-width: 8rem;
+    }
 
-	&__item {
-		display: flex;
-		align-items: center;
-		gap: .5rem;
-		padding: .5rem .75rem;
-		cursor: pointer;
-		font-size: .9rem;
-		color: #333;
-		transition: background .1s;
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .5rem .75rem;
+        cursor: pointer;
+        font-size: .9rem;
+        color: #333;
+        transition: background .1s;
 
-		&:hover {
-			background: rgba(0,0,0,.05);
-		}
+        &:hover {
+            background: rgba(0,0,0,.05);
+        }
 
-		&--active {
-			color: var(--accent-color);
-			font-weight: 600;
-		}
-	}
+        &--active {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+    }
 }
 
 .login-card {
-	width: fit-content;
-	height: fit-content;
+    width: fit-content;
+    height: fit-content;
 
-	background: white;
-	border-radius: 2rem;
-	filter: drop-shadow(0 0 10px rgba(0,0,0,.2));
+    background: white;
+    border-radius: 2rem;
+    filter: drop-shadow(0 0 10px rgba(0,0,0,.2));
 
-	display: flex;
-	flex-direction: column;
-	gap: .5rem;
-	padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding: 2rem;
 
-	&__logo {
-		margin-bottom: 1rem;
-		max-height: 4rem;
-		user-select: none;
-	}
+    &__logo {
+        margin-bottom: 1rem;
+        max-height: 4rem;
+        user-select: none;
+    }
 
-	&__form-error, &__form-reminder {
-		color: var(--accent-color);
-		user-select: none;
-	}
+    &__form-error, &__form-reminder {
+        color: var(--accent-color);
+        user-select: none;
+    }
 
-	&__form-error {
-		margin: 1rem 0;
-		color: rgb(255,60,60);
-	}
+    &__form-error {
+        margin: 1rem 0;
+        color: rgb(255,60,60);
+    }
 
-	&__form-reminder {
-		margin-top: 1rem;
-		cursor: pointer;
+    &__form-reminder {
+        margin-top: 1rem;
+        cursor: pointer;
 
-		&:hover {
-				color: var(--accent-hover-color)
-		}
-	}
+        &:hover {
+                color: var(--accent-hover-color)
+        }
+    }
 }
