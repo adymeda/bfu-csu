@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express"
 import service from "../services/message.service"
+import mlService from "../services/ml.service"
 import type { RecipientInput, CreateMessageDto } from "../types/message"
 import type { CreateEventDto } from "../types/event"
 import type { CreateDeadlineDto } from "../types/deadline"
@@ -116,6 +117,12 @@ class MessagesController {
                     error: "reply_to message not found"
                 })
             }
+
+            const moderation = await mlService.checkToxicity(`${title}\n${content}`)
+            if(moderation?.toxic) return res.status(422).json({
+                error: "Message rejected by toxicity filter",
+                score: moderation.score,
+            })
 
             const dto: CreateMessageDto = {
                 title,
