@@ -73,7 +73,6 @@ $event-row-height: 18px;
         width: 26px;
         height: 26px;
         margin: .5rem;
-        margin-bottom: .25rem;
         border-radius: 50%;
         font-size: 13px;
         font-weight: 500;
@@ -88,6 +87,30 @@ $event-row-height: 18px;
 
         &--selected:not(&--today) {
             outline: 2px solid var(--accent-hover-color);
+        }
+    }
+
+    &__cell-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__deadline-badge {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        margin-right: .5rem;
+        color: #f44336;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        flex-shrink: 0;
+
+        svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
         }
     }
 

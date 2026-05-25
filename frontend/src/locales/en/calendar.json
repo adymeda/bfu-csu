@@ -1,8 +1,13 @@
 {
-    "eventsTodayCount": {
-        "one": "{{count}} event today",
-        "two": "{{count}} events today",
-        "many": "{{count}} events today"
+    "eventsCount": {
+        "one": "{{count}} event",
+        "two": "{{count}} events",
+        "many": "{{count}} events"
+    },
+    "deadlinesCount": {
+        "one": "{{count}} deadline",
+        "two": "{{count}} deadlines",
+        "many": "{{count}} deadlines"
     },
     "today": "Today",
     "currentMonth": "Current month",

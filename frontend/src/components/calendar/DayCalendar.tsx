@@ -39,7 +39,7 @@ function getNowLeft(): number {
     return (minutes / TOTAL_MINUTES) * CELL_WIDTH * HOURS_COUNT
 }
 
-function DayCalendar({ events, date, selectedEventId, onEventSelect }: DayCalendarProps) {
+function DayCalendar({ events, deadlines = [], date, selectedEventId, onEventSelect }: DayCalendarProps) {
     const timelineRef = useRef<HTMLDivElement>(null)
     const [nowLeft, setNowLeft] = useState(getNowLeft)
     const [shadows, setShadows] = useState({ left: false, right: false })
@@ -154,6 +154,26 @@ function DayCalendar({ events, date, selectedEventId, onEventSelect }: DayCalend
                                 )
                             })}
                         </div>
+
+                        {deadlines.map(deadline => {
+                            const min = dateToMinutes(deadline.date)
+                            const left = (min / TOTAL_MINUTES) * totalWidth
+                            return (
+                                <div key={deadline.id}
+                                    className="day-calendar__deadline"
+                                    style={{ left }}>
+                                    <div className="day-calendar__deadline-bar" />
+                                    <div className="day-calendar__deadline-popup">
+                                        <span className="day-calendar__deadline-popup-title">
+                                            {deadline.title}
+                                        </span>
+                                        <span className="day-calendar__deadline-popup-time">
+                                            {formatTime(deadline.date)}
+                                        </span>
+                                    </div>
+                                </div>
+                            )
+                        })}
 
                         {isToday && (
                             <div className="day-calendar__now-line"

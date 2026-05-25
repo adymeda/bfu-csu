@@ -14,6 +14,7 @@ export interface CalendarEvent {
 
 export interface MonthCalendarProps {
     events: CalendarEvent[]
+    deadlines?: CalendarDeadline[]
     selectedDate: Date
     monthCursor: Date
     onDaySelect: (date: Date) => void
@@ -24,8 +25,15 @@ export interface PositionedEvent {
     row: number
 }
 
+export interface CalendarDeadline {
+    id: string
+    title: string
+    date: Date
+}
+
 export interface DayCalendarProps {
     events: CalendarEvent[]
+    deadlines?: CalendarDeadline[]
     date?: Date
     selectedEventId?: string | null
     onEventSelect?: (id: string) => void

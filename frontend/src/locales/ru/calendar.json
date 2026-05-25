@@ -1,8 +1,13 @@
 {
-    "eventsTodayCount": {
-        "one": "{{count}} мероприятие сегодня",
-        "two": "{{count}} мероприятия сегодня",
-        "many": "{{count}} мероприятий сегодня"
+    "eventsCount": {
+        "one": "{{count}} мероприятие",
+        "two": "{{count}} мероприятия",
+        "many": "{{count}} мероприятий"
+    },
+    "deadlinesCount": {
+        "one": "{{count}} дедлайн",
+        "two": "{{count}} дедлайна",
+        "many": "{{count}} дедлайнов"
     },
     "today": "Сегодня",
     "currentMonth": "Текущий месяц",

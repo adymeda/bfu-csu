@@ -7,7 +7,7 @@ import DayCalendar from "../components/calendar/DayCalendar"
 import MonthCalendar from "../components/calendar/MonthCalendar"
 import EventList from "../components/calendar/EventList"
 import EventDetail from "../components/calendar/EventDetail"
-import type { CalendarEvent } from "../components/calendar/types"
+import type { CalendarEvent, CalendarDeadline } from "../components/calendar/types"
 import { toISODate, isSameDay, isSameMonth, addDays, addMonths, startOfMonth } from "@helpers"
 
 function makeEventDate(offsetDays: number, h: number, m: number): Date {
@@ -99,9 +99,27 @@ const EVENTS: CalendarEvent[] = [
     },
 ]
 
+const DEADLINES: CalendarDeadline[] = [
+    {
+        id: "d1",
+        title: "Сдача курсового проекта",
+        date: makeEventDate(0, 18, 15),
+    },
+    {
+        id: "d2",
+        title: "Отчёт по практике",
+        date: makeEventDate(1, 23, 59),
+    },
+    {
+        id: "d3",
+        title: "Лабораторная работа №3",
+        date: makeEventDate(3, 12, 0),
+    },
+]
+
 type View = "month" | "day"
 
-function getEventsPluralKey(count: number, lng: string): "one" | "two" | "many" {
+function getPluralKey(count: number, lng: string): "one" | "two" | "many" {
     if(lng === "ru") {
         const mod10 = count % 10
         const mod100 = count % 100
@@ -140,9 +158,24 @@ function CalendarPage() {
     const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
 
     const eventsForDay = EVENTS.filter(e => toISODate(e.startDate) === toISODate(selectedDate))
+    const deadlinesForDay = DEADLINES.filter(d => toISODate(d.date) === toISODate(selectedDate))
     const count = eventsForDay.length
-    const pluralKey = getEventsPluralKey(count, i18n.language)
-    const eventsLabel = t(`eventsTodayCount.${pluralKey}`, { count })
+    const deadlineCount = deadlinesForDay.length
+
+    const eventsLabel = (() => {
+        const today = t("today").toLowerCase()
+        const hasEvents = count > 0
+        const hasDeadlines = deadlineCount > 0
+        if(hasEvents && hasDeadlines) {
+            const evPart = t(`eventsCount.${getPluralKey(count, i18n.language)}`, { count })
+            const dlPart = t(`deadlinesCount.${getPluralKey(deadlineCount, i18n.language)}`, { count: deadlineCount })
+            return `${evPart} и ${dlPart} ${today}`
+        }
+        if(hasEvents) return `${t(`eventsCount.${getPluralKey(count, i18n.language)}`, { count })} ${today}`
+        if(hasDeadlines) return `${t(`deadlinesCount.${getPluralKey(deadlineCount, i18n.language)}`, { count: deadlineCount })} ${today}`
+        return `${t("eventsCount.many", { count: 0 })} ${today}`
+    })()
+
     const selectedEvent = eventsForDay.find(e => e.id === selectedEventId) ?? null
 
     const isOnToday = view === "day"
@@ -239,12 +272,14 @@ function CalendarPage() {
                     {view === "month"
                         ? <MonthCalendar
                             events={EVENTS}
+                            deadlines={DEADLINES}
                             selectedDate={selectedDate}
                             monthCursor={monthCursor}
                             onDaySelect={handleDaySelect}
                         />
                         : <DayCalendar
                             events={eventsForDay}
+                            deadlines={deadlinesForDay}
                             date={selectedDate}
                             selectedEventId={selectedEventId}
                             onEventSelect={setSelectedEventId}

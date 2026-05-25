@@ -1,5 +1,6 @@
 import clsx from "clsx"
 import { useTranslation } from "react-i18next"
+import { ExclamationCircleIcon } from "@heroicons/react/24/outline"
 import type { MonthCalendarProps } from "./types"
 import { toISODate, hexToRgba, isSameDay } from "@helpers"
 import "@styles/components/calendar/MonthCalendar.scss"
@@ -22,7 +23,7 @@ function getWeekdayHeaders(locale: string): string[] {
     return Array.from({ length: 7 }, (_, i) => fmt.format(new Date(2024, 0, i + 1)))
 }
 
-function MonthCalendar({ events, selectedDate, monthCursor, onDaySelect }: MonthCalendarProps) {
+function MonthCalendar({ events, deadlines = [], selectedDate, monthCursor, onDaySelect }: MonthCalendarProps) {
     const { t, i18n } = useTranslation("calendar")
     const weekLocale = i18n.language === "ru" ? "ru-RU" : "en-US"
     const today = new Date()
@@ -46,15 +47,24 @@ function MonthCalendar({ events, selectedDate, monthCursor, onDaySelect }: Month
                         const dayEvents = events.filter(e => toISODate(e.startDate) === isoDate)
                         const visibleEvents = dayEvents.slice(0, MAX_VISIBLE_EVENTS)
                         const extraCount = dayEvents.length - visibleEvents.length
+                        const dayDeadlineCount = deadlines.filter(d => toISODate(d.date) === isoDate).length
 
                         const cellClass = clsx("month-calendar__cell", !inMonth && "month-calendar__cell--outside")
                         const dayClass = clsx("month-calendar__day", isToday && "month-calendar__day--today", isSelected && "month-calendar__day--selected")
 
                         return (
                             <div key={i} className={cellClass} onClick={() => onDaySelect(cellDate)}>
-                                <span className={dayClass}>
-                                    {cellDate.getDate()}
-                                </span>
+                                <div className="month-calendar__cell-header">
+                                    <span className={dayClass}>
+                                        {cellDate.getDate()}
+                                    </span>
+                                    {dayDeadlineCount > 0 && (
+                                        <div className="month-calendar__deadline-badge">
+                                            <span>{dayDeadlineCount}</span>
+                                            <ExclamationCircleIcon />
+                                        </div>
+                                    )}
+                                </div>
                                 <div className="month-calendar__cell-events">
                                     {visibleEvents.map(event => (
                                         <div key={event.id}
