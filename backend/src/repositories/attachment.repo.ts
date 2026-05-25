@@ -1,19 +1,12 @@
 import type { PoolClient } from "pg"
 import pool from "../db"
 import { generateToken } from "../utils/token"
-import type { Attachment, AttachmentPublic } from "../types/attachment"
+import type { Attachment, AttachmentPublic, CreateAttachmentDto } from "../types/attachment"
 
 export class AttachmentLinkError extends Error {
     constructor() {
         super("Invalid attachment id")
     }
-}
-
-interface CreateAttachmentDto {
-    uploader_id: number
-    original_name: string
-    mime_type: string
-    size_bytes: number
 }
 
 class AttachmentRepository {

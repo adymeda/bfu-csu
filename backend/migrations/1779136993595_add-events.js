@@ -24,12 +24,6 @@ exports.up = (pgm) => {
             references: '"users"(id)',
             onDelete: 'CASCADE',
         },
-        assignee_id: {
-            type: 'integer',
-            notNull: true,
-            references: '"users"(id)',
-            onDelete: 'CASCADE',
-        },
         message_id: {
             type: 'bigint',
             references: '"messages"(id)',
@@ -52,8 +46,28 @@ exports.up = (pgm) => {
     pgm.addConstraint('events', 'events_end_after_start', 'CHECK (end_at IS NULL OR end_at >= start_at)')
 
     pgm.createIndex('events', 'created_by')
-    pgm.createIndex('events', 'assignee_id')
     pgm.createIndex('events', 'message_id')
+
+    pgm.createTable('event_participants', {
+        event_id: {
+            type: 'bigint',
+            notNull: true,
+            references: '"events"(id)',
+            onDelete: 'CASCADE',
+        },
+        user_id: {
+            type: 'integer',
+            notNull: true,
+            references: '"users"(id)',
+            onDelete: 'CASCADE',
+        },
+    }, {
+        constraints: {
+            primaryKey: ['event_id', 'user_id'],
+        },
+    })
+
+    pgm.createIndex('event_participants', 'user_id')
 
     pgm.createTable('deadlines', {
         id: {
@@ -65,12 +79,6 @@ exports.up = (pgm) => {
             notNull: true,
         },
         created_by: {
-            type: 'integer',
-            notNull: true,
-            references: '"users"(id)',
-            onDelete: 'CASCADE',
-        },
-        assignee_id: {
             type: 'integer',
             notNull: true,
             references: '"users"(id)',
@@ -93,8 +101,28 @@ exports.up = (pgm) => {
     })
 
     pgm.createIndex('deadlines', 'created_by')
-    pgm.createIndex('deadlines', 'assignee_id')
     pgm.createIndex('deadlines', 'message_id')
+
+    pgm.createTable('deadline_assignees', {
+        deadline_id: {
+            type: 'bigint',
+            notNull: true,
+            references: '"deadlines"(id)',
+            onDelete: 'CASCADE',
+        },
+        user_id: {
+            type: 'integer',
+            notNull: true,
+            references: '"users"(id)',
+            onDelete: 'CASCADE',
+        },
+    }, {
+        constraints: {
+            primaryKey: ['deadline_id', 'user_id'],
+        },
+    })
+
+    pgm.createIndex('deadline_assignees', 'user_id')
 }
 
 /**
@@ -103,6 +131,8 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
+    pgm.dropTable('deadline_assignees')
     pgm.dropTable('deadlines')
+    pgm.dropTable('event_participants')
     pgm.dropTable('events')
 }

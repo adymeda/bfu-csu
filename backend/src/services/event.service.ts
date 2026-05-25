@@ -1,7 +1,8 @@
 import repo from "../repositories/event.repo"
 import type { EventResolved, CreateEventDto, UpdateEventDto } from "../types/event"
+import type { RecipientInput } from "../types/message"
 
-const UPDATABLE_FIELDS = ["title", "assignee_id", "start_at", "end_at", "message_id"] as const
+const UPDATABLE_FIELDS = ["title", "start_at", "end_at", "message_id"] as const
 
 class EventsService {
     async findById(id: number): Promise<EventResolved | null> {
@@ -21,8 +22,9 @@ class EventsService {
         for (const field of UPDATABLE_FIELDS) {
             if(field in body) (data as Record<string, unknown>)[field] = body[field]
         }
-        if(Object.keys(data).length === 0) return null
-        return repo.update(id, data)
+        const recipients = "recipients" in body ? (body["recipients"] as RecipientInput[]) : undefined
+        if(Object.keys(data).length === 0 && recipients === undefined) return null
+        return repo.update(id, data, recipients)
     }
 
     async delete(id: number): Promise<boolean> {

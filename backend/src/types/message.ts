@@ -91,3 +91,24 @@ export interface MessageDetail extends MessageListItem {
     deadlines: DeadlineResolved[]
     attachments: AttachmentPublic[]
 }
+
+export interface MessageListRow {
+    id: number
+    title: string
+    content: string
+    reply_to: number | null
+    forwarded_from: number | null
+    created_at: Date
+    sender_id: number
+    sender_display_name: string
+    sender_accent_color: string
+    is_read: boolean
+    is_favorite: boolean
+}
+
+export interface RecipientJoinRow {
+    type: number
+    id: number
+    name: string
+    accent_color: string | null
+}

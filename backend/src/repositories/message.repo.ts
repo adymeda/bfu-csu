@@ -1,64 +1,13 @@
 import pool from "../db"
-import type { Message, MessageListItem, MessageDetail, RecipientInput, MessageRecipientResolved, MessageListQuery, MessageStateUpdate, EventResolved, DeadlineResolved } from "../types/message"
+import type { Message, MessageListItem, MessageDetail, RecipientInput, MessageRecipientResolved, MessageListQuery, MessageStateUpdate, EventResolved, DeadlineResolved, MessageListRow, RecipientJoinRow } from "../types/message"
 import { RECIPIENT_TYPE } from "../types/message"
 import type { CreateEventDto } from "../types/event"
+import type { EventRow, EventParticipantRow } from "../types/event"
 import type { CreateDeadlineDto } from "../types/deadline"
+import type { DeadlineRow, DeadlineParticipantRow } from "../types/deadline"
 import attachmentRepo from "./attachment.repo"
-
-interface MessageListRow {
-    id: number
-    title: string
-    content: string
-    reply_to: number | null
-    forwarded_from: number | null
-    created_at: Date
-    sender_id: number
-    sender_display_name: string
-    sender_accent_color: string
-    is_read: boolean
-    is_favorite: boolean
-}
-
-interface MessageDetailRow extends MessageListRow {
-    is_read: boolean
-    is_favorite: boolean
-}
-
-interface RecipientRow {
-    type: number
-    id: number
-    name: string
-    accent_color: string | null
-}
-
-interface EventDetailRow {
-    id: number
-    title: string
-    message_id: number | null
-    start_at: Date
-    end_at: Date | null
-    created_at: Date
-    cb_id: number
-    cb_name: string
-    cb_color: string
-    a_id: number
-    a_name: string
-    a_color: string
-}
-
-interface DeadlineDetailRow {
-    id: number
-    title: string
-    message_id: number | null
-    due_at: Date
-    created_at: Date
-    cb_id: number
-    cb_name: string
-    cb_color: string
-    a_id: number
-    a_name: string
-    a_color: string
-}
+import { insertEventParticipants } from "./event.repo"
+import { insertDeadlineAssignees } from "./deadline.repo"
 
 class MessagesRepository {
     async createMessage(
@@ -117,19 +66,23 @@ class MessagesRepository {
             }
 
             for (const event of events) {
-                await client.query(
-                    `INSERT INTO events (title, created_by, assignee_id, message_id, start_at, end_at)
-                    VALUES ($1, $2, $3, $4, $5, $6)`,
-                    [event.title, data.sender_id, event.assignee_id, message.id, event.start_at, event.end_at ?? null]
+                const { rows: evRows } = await client.query<{ id: number }>(
+                    `INSERT INTO events (title, created_by, message_id, start_at, end_at)
+                    VALUES ($1, $2, $3, $4, $5)
+                    RETURNING id`,
+                    [event.title, data.sender_id, message.id, event.start_at, event.end_at ?? null]
                 )
+                await insertEventParticipants(client, evRows[0]!.id, allUserIds)
             }
 
             for (const deadline of deadlines) {
-                await client.query(
-                    `INSERT INTO deadlines (title, created_by, assignee_id, message_id, due_at)
-                    VALUES ($1, $2, $3, $4, $5)`,
-                    [deadline.title, data.sender_id, deadline.assignee_id, message.id, deadline.due_at]
+                const { rows: dlRows } = await client.query<{ id: number }>(
+                    `INSERT INTO deadlines (title, created_by, message_id, due_at)
+                    VALUES ($1, $2, $3, $4)
+                    RETURNING id`,
+                    [deadline.title, data.sender_id, message.id, deadline.due_at]
                 )
+                await insertDeadlineAssignees(client, dlRows[0]!.id, allUserIds)
             }
 
             if(attachmentIds.length > 0) {
@@ -224,7 +177,7 @@ class MessagesRepository {
     }
 
     async findDetailById(messageId: number, userId: number): Promise<MessageDetail | null> {
-        const { rows: msgRows } = await pool.query<MessageDetailRow>(
+        const { rows: msgRows } = await pool.query<MessageListRow>(
             `SELECT
                 m.id, m.title, m.content, m.reply_to, m.forwarded_from, m.created_at,
                 m.sender_id, u.display_name AS sender_display_name, u.accent_color AS sender_accent_color,
@@ -238,7 +191,7 @@ class MessagesRepository {
         const msg = msgRows[0]
         if(!msg) return null
 
-        const { rows: recipientRows } = await pool.query<RecipientRow>(
+        const { rows: recipientRows } = await pool.query<RecipientJoinRow>(
             `SELECT
                 mr.recipient_type AS type,
                 mr.recipient_id AS id,
@@ -252,29 +205,57 @@ class MessagesRepository {
             [messageId]
         )
 
-        const { rows: eventRows } = await pool.query<EventDetailRow>(
+        const { rows: eventRows } = await pool.query<EventRow>(
             `SELECT e.id, e.title, e.message_id, e.start_at, e.end_at, e.created_at,
-                cb.id AS cb_id, cb.display_name AS cb_name, cb.accent_color AS cb_color,
-                a.id AS a_id, a.display_name AS a_name, a.accent_color AS a_color
+                cb.id AS cb_id, cb.display_name AS cb_name, cb.accent_color AS cb_color
             FROM events e
             JOIN users cb ON cb.id = e.created_by
-            JOIN users a ON a.id = e.assignee_id
             WHERE e.message_id = $1
             ORDER BY e.start_at`,
             [messageId]
         )
 
-        const { rows: deadlineRows } = await pool.query<DeadlineDetailRow>(
+        const { rows: eventParticipantRows } = await pool.query<EventParticipantRow>(
+            `SELECT ep.event_id, u.id AS p_id, u.display_name AS p_name, u.accent_color AS p_color
+            FROM event_participants ep
+            JOIN users u ON u.id = ep.user_id
+            WHERE ep.event_id = ANY($1)
+            ORDER BY ep.event_id, u.id`,
+            [eventRows.map(r => r.id)]
+        )
+
+        const eventParticipantsMap = new Map<number, { id: number, display_name: string, accent_color: string }[]>()
+        for (const r of eventParticipantRows) {
+            const list = eventParticipantsMap.get(r.event_id) ?? []
+            list.push({ id: r.p_id, display_name: r.p_name, accent_color: r.p_color })
+            eventParticipantsMap.set(r.event_id, list)
+        }
+
+        const { rows: deadlineRows } = await pool.query<DeadlineRow>(
             `SELECT d.id, d.title, d.message_id, d.due_at, d.created_at,
-                cb.id AS cb_id, cb.display_name AS cb_name, cb.accent_color AS cb_color,
-                a.id AS a_id, a.display_name AS a_name, a.accent_color AS a_color
+                cb.id AS cb_id, cb.display_name AS cb_name, cb.accent_color AS cb_color
             FROM deadlines d
             JOIN users cb ON cb.id = d.created_by
-            JOIN users a ON a.id = d.assignee_id
             WHERE d.message_id = $1
             ORDER BY d.due_at`,
             [messageId]
         )
+
+        const { rows: deadlineAssigneeRows } = await pool.query<DeadlineParticipantRow>(
+            `SELECT da.deadline_id, u.id AS p_id, u.display_name AS p_name, u.accent_color AS p_color
+            FROM deadline_assignees da
+            JOIN users u ON u.id = da.user_id
+            WHERE da.deadline_id = ANY($1)
+            ORDER BY da.deadline_id, u.id`,
+            [deadlineRows.map(r => r.id)]
+        )
+
+        const deadlineAssigneesMap = new Map<number, { id: number, display_name: string, accent_color: string }[]>()
+        for (const r of deadlineAssigneeRows) {
+            const list = deadlineAssigneesMap.get(r.deadline_id) ?? []
+            list.push({ id: r.p_id, display_name: r.p_name, accent_color: r.p_color })
+            deadlineAssigneesMap.set(r.deadline_id, list)
+        }
 
         const attachments = await attachmentRepo.findByMessageId(messageId)
 
@@ -306,7 +287,7 @@ class MessagesRepository {
                 end_at: r.end_at,
                 created_at: r.created_at,
                 created_by: { id: r.cb_id, display_name: r.cb_name, accent_color: r.cb_color },
-                assignee: { id: r.a_id, display_name: r.a_name, accent_color: r.a_color },
+                participants: eventParticipantsMap.get(r.id) ?? [],
             } satisfies EventResolved)),
             deadlines: deadlineRows.map(r => ({
                 id: r.id,
@@ -315,7 +296,7 @@ class MessagesRepository {
                 due_at: r.due_at,
                 created_at: r.created_at,
                 created_by: { id: r.cb_id, display_name: r.cb_name, accent_color: r.cb_color },
-                assignee: { id: r.a_id, display_name: r.a_name, accent_color: r.a_color },
+                participants: deadlineAssigneesMap.get(r.id) ?? [],
             } satisfies DeadlineResolved)),
             attachments,
         }

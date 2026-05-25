@@ -3,6 +3,8 @@ import service from "../services/deadline.service"
 import groupService from "../services/group.service"
 import { parseId } from "../utils/parseId"
 import { isValidDate } from "../utils/isValidDate"
+import { validateRecipients } from "../utils/validateRecipients"
+import { RECIPIENT_TYPE } from "../types/message"
 
 class DeadlinesController {
     async list(req: Request, res: Response, next: NextFunction) {
@@ -52,7 +54,7 @@ class DeadlinesController {
 
     async create(req: Request, res: Response, next: NextFunction) {
         const body = req.body as Record<string, unknown>
-        const { title, assignee_id, due_at, message_id } = body
+        const { title, recipients, due_at, message_id } = body
         const userId = res.locals.userId as number
 
         if(typeof title !== "string" || title.length === 0 || title.length > 255)
@@ -60,9 +62,9 @@ class DeadlinesController {
                 error: "title must be a non-empty string up to 255 characters"
             })
 
-        if(!Number.isInteger(assignee_id) || (assignee_id as number) < 1)
+        if(!validateRecipients(recipients))
             return res.status(400).json({
-                error: "assignee_id must be a positive integer"
+                error: "recipients must be a non-empty array of { type: 0|1, id: integer }"
             })
 
         if(!isValidDate(due_at))
@@ -78,17 +80,19 @@ class DeadlinesController {
         }
 
         try {
-            if((assignee_id as number) !== userId) {
-                const ok = await groupService.canAssign(userId, assignee_id as number)
-                if(!ok) return res.status(403).json({
-                    error: "Assignee is not in your group or a subgroup"
-                })
+            for (const r of recipients) {
+                if(r.type === RECIPIENT_TYPE.USER && r.id !== userId) {
+                    const ok = await groupService.canAssign(userId, r.id)
+                    if(!ok) return res.status(403).json({
+                        error: "Recipient is not in your group or a subgroup"
+                    })
+                }
             }
 
             const deadline = await service.create(
                 {
                     title,
-                    assignee_id: assignee_id as number,
+                    recipients,
                     due_at: due_at as string,
                     message_id: message_id !== undefined ? (message_id as number | null) : null,
                 },
@@ -98,7 +102,7 @@ class DeadlinesController {
         } catch (err: unknown) {
             const pg = err as { code?: string }
             if(pg.code === "23503") return res.status(400).json({
-                error: "Invalid message_id or assignee_id"
+                error: "Invalid message_id or recipient id"
             })
             next(err)
         }
@@ -111,7 +115,7 @@ class DeadlinesController {
         })
 
         const body = req.body as Record<string, unknown>
-        const { title, assignee_id, due_at, message_id } = body
+        const { title, recipients, due_at, message_id } = body
         const userId = res.locals.userId as number
 
         if("title" in body) {
@@ -121,10 +125,10 @@ class DeadlinesController {
                 })
         }
 
-        if("assignee_id" in body) {
-            if(!Number.isInteger(assignee_id) || (assignee_id as number) < 1)
+        if("recipients" in body) {
+            if(!validateRecipients(recipients))
                 return res.status(400).json({
-                    error: "assignee_id must be a positive integer"
+                    error: "recipients must be a non-empty array of { type: 0|1, id: integer }"
                 })
         }
 
@@ -151,11 +155,15 @@ class DeadlinesController {
                 error: "Forbidden"
             })
 
-            if("assignee_id" in body && (assignee_id as number) !== userId) {
-                const ok = await groupService.canAssign(userId, assignee_id as number)
-                if(!ok) return res.status(403).json({
-                    error: "Assignee is not in your group or a subgroup"
-                })
+            if("recipients" in body && validateRecipients(recipients)) {
+                for (const r of recipients) {
+                    if(r.type === RECIPIENT_TYPE.USER && r.id !== userId) {
+                        const ok = await groupService.canAssign(userId, r.id)
+                        if(!ok) return res.status(403).json({
+                            error: "Recipient is not in your group or a subgroup"
+                        })
+                    }
+                }
             }
 
             const updated = await service.update(id, body)
@@ -166,9 +174,8 @@ class DeadlinesController {
         } catch (err: unknown) {
             const pg = err as { code?: string }
             if(pg.code === "23503") return res.status(400).json({
-                error: "Invalid message_id or assignee_id"
+                error: "Invalid message_id or recipient id"
             })
-            
             next(err)
         }
     }
