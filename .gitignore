@@ -1,3 +1,11 @@
+.vscode
+
+dist
+uploads
+.env
+
 node_modules
 
-backend/.env
+.venv
+__pycache__
+*.joblib
