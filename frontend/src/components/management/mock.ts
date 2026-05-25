@@ -123,19 +123,19 @@ export const MOCK_GROUPS: ManagementGroup[] = [
     },
     {
         id: 5,
-        name: "Институт гуманитарных наук",
+        name: "Высшая школа бизнеса и предпринимательства",
         parent_id: null,
         members: []
     },
     {
         id: 6,
-        name: "Кафедра лингвистики",
+        name: "Экономика и менеджмент",
         parent_id: 5,
         members: []
     },
     {
         id: 7,
-        name: "1ЛГ",
+        name: "2ММ",
         parent_id: 6,
         members: [
             { id: 4, display_name: "Петрова Мария Сергеевна", isAdmin: true, accent_color: "8b1a4a" }
