@@ -9,7 +9,7 @@ function Avatar({ image, placeholder, color }: AvatarProps) {
         let res = []
         for(let i = 0; i < Math.min(split.length, 2); i++) {
             if(split.length == 0) continue
-            res.push(split[i][0])
+            res.push(split[i][0].toUpperCase())
         }
 
         placeholder = res.join("")
@@ -18,7 +18,7 @@ function Avatar({ image, placeholder, color }: AvatarProps) {
     return (
         <div className="avatar" style={color ? { "--avatar-color": color } as React.CSSProperties : undefined}>
             {image ?
-                <img src={image} alt={placeholder ?? ""}/>
+                <img src={image} alt={placeholder ?? ""} draggable={false} />
             :
                 <div className="avatar__placeholder">{placeholder}</div>
             }

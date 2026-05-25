@@ -41,3 +41,40 @@ export interface DropdownProps {
     className?: string,
     triggerClassName?: string
 }
+
+export interface TabItem {
+    key: string,
+    label: string
+}
+
+export interface TabsProps {
+    tabs: TabItem[],
+    activeKey: string,
+    onChange: (key: string) => void
+}
+
+export interface TreeMember {
+    display_name: string,
+    accent_color: string,
+    image?: string,
+    isAdmin?: boolean
+}
+
+export interface TreeNode {
+    id: string|number,
+    label: string,
+    children?: TreeNode[],
+    members?: TreeMember[]
+}
+
+export interface TreeProps {
+    nodes: TreeNode[],
+    selectedId?: string | number,
+    onSelect?: (node: TreeNode) => void
+}
+
+export interface TreeBranchProps {
+    node: TreeNode,
+    selectedId?: string | number,
+    onSelect?: (node: TreeNode) => void
+}

@@ -3,7 +3,8 @@
     "navigation": {
         "calendar": "Calendar",
         "inbox": "Inbox",
-        "settings": "Settings"
+        "settings": "Settings",
+        "user_control": "User Management"
     },
     "semesterType": {
         "autumn": "Autumn semester",

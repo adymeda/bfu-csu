@@ -2,7 +2,7 @@ import "@styles/layouts/MainLayout.scss"
 import { Outlet, useNavigate } from "react-router"
 import { useTranslation } from "react-i18next"
 import Logo from "../components/ui/Logo"
-import { ArrowLeftEndOnRectangleIcon, CalendarIcon, InboxIcon, MagnifyingGlassIcon, Cog6ToothIcon } from "@heroicons/react/24/outline"
+import { ArrowLeftEndOnRectangleIcon, CalendarIcon, InboxIcon, MagnifyingGlassIcon, Cog6ToothIcon, UserGroupIcon } from "@heroicons/react/24/outline"
 import NavButton from "../components/ui/NavButton"
 import Avatar from "../components/ui/Avatar"
 import Dropdown from "../components/ui/Dropdown"
@@ -63,12 +63,21 @@ function MainLayout() {
                 </div>
 
                 <nav className="main-sidebar__nav">
-                    <NavButton text={t('navigation.calendar')}
-                    path="/"
-                    Icon={CalendarIcon}/>
-                    <NavButton text={t('navigation.inbox')}
-                    path="/inbox"
-                    Icon={InboxIcon} />
+                    <NavButton
+                        text={t('navigation.calendar')}
+                        path="/"
+                        Icon={CalendarIcon}
+                        />
+                    <NavButton 
+                        text={t('navigation.inbox')}
+                        path="/inbox"
+                        Icon={InboxIcon}
+                    />
+                    <NavButton
+                        text={t("navigation.user_control")}
+                        path="/management"
+                        Icon={UserGroupIcon}
+                    />
                     <button className="mobile-profile-button nav-button" onClick={() => {}}>
                         <Avatar placeholder={username} color={avatarColor} />
                         Профиль

@@ -1,0 +1,98 @@
+.tree {
+    font-size: 13px;
+
+    &__branch {
+        display: flex;
+        flex-direction: column;
+
+        &-header {
+            display: flex;
+            align-items: center;
+            gap: .25rem;
+            padding: .2rem 0;
+
+            &--clickable {
+                cursor: pointer;
+                user-select: none;
+                padding: .2rem .4rem;
+                border-radius: .375rem;
+
+                &:hover {
+                    background: #f4f4f4;
+                }
+            }
+
+            &--selected {
+                background: #f0eef8;
+
+                &:hover {
+                    background: #ebe8f5;
+                }
+            }
+        }
+
+        &-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            background: none;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            color: var(--text-info-color);
+            padding: 0;
+
+            svg {
+                width: 14px;
+                height: 14px;
+                transition: transform 0.2s ease;
+            }
+
+            &--collapsed svg {
+                transform: rotate(-180deg);
+            }
+
+            &:hover {
+                color: var(--accent-hover-color);
+            }
+        }
+
+        &-title {
+            color: var(--text-primary-color);
+        }
+
+        &-children {
+            padding-left: 1.25rem;
+            border-left: 1px solid var(--border-primary-color);
+            margin-left: .45rem;
+        }
+
+        &-member {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .25rem 0;
+
+            .avatar {
+                width: 22px;
+                font-size: 8px;
+                flex-shrink: 0;
+            }
+        }
+
+        &-member-admin {
+            width: 12px;
+            height: 12px;
+            flex-shrink: 0;
+            color: #f59e0b;
+        }
+
+        &-member-name {
+            font-size: 12px;
+            color: var(--text-secondary-color);
+        }
+    }
+}

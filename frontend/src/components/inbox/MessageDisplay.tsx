@@ -36,7 +36,7 @@ function MessageDisplay({ title, text, onClose }: MessageProps) {
                     {title}
                 </div>
                 <div className="message-display__header-author">
-                    <Avatar placeholder="Ишанов Сергей Александрович"/>
+                    <Avatar placeholder="Ишанов Сергей Александрович" image="https://kantiana.ru/upload/sotbit_speedpage/webp/resize_cache/iblock/78d/i0dv87vm1g80qmqog6q2g40xxywpojif/240_240_2/1671629880472_01.webp"/>
                     <span>Ишанов Сергей Александрович</span>
                 </div>
             </div>

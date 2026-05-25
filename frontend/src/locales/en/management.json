@@ -1,0 +1,23 @@
+{
+    "tabs": {
+        "users": "Users",
+        "groups": "Groups"
+    },
+    "searchPlaceholder": "Search users...",
+    "selectUser": "Select a user from the list",
+    "groupsTitle": "Groups",
+    "group": {
+        "select": "Select a group from the list",
+        "namePlaceholder": "Group name",
+        "createRoot": "Create group",
+        "createChild": "Create subgroup",
+        "parent": "Parent group",
+        "noParent": "Root group",
+        "membersTotal": "Total members",
+        "searchMembers": "Search members...",
+        "empty": "No members",
+        "makeAdmin": "Make admin",
+        "revokeAdmin": "Revoke admin rights",
+        "removeFromGroup": "Remove from group"
+    }
+}

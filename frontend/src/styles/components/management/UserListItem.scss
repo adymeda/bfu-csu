@@ -1,0 +1,33 @@
+.management-user {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+
+    .avatar {
+        width: 16px;
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+    padding: .6rem .75rem;
+    border-radius: .5rem;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+        background: #f4f4f4;
+    }
+
+    &--selected {
+        background: #f0eef8;
+
+        &:hover {
+            background: #ebe8f5;
+        }
+    }
+
+    &__name {
+        font-size: 13px;
+        color: var(--text-secondary-color);
+        line-height: 1.3;
+    }
+}

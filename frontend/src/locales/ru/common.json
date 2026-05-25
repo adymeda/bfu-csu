@@ -3,7 +3,8 @@
     "navigation": {
         "calendar": "Календарь",
         "inbox": "Сообщения",
-        "settings": "Настройки"
+        "settings": "Настройки",
+        "user_control": "Управление"
     },
     "semesterType": {
         "autumn": "Осенний семестр",

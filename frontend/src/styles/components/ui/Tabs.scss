@@ -1,0 +1,35 @@
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-primary-color);
+
+    &__tab {
+        position: relative;
+        padding: .5rem 1rem;
+        font-size: 14px;
+        color: var(--text-info-color);
+        background: none;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+
+        &:hover {
+            color: var(--accent-hover-color);
+        }
+
+        &--active {
+            color: var(--accent-hover-color);
+
+            &::after {
+                content: "";
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: var(--accent-hover-color);
+            }
+        }
+    }
+}

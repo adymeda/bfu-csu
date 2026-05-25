@@ -7,12 +7,14 @@ import enCalendar from './en/calendar.json'
 import enCommon from './en/common.json'
 import enInbox from './en/inbox.json'
 import enSettings from './en/settings.json'
+import enManagement from './en/management.json'
 
 import ruAuth from './ru/auth.json'
 import ruCalendar from './ru/calendar.json'
 import ruCommon from './ru/common.json'
 import ruInbox from './ru/inbox.json'
 import ruSettings from './ru/settings.json'
+import ruManagement from './ru/management.json'
 
 i18n
     .use(LanguageDetector)
@@ -25,6 +27,7 @@ i18n
                 common: enCommon,
                 inbox: enInbox,
                 settings: enSettings,
+                management: enManagement,
             },
             ru: {
                 auth: ruAuth,
@@ -32,6 +35,7 @@ i18n
                 common: ruCommon,
                 inbox: ruInbox,
                 settings: ruSettings,
+                management: ruManagement,
             },
         },
         defaultNS: 'common',

@@ -7,6 +7,7 @@ import MainLayout from "../layouts/MainLayout"
 import ResetCard from "../components/auth/ResetCard"
 import CalendarPage from "../pages/CalendarPage"
 import InboxPage from "../pages/InboxPage"
+import ManagementPage from "../pages/ManagementPage"
 import { useAuth } from "../contexts/AuthContext"
 
 function RequireAuth({ children }: { children: ReactNode }) {
@@ -34,6 +35,7 @@ const router = createBrowserRouter([
             { index: true, element: <CalendarPage /> },
             { path: "inbox", element: <InboxPage /> },
             { path: "settings", element: <Outlet /> },
+            { path: "management", element: <ManagementPage />}
         ],
     },
     {
