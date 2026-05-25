@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express"
 import service from "../services/message.service"
 import mlService from "../services/ml.service"
+import notificationsService from "../services/notifications.service"
+import userRepo from "../repositories/user.repo"
 import type { RecipientInput, CreateMessageDto } from "../types/message"
 import type { CreateEventDto } from "../types/event"
 import type { CreateDeadlineDto } from "../types/deadline"
@@ -134,6 +136,17 @@ class MessagesController {
                 attachments: validatedAttachments,
             }
             const msg = await service.create(dto, userId)
+
+            const sender = await userRepo.findById(userId)
+            if(sender) {
+                void notificationsService.dispatchMessage({
+                    sender: { id: userId, display_name: sender.display_name },
+                    title,
+                    content,
+                    recipients,
+                })
+            }
+
             res.status(201).json(msg)
         } catch (err: unknown) {
             if(err instanceof AttachmentLinkError) return res.status(400).json({
