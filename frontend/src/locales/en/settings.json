@@ -1,1 +1,30 @@
-{}
+{
+    "profile": {
+        "title": "Profile",
+        "changeAvatar": "Change avatar"
+    },
+    "password": {
+        "title": "Change password",
+        "old": "Current password",
+        "new": "New password",
+        "confirm": "Repeat new password",
+        "save": "Save",
+        "mismatch": "Passwords do not match"
+    },
+    "language": {
+        "title": "Interface language",
+        "ru": "Русский",
+        "en": "English"
+    },
+    "externalLinks": {
+        "title": "External communication sources"
+    },
+    "link": "Link",
+    "telegram": {
+        "important": "Notify about important messages",
+        "eventsDeadlines": "Notify about messages with events or deadlines",
+        "remindBefore": "Remind about deadlines",
+        "remindBeforeDays": "days before",
+        "allMessages": "Notify about all messages"
+    }
+}

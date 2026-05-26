@@ -1,0 +1,125 @@
+.settings-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    &__titlebar {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+
+        background: white;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-primary-color);
+    }
+
+    &__title {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-primary-color);
+    }
+}
+
+.settings-wrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.settings {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    max-width: 640px;
+
+    &__section {
+        display: flex;
+        flex-direction: column;
+        gap: .875rem;
+    }
+
+    &__section-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-info-color);
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    &__section-card {
+        background: white;
+        border: 1px solid var(--border-primary-color);
+        border-radius: .75rem;
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    &__avatar-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        .avatar {
+            width: 64px;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+    }
+
+    &__fields {
+        display: flex;
+        flex-direction: column;
+        gap: .625rem;
+    }
+
+    &__error {
+        font-size: 13px;
+        color: #c0392b;
+    }
+
+    &__lang-row {
+        display: flex;
+        gap: .5rem;
+    }
+
+    &__lang-btn {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .5rem 1.25rem;
+        border: 1px solid var(--border-primary-color);
+        border-radius: .5rem;
+        background: white;
+        font-size: 14px;
+        color: var(--text-primary-color);
+        cursor: pointer;
+        transition: background .15s, border-color .15s, color .15s;
+
+        &--active {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        &:hover:not(&--active) {
+            border-color: var(--accent-hover-color);
+            color: var(--accent-hover-color);
+        }
+    }
+
+    &__lang-flag {
+        width: 20px;
+        height: 15px;
+        object-fit: cover;
+        border-radius: 2px;
+        flex-shrink: 0;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .settings {
+        padding: 1rem;
+    }
+}

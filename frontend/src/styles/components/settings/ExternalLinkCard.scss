@@ -1,0 +1,72 @@
+.external-links {
+    background: white;
+    border: 1px solid var(--border-primary-color);
+    border-radius: .75rem;
+    overflow: hidden;
+
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        padding: .875rem 1rem;
+        border-bottom: 1px solid var(--border-primary-color);
+
+        button {
+            width: fit-content;
+            padding: 1rem;
+        }
+    }
+
+    &__icon {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+        object-fit: contain;
+        user-select: none;
+    }
+
+    &__name {
+        flex-grow: 1;
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--text-primary-color);
+    }
+
+    &__value {
+        font-size: 14px;
+        color: var(--text-secondary-color);
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+        padding: 1rem;
+    }
+
+    &__row {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+
+        .checkbox {
+            flex-shrink: 0;
+        }
+
+        select {
+            height: 28px;
+            padding: 0 .4rem;
+            border: 1px solid var(--border-primary-color);
+            border-radius: .375rem;
+            font-size: 14px;
+            color: var(--text-primary-color);
+            background: white;
+            cursor: pointer;
+
+            &:disabled {
+                opacity: .45;
+                cursor: not-allowed;
+            }
+        }
+    }
+}

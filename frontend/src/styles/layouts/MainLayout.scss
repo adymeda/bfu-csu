@@ -114,7 +114,18 @@ body {
     }
 
     > .dropdown {
-        height: 75%;
+        height: 50%;
+
+        .dropdown__trigger {
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar {
+            height: 100%;
+            box-sizing: border-box;
+        }
     }
     
     &__profile {
@@ -127,6 +138,49 @@ body {
         cursor: pointer;
         user-select: none;
         outline: none;
+    }
+}
+
+.profile-card {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .75rem 1rem;
+
+    .avatar {
+        width: 36px;
+        font-size: 13px;
+        flex-shrink: 0;
+    }
+
+    &__info {
+        display: flex;
+        flex-direction: column;
+        gap: .15rem;
+        min-width: 0;
+    }
+
+    &__name {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-primary-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__email {
+        font-size: 12px;
+        color: var(--text-info-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__divider {
+        height: 1px;
+        background: var(--border-primary-color);
+        margin: .125rem 0;
     }
 }
 

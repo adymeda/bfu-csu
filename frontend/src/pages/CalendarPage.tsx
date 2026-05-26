@@ -101,8 +101,8 @@ const EVENTS: CalendarEvent[] = [
 
 const DEADLINES: CalendarDeadline[] = [
     {
-        id: "d1",
-        title: "Сдача курсового проекта",
+        id: "1",
+        title: "Сдача курсовой работы",
         date: makeEventDate(0, 18, 15),
     },
     {
@@ -114,7 +114,7 @@ const DEADLINES: CalendarDeadline[] = [
         id: "d3",
         title: "Лабораторная работа №3",
         date: makeEventDate(3, 12, 0),
-    },
+    }
 ]
 
 type View = "month" | "day"

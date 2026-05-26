@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider, Navigate, Outlet } from "react-router"
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router"
 import type { ReactNode } from "react"
 import NotFoundPage from "../components/NotFoundPage"
 import AuthCard from "../components/auth/AuthCard"
@@ -8,6 +8,7 @@ import ResetCard from "../components/auth/ResetCard"
 import CalendarPage from "../pages/CalendarPage"
 import InboxPage from "../pages/InboxPage"
 import ManagementPage from "../pages/ManagementPage"
+import SettingsPage from "../pages/SettingsPage"
 import { useAuth } from "../contexts/AuthContext"
 
 function RequireAuth({ children }: { children: ReactNode }) {
@@ -34,7 +35,7 @@ const router = createBrowserRouter([
         children: [
             { index: true, element: <CalendarPage /> },
             { path: "inbox", element: <InboxPage /> },
-            { path: "settings", element: <Outlet /> },
+            { path: "settings", element: <SettingsPage /> },
             { path: "management", element: <ManagementPage />}
         ],
     },

@@ -94,6 +94,14 @@ function MainLayout() {
                     <Dropdown
                     trigger={<Avatar placeholder={username} color={avatarColor}/>}
                     triggerClassName="top-bar__profile">
+                        <div className="profile-card">
+                            <Avatar placeholder={username} color={avatarColor} />
+                            <div className="profile-card__info">
+                                <span className="profile-card__name">{username}</span>
+                                <span className="profile-card__email">{user?.email}</span>
+                            </div>
+                        </div>
+                        <div className="profile-card__divider" />
                         <NavButton text={t('navigation.settings')}
                             Icon={Cog6ToothIcon}
                             path="/settings"/>
