@@ -86,7 +86,9 @@ body {
 .top-bar {
     height: $top-bar-height;
 
+    flex-shrink: 0;
     display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 1rem;
     
@@ -111,29 +113,10 @@ body {
         }
     }
 
-    &__search {
-        display: flex;
-        align-items: center;
-        gap: .5rem;
-
-        margin-left: auto;
-        padding: 5px 10px;
-        border: 1px solid var(--border-primary-color);
-        border-radius: .5rem;
-
-        svg {
-            width: 16px;
-            height: 16px;
-            color: var(--text-info-color);
-        }
-
-        input {
-            color: var(--text-secondary-color);
-            border: none;
-            outline: none;
-        }
+    > .dropdown {
+        height: 75%;
     }
-
+    
     &__profile {
         position: relative;
         display: flex;

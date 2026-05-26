@@ -91,11 +91,6 @@ function MainLayout() {
                         {semesterInfo && <span className="top-bar__date-info">{semesterInfo}</span>}
                     </div>
 
-                    <div className="top-bar__search">
-                        <input id="context-search" placeholder={t('searchPlaceholder')}/>
-                        <MagnifyingGlassIcon />
-                    </div>
-
                     <Dropdown
                     trigger={<Avatar placeholder={username} color={avatarColor}/>}
                     triggerClassName="top-bar__profile">

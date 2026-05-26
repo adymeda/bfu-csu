@@ -124,6 +124,62 @@
         &::placeholder { color: var(--text-info-color); }
     }
 
+    &__detection {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: .25rem 1rem;
+        margin-bottom: .5rem;
+        border: 1px solid transparent;
+        border-radius: 1rem;
+        opacity: 0;
+        transform: translateY(-4px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+
+        &--visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        &--event {
+            background: #d4f5e0;
+            border-color: var(--border-primary-color);
+            color: var(--text-secondary-color);
+        }
+
+        &--deadline {
+            background: #fde0e0;
+            border-color: var(--border-primary-color);
+            color: #7a1e1e;
+        }
+    }
+
+    &__detection-text {
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.4;
+    }
+
+    &__detection-button {
+        flex-shrink: 0;
+        padding: .3rem .7rem;
+        border-radius: .4rem;
+        border: 1px solid currentColor;
+        background: transparent;
+        color: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: .15s;
+
+        &:hover {
+            opacity: .7;
+        }
+    }
+
     &__footer {
         flex-shrink: 0;
         padding: .75rem 0;
