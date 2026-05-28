@@ -9,7 +9,10 @@
         "new": "New password",
         "confirm": "Repeat new password",
         "save": "Save",
-        "mismatch": "Passwords do not match"
+        "mismatch": "Passwords do not match",
+        "empty": "Enter a new password",
+        "success": "Password updated",
+        "error": "Failed to update password"
     },
     "language": {
         "title": "Interface language",
@@ -20,11 +23,18 @@
         "title": "External communication sources"
     },
     "link": "Link",
+    "linkConfirm": "Link",
+    "linkCancel": "Cancel",
     "telegram": {
         "important": "Notify about important messages",
         "eventsDeadlines": "Notify about messages with events or deadlines",
         "remindBefore": "Remind about deadlines",
         "remindBeforeDays": "days before",
-        "allMessages": "Notify about all messages"
+        "allMessages": "Notify about all messages",
+        "codePlaceholder": "Code from the bot",
+        "errorInvalid": "Invalid or unknown code",
+        "errorExpired": "The code has expired, request a new one",
+        "errorUnavailable": "Telegram service is unavailable",
+        "errorGeneric": "Failed to link, try again"
     }
 }

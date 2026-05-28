@@ -2,12 +2,11 @@ import { createContext, useContext, useEffect, useState } from "react"
 import type { ReactNode } from "react"
 import * as authApi from "../api/auth"
 import type { User } from "../api/auth"
+import { STORAGE_TOKEN_KEY, STORAGE_USER_KEY, UNAUTHORIZED_EVENT } from "../api/client"
+import { queryClient } from "../api/queryClient"
 import type { AuthStatus, AuthContextValue } from "./types"
 
 const AuthContext = createContext<AuthContextValue | null>(null)
-
-const STORAGE_TOKEN_KEY = "auth_token"
-const STORAGE_USER_KEY = "auth_user"
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [status, setStatus] = useState<AuthStatus>("loading")
@@ -44,17 +43,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setStatus("authed")
     }
 
-    async function logout() {
-        const current = token
+    function clearSession() {
         setToken(null)
         setUser(null)
         setStatus("nouser")
         localStorage.removeItem(STORAGE_TOKEN_KEY)
         localStorage.removeItem(STORAGE_USER_KEY)
+        queryClient.clear()
+    }
+
+    async function logout() {
+        const current = token
+        clearSession()
         if (current) {
             authApi.logout(current).catch(() => {})
         }
     }
+
+    useEffect(() => {
+        function onUnauthorized() {
+            clearSession()
+        }
+        window.addEventListener(UNAUTHORIZED_EVENT, onUnauthorized)
+        return () => window.removeEventListener(UNAUTHORIZED_EVENT, onUnauthorized)
+    }, [])
 
     return (
         <AuthContext.Provider value={{ status, user, token, login, logout }}>

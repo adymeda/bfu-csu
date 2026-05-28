@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express"
 import service from "../services/link.service"
+import telegram from "../services/telegram.service"
 import type { CreateLinkDto } from "../types/link"
 
 class LinksController {
@@ -34,6 +35,25 @@ class LinksController {
                 error: "Link already exists"
             })
             else next(err)
+        }
+    }
+
+    async linkTelegram(req: Request, res: Response, next: NextFunction) {
+        const { code } = req.body as { code: unknown }
+
+        if(typeof code !== 'string' || code.length === 0)
+            return res.status(400).json({
+                error: "code should be a non-empty string"
+            })
+
+        try {
+            const result = await telegram.link(res.locals.userId as number, code)
+            if(result.ok) return res.json({ telegram_id: result.telegram_id })
+            if(result.reason === "not_found") return res.status(404).json({ error: "Invalid or unknown code" })
+            if(result.reason === "expired") return res.status(410).json({ error: "Code expired" })
+            return res.status(503).json({ error: "Telegram service unavailable" })
+        } catch(err) {
+            next(err)
         }
     }
 

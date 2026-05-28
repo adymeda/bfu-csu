@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import "@styles/pages/CalendarPage.scss"
 import { useTranslation } from "react-i18next"
 import { CalendarDaysIcon, ViewColumnsIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
@@ -7,117 +7,28 @@ import DayCalendar from "../components/calendar/DayCalendar"
 import MonthCalendar from "../components/calendar/MonthCalendar"
 import EventList from "../components/calendar/EventList"
 import EventDetail from "../components/calendar/EventDetail"
-import type { CalendarEvent, CalendarDeadline } from "../components/calendar/types"
+import { toCalendarEvent, toCalendarDeadline } from "../components/calendar/adapters"
+import { useEvents, useDeadlines } from "../hooks/calendar"
 import { toISODate, isSameDay, isSameMonth, addDays, addMonths, startOfMonth } from "@helpers"
 
-function makeEventDate(offsetDays: number, h: number, m: number): Date {
-    const d = new Date()
-    d.setDate(d.getDate() + offsetDays)
-    d.setHours(h, m, 0, 0)
-    return d
+type View = "month" | "day"
+
+// Range fetched from the API for the current view. Day view loads just the
+// selected day; month view loads the whole 6-week grid (±1 week of padding so
+// leading/trailing cells from neighbouring months are covered).
+function dayRange(d: Date): { from: string, to: string } {
+    const from = new Date(d)
+    from.setHours(0, 0, 0, 0)
+    const to = new Date(d)
+    to.setHours(23, 59, 59, 999)
+    return { from: from.toISOString(), to: to.toISOString() }
 }
 
-const EVENTS: CalendarEvent[] = [
-    {
-        id: "1",
-        startDate: makeEventDate(0, 8, 30),
-        endDate: makeEventDate(0, 10, 0),
-        title: "Переписка контрольных работ",
-        place: "Ауд. 229",
-        color: "#42a5f5",
-        organizer: "Ишанов Сергей Александрович",
-        description: "Переписка контрольной работы по дифференциальным уравнениям, последняя попытка. Аудитория 229",
-        linkedMessage: {
-            author: "Ишанов Сергей Александрович",
-            title: "Переписка контрольных по дифференциальным уравнениям",
-            text: "Следующая переписка контрольных работ по дифференциальным уравнениям пройдёт 14 апреля в 13:50, аудитория 229. Старосты должны предварительно предоставить списки переписываемых контрольных работ",
-        },
-    },
-    {
-        id: "2",
-        startDate: makeEventDate(0, 12, 0),
-        endDate: makeEventDate(0, 14, 0),
-        title: "Общее собрание",
-        place: "Ауд. 420",
-        color: "#ab47bc",
-    },
-    {
-        id: "3",
-        startDate: makeEventDate(0, 14, 30),
-        endDate: makeEventDate(0, 17, 0),
-        title: "Экзамен",
-        place: "Ауд. 123",
-        color: "#ffa726",
-    },
-    {
-        id: "4",
-        startDate: makeEventDate(1, 10, 0),
-        endDate: makeEventDate(1, 11, 30),
-        title: "Семинар",
-        place: "Ауд. 118",
-        color: "#66bb6a",
-    },
-    {
-        id: "5",
-        startDate: makeEventDate(1, 14, 0),
-        endDate: makeEventDate(1, 15, 0),
-        title: "Консультация",
-        place: "Ауд. 305",
-        color: "#ef5350",
-    },
-    {
-        id: "6",
-        startDate: makeEventDate(3, 9, 0),
-        endDate: makeEventDate(3, 12, 0),
-        title: "Практика",
-        place: "Лаб. 12",
-        color: "#26c6da",
-    },
-    {
-        id: "7",
-        startDate: makeEventDate(-2, 11, 0),
-        endDate: makeEventDate(-2, 13, 30),
-        title: "Зачёт",
-        place: "Ауд. 215",
-        color: "#ffa726",
-    },
-    {
-        id: "8",
-        startDate: makeEventDate(5, 8, 30),
-        endDate: makeEventDate(5, 10, 0),
-        title: "Лекция",
-        place: "Ауд. 101",
-        color: "#42a5f5",
-    },
-    {
-        id: "10",
-        startDate: makeEventDate(7, 13, 0),
-        endDate: makeEventDate(7, 15, 0),
-        title: "Защита проекта",
-        place: "Ауд. 310",
-        color: "#ef5350",
-    },
-]
-
-const DEADLINES: CalendarDeadline[] = [
-    {
-        id: "1",
-        title: "Сдача курсовой работы",
-        date: makeEventDate(0, 18, 15),
-    },
-    {
-        id: "d2",
-        title: "Отчёт по практике",
-        date: makeEventDate(1, 23, 59),
-    },
-    {
-        id: "d3",
-        title: "Лабораторная работа №3",
-        date: makeEventDate(3, 12, 0),
-    }
-]
-
-type View = "month" | "day"
+function monthRange(cursor: Date): { from: string, to: string } {
+    const from = addDays(startOfMonth(cursor), -7)
+    const to = addDays(startOfMonth(addMonths(cursor, 1)), 7)
+    return { from: from.toISOString(), to: to.toISOString() }
+}
 
 function getPluralKey(count: number, lng: string): "one" | "two" | "many" {
     if(lng === "ru") {
@@ -157,8 +68,14 @@ function CalendarPage() {
     const [monthCursor, setMonthCursor] = useState(() => startOfMonth(new Date()))
     const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
 
-    const eventsForDay = EVENTS.filter(e => toISODate(e.startDate) === toISODate(selectedDate))
-    const deadlinesForDay = DEADLINES.filter(d => toISODate(d.date) === toISODate(selectedDate))
+    const range = view === "day" ? dayRange(selectedDate) : monthRange(monthCursor)
+    const { data: eventsData } = useEvents(range.from, range.to)
+    const { data: deadlinesData } = useDeadlines(range.from, range.to)
+    const events = useMemo(() => (eventsData ?? []).map(toCalendarEvent), [eventsData])
+    const deadlines = useMemo(() => (deadlinesData ?? []).map(toCalendarDeadline), [deadlinesData])
+
+    const eventsForDay = events.filter(e => toISODate(e.startDate) === toISODate(selectedDate))
+    const deadlinesForDay = deadlines.filter(d => toISODate(d.date) === toISODate(selectedDate))
     const count = eventsForDay.length
     const deadlineCount = deadlinesForDay.length
 
@@ -271,8 +188,8 @@ function CalendarPage() {
                 <div className="calendar-page__calendar">
                     {view === "month"
                         ? <MonthCalendar
-                            events={EVENTS}
-                            deadlines={DEADLINES}
+                            events={events}
+                            deadlines={deadlines}
                             selectedDate={selectedDate}
                             monthCursor={monthCursor}
                             onDaySelect={handleDaySelect}

@@ -1,9 +1,18 @@
 import "@styles/components/inbox/MessageCreate.scss"
 import type { MessageCreateProps, Recipient } from "./types"
-import { ChevronLeftIcon, GlobeAltIcon, MagnifyingGlassIcon, PaperAirplaneIcon, PaperClipIcon, PlusIcon, UsersIcon, XMarkIcon } from "@heroicons/react/24/outline"
+import { ChevronLeftIcon, FlagIcon, GlobeAltIcon, MagnifyingGlassIcon, PaperAirplaneIcon, PaperClipIcon, PlusIcon, UsersIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import { useState, useEffect, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import clsx from "clsx"
+import Dropdown from "@components/ui/Dropdown"
+import Avatar from "@components/ui/Avatar"
+import MessageRecipient from "./MessageRecipient"
+import ScheduleModal, { type SubmitResult } from "./ScheduleModal"
+import { useSendMessage } from "../../hooks/messages"
+import { useUsers } from "../../hooks/users"
+import { useSearchGroups } from "../../hooks/groups"
+import { uploadAttachments, formatBytes } from "../../api/attachments"
+import type { AttachmentPublic, MessageEventInput, MessageDeadlineInput } from "../../api/types"
 
 // ─── Event / deadline detection ──────────────────────────────────────────────
 
@@ -37,27 +46,43 @@ function detectContent(text: string): DetectionResult {
 	if (EVENT_KEYWORD.test(text) || hasDate) return "event"
 	return null
 }
-import Dropdown from "@components/ui/Dropdown"
-import Avatar from "@components/ui/Avatar"
-import MessageRecipient from "./MessageRecipient"
 
-const MOCK_RECIPIENTS: Recipient[] = [
-    { id: "1", name: "Ишанов Сергей Александрович", isGroup: false },
-    { id: "2", name: "Савкин Дмитрий Александрович", isGroup: false },
-    { id: "3", name: "4ПМ АДМО", isGroup: true },
-    { id: "4", name: "Кулдышев Никита Андреевич", isGroup: false },
-]
-
-function MessageCreate({ onClose, onSend }: MessageCreateProps) {
-    const { t } = useTranslation('inbox')
+function MessageCreate({ onClose }: MessageCreateProps) {
+    const { t, i18n } = useTranslation('inbox')
     const [subject, setSubject] = useState("")
     const [body, setBody] = useState("")
     const [selected, setSelected] = useState<Recipient[]>([])
-    const [attachments] = useState<string[]>([])
+    const [attachments, setAttachments] = useState<AttachmentPublic[]>([])
+    const [events, setEvents] = useState<MessageEventInput[]>([])
+    const [deadlines, setDeadlines] = useState<MessageDeadlineInput[]>([])
+    const [modal, setModal] = useState<"event" | "deadline" | null>(null)
+    const [recipientQuery, setRecipientQuery] = useState("")
     const [detected, setDetected] = useState<DetectionResult>(null)
     const [visible, setVisible] = useState(false)
+
+    const locale = i18n.language === "ru" ? "ru-RU" : "en-US"
+    const formatDateTime = (iso: string) => new Intl.DateTimeFormat(locale, {
+        day: "numeric", month: "short", hour: "2-digit", minute: "2-digit"
+    }).format(new Date(iso))
+
+    function openModal(m: "event" | "deadline") {
+        // Dropdown has no imperative close — nudge it shut via an outside mousedown.
+        document.dispatchEvent(new MouseEvent("mousedown"))
+        setModal(m)
+    }
+
+    function handleSchedule(result: SubmitResult) {
+        if(result.mode === "event") setEvents(prev => [...prev, result.value])
+        else setDeadlines(prev => [...prev, result.value])
+        setModal(null)
+    }
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
+    const sendMessage = useSendMessage()
+    const { data: usersData } = useUsers({ q: recipientQuery, limit: 8 })
+    const { data: groupsData } = useSearchGroups(recipientQuery)
 
     useEffect(() => {
         if (timerRef.current) clearTimeout(timerRef.current)
@@ -75,22 +100,46 @@ function MessageCreate({ onClose, onSend }: MessageCreateProps) {
         return () => { if (timerRef.current) clearTimeout(timerRef.current) }
     }, [body])
 
-    const selectedIds = new Set(selected.map(r => r.id))
-    const available = MOCK_RECIPIENTS.filter(r => !selectedIds.has(r.id))
+    const selectedKeys = new Set(selected.map(r => `${r.isGroup ? "g" : "u"}${r.id}`))
+    const available: Recipient[] = [
+        ...(usersData?.items ?? []).map(u => ({ id: u.id, name: u.display_name, isGroup: false })),
+        ...(groupsData ?? []).map(g => ({ id: g.id, name: g.name, isGroup: true }))
+    ].filter(r => !selectedKeys.has(`${r.isGroup ? "g" : "u"}${r.id}`))
 
     function addRecipient(r: Recipient) {
         setSelected(prev => [...prev, r])
     }
 
-    function removeRecipient(id: string) {
-        setSelected(prev => prev.filter(r => r.id !== id))
+    function removeRecipient(r: Recipient) {
+        setSelected(prev => prev.filter(x => !(x.id === r.id && x.isGroup === r.isGroup)))
     }
 
+    async function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
+        const files = e.target.files
+        if(!files || files.length === 0) return
+        const slots = 5 - attachments.length
+        const picked = Array.from(files).slice(0, slots)
+        e.target.value = ""
+        if(picked.length === 0) return
+        try {
+            const uploaded = await uploadAttachments(picked)
+            setAttachments(prev => [...prev, ...uploaded])
+        } catch { /* ignore upload error for now */ }
+    }
+
+    const canSend = subject.trim().length > 0 && body.trim().length > 0 && selected.length > 0 && !sendMessage.isPending
+
     function handleSend() {
-        onSend?.({
-            subject,
-            body,
-            recipientIds: selected.map(r => r.id)
+        if(!canSend) return
+        sendMessage.mutate({
+            title: subject.trim(),
+            content: body.trim(),
+            recipients: selected.map(r => ({ type: r.isGroup ? 1 : 0, id: r.id })),
+            ...(attachments.length > 0 && { attachments: attachments.map(a => a.id) }),
+            ...(events.length > 0 && { events }),
+            ...(deadlines.length > 0 && { deadlines })
+        }, {
+            onSuccess: () => onClose()
         })
     }
 
@@ -111,9 +160,9 @@ function MessageCreate({ onClose, onSend }: MessageCreateProps) {
                         <span className="message-create__recipients-label">{t('message.toRecipients')}</span>
                         <div className="message-create__recipients-list">
                             {selected.map(r => (
-                                <MessageRecipient key={r.id} name={r.name} isGroup={r.isGroup}>
+                                <MessageRecipient key={`${r.isGroup ? "g" : "u"}${r.id}`} name={r.name} isGroup={r.isGroup}>
                                     <button className="message-create__recipient-remove"
-                                    onClick={() => removeRecipient(r.id)}>
+                                    onClick={() => removeRecipient(r)}>
                                         <XMarkIcon />
                                     </button>
                                 </MessageRecipient>
@@ -127,14 +176,18 @@ function MessageCreate({ onClose, onSend }: MessageCreateProps) {
                             <div className="message-create__recipients-dropdown">
                                 <div className="message-create__recipients-dropdown-search">
                                     <MagnifyingGlassIcon />
-                                    <input placeholder={t('recipients.searchPlaceholder')} />
+                                    <input
+                                        placeholder={t('recipients.searchPlaceholder')}
+                                        value={recipientQuery}
+                                        onChange={e => setRecipientQuery(e.target.value)}
+                                    />
                                 </div>
                                 <div className="message-create__recipients-dropdown-list">
                                     {available.length === 0
                                     ? <span className="message-create__recipients-dropdown-empty">{t('recipients.allAdded')}</span>
                                     : available.map(r => (
                                         <div
-                                            key={r.id}
+                                            key={`${r.isGroup ? "g" : "u"}${r.id}`}
                                             className="message-create__recipients-dropdown-item"
                                             onClick={() => addRecipient(r)}
                                         >
@@ -162,17 +215,17 @@ function MessageCreate({ onClose, onSend }: MessageCreateProps) {
                         <div className={clsx("message-create__detection", `message-create__detection--${detected}`, visible && "message-create__detection--visible")}>
                             <span className="message-create__detection-text">
                                 {detected === "deadline"
-                                    ? "В тексте упоминается дедлайн. Хотите добавить его?"
-                                    : "В тексте упоминается событие. Хотите создать его?"}
+                                    ? t("detection.deadlineText")
+                                    : t("detection.eventText")}
                             </span>
-                            <button className="message-create__detection-button">
-                                {detected === "deadline" ? "Добавить дедлайн" : "Создать событие"}
+                            <button className="message-create__detection-button" onClick={() => openModal(detected)}>
+                                {detected === "deadline" ? t("detection.createDeadline") : t("detection.createEvent")}
                             </button>
                         </div>
                     )}
 
                     <div className="message-create__footer">
-                        <button className="message-create__send-button" onClick={handleSend}>
+                        <button className="message-create__send-button" onClick={handleSend} disabled={!canSend}>
                             <PaperAirplaneIcon />
                             <span>{t('message.send')}</span>
                         </button>
@@ -190,24 +243,78 @@ function MessageCreate({ onClose, onSend }: MessageCreateProps) {
                             }
                         >
                             <div className="message-create__attachments-dropdown">
-                                <div className="message-create__attachments-dropdown-item">
+                                <div className="message-create__attachments-dropdown-item" onClick={() => fileInputRef.current?.click()}>
                                     <PaperClipIcon />
                                     <span>{t('attachments.addFile')}</span>
                                 </div>
-                                <div className="message-create__attachments-dropdown-item">
+                                <div className="message-create__attachments-dropdown-item" onClick={() => openModal("event")}>
                                     <GlobeAltIcon />
                                     <span>{t('attachments.createEvent')}</span>
+                                </div>
+                                <div className="message-create__attachments-dropdown-item" onClick={() => openModal("deadline")}>
+                                    <FlagIcon />
+                                    <span>{t('attachments.createDeadline')}</span>
                                 </div>
                             </div>
                         </Dropdown>
                     </div>
-                    {attachments.length === 0 && (
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        style={{ display: "none" }}
+                        onChange={handleFiles}
+                    />
+                    {attachments.length === 0 && events.length === 0 && deadlines.length === 0 && (
                         <span className="message-create__attachments-empty">
                             {t('message.attachmentsEmpty')}
                         </span>
                     )}
+                    {attachments.map(a => (
+                        <div key={`file-${a.id}`} className="message-create__attachment">
+                            <PaperClipIcon />
+                            <span className="message-create__attachment-name">{a.original_name}</span>
+                            <span className="message-create__attachment-size">{formatBytes(a.size_bytes)}</span>
+                            <button
+                                className="message-create__attachment-remove"
+                                onClick={() => setAttachments(prev => prev.filter(x => x.id !== a.id))}>
+                                <XMarkIcon />
+                            </button>
+                        </div>
+                    ))}
+                    {events.map((ev, i) => (
+                        <div key={`ev-${i}`} className="message-create__attachment">
+                            <GlobeAltIcon />
+                            <span className="message-create__attachment-name">{ev.title}</span>
+                            <span className="message-create__attachment-size">{formatDateTime(ev.start_at)}</span>
+                            <button
+                                className="message-create__attachment-remove"
+                                onClick={() => setEvents(prev => prev.filter((_, idx) => idx !== i))}>
+                                <XMarkIcon />
+                            </button>
+                        </div>
+                    ))}
+                    {deadlines.map((dl, i) => (
+                        <div key={`dl-${i}`} className="message-create__attachment">
+                            <FlagIcon />
+                            <span className="message-create__attachment-name">{dl.title}</span>
+                            <span className="message-create__attachment-size">{formatDateTime(dl.due_at)}</span>
+                            <button
+                                className="message-create__attachment-remove"
+                                onClick={() => setDeadlines(prev => prev.filter((_, idx) => idx !== i))}>
+                                <XMarkIcon />
+                            </button>
+                        </div>
+                    ))}
                 </div>
             </div>
+            {modal && (
+                <ScheduleModal
+                    mode={modal}
+                    onClose={() => setModal(null)}
+                    onSubmit={handleSchedule}
+                />
+            )}
         </>
     )
 }

@@ -37,6 +37,53 @@
         color: var(--text-secondary-color);
     }
 
+    &__linked {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    &__unlink {
+        display: flex;
+        padding: 0 !important;
+        border: none;
+        background: none;
+        cursor: pointer;
+        color: var(--text-info-color);
+
+        &:hover { color: var(--accent-hover-color); }
+
+        svg { width: 18px; }
+    }
+
+    &__form {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+
+        .button {
+            padding: .45rem .8rem !important;
+        }
+    }
+
+    &__input {
+        padding: .4rem .6rem;
+        border: 1px solid var(--border-primary-color);
+        border-radius: .5rem;
+        font-size: 14px;
+        color: var(--text-primary-color);
+        outline: none;
+
+        &:focus { border-color: var(--accent-hover-color); }
+    }
+
+    &__error {
+        display: block;
+        padding: 0 1rem .875rem;
+        font-size: 13px;
+        color: #e05c5c;
+    }
+
     &__body {
         display: flex;
         flex-direction: column;

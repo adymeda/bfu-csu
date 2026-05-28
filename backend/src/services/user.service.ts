@@ -12,6 +12,10 @@ class UsersService {
         return repo.create({ ...body, password, accent_color })
     }
 
+    async list(params: { q?: string, limit: number, offset: number }): Promise<{ items: UserPublic[], total: number }> {
+        return repo.list(params)
+    }
+
     async getById(id: number): Promise<UserPublic | null> {
         return repo.findById(id)
     }

@@ -10,6 +10,10 @@ import Checkbox from "@components/ui/Checkbox"
 import AuthInput from "../components/auth/AuthInput"
 import ExternalLinkCard from "../components/settings/ExternalLinkCard"
 import { useAuth } from "../contexts/AuthContext"
+import { useLinks, useLinkTelegram, useDeleteLink } from "../hooks/links"
+import { useUpdateUser } from "../hooks/users"
+import { TELEGRAM_LINK_TYPE } from "../api/links"
+import type { ApiError } from "../api/types"
 
 function SettingsPage() {
     const { t, i18n } = useTranslation("settings")
@@ -33,21 +37,48 @@ function SettingsPage() {
     const [newPassword, setNewPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [passwordError, setPasswordError] = useState<string | null>(null)
+    const [passwordSuccess, setPasswordSuccess] = useState(false)
+    const updateUser = useUpdateUser()
 
     function handlePasswordSave(e: React.FormEvent) {
         e.preventDefault()
+        setPasswordSuccess(false)
+        if(newPassword.length === 0) {
+            setPasswordError(t("password.empty"))
+            return
+        }
         if(newPassword !== confirmPassword) {
             setPasswordError(t("password.mismatch"))
             return
         }
-        setPasswordError(null)
-        setOldPassword("")
-        setNewPassword("")
-        setConfirmPassword("")
+        if(!user) return
+        updateUser.mutate({ id: user.id, data: { password: newPassword } }, {
+            onSuccess: () => {
+                setPasswordError(null)
+                setPasswordSuccess(true)
+                setOldPassword("")
+                setNewPassword("")
+                setConfirmPassword("")
+            },
+            onError: () => setPasswordError(t("password.error"))
+        })
     }
 
-    // Telegram link (mock)
-    const [tgLinked] = useState<string | null>(null)
+    // Telegram link
+    const { data: links } = useLinks()
+    const linkTelegram = useLinkTelegram()
+    const deleteLink = useDeleteLink()
+    const tgLink = links?.find(l => l.link_type === TELEGRAM_LINK_TYPE)
+    const tgLinked = tgLink ? `ID ${tgLink.link_value}` : null
+
+    function telegramError(): string | null {
+        if(!linkTelegram.isError) return null
+        const status = (linkTelegram.error as unknown as ApiError).status
+        if(status === 404) return t("telegram.errorInvalid")
+        if(status === 410) return t("telegram.errorExpired")
+        if(status === 503) return t("telegram.errorUnavailable")
+        return t("telegram.errorGeneric")
+    }
 
     // Telegram notification prefs
     const [tgImportant, setTgImportant] = useState(false)
@@ -114,7 +145,8 @@ function SettingsPage() {
                             onChange={e => setConfirmPassword(e.target.value)}
                         />
                         {passwordError && <span className="settings__error">{passwordError}</span>}
-                        <Button buttonType="submit">{t("password.save")}</Button>
+                        {passwordSuccess && <span className="settings__success">{t("password.success")}</span>}
+                        <Button buttonType="submit" disabled={updateUser.isPending}>{t("password.save")}</Button>
                     </form>
                 </div>
             </div>
@@ -151,7 +183,11 @@ function SettingsPage() {
                     icon="https://telegram.org/img/favicon.ico"
                     name="Telegram"
                     linkedValue={tgLinked ?? undefined}
-                    onLink={() => {}}
+                    inputPlaceholder={t("telegram.codePlaceholder")}
+                    isLinking={linkTelegram.isPending}
+                    error={telegramError()}
+                    onLink={code => linkTelegram.mutate(code)}
+                    onUnlink={() => deleteLink.mutate(TELEGRAM_LINK_TYPE)}
                 >
                     <Checkbox
                         text={t("telegram.important")}

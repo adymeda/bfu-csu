@@ -24,7 +24,8 @@ function EventList({ events, selectedId, onSelect }: EventListProps) {
     return (
         <div className="event-list">
             {events.map(event => {
-                const info = `${formatTime(event.startDate)}-${formatTime(event.endDate)} • ${event.place}`
+                const time = `${formatTime(event.startDate)}${event.endDate ? `-${formatTime(event.endDate)}` : ""}`
+                const info = event.place ? `${time} • ${event.place}` : time
                 return (
                     <div key={event.id}
                         className={clsx("event-list__item", selectedId === event.id && "event-list__item--active")}

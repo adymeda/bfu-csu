@@ -79,6 +79,11 @@
         color: #c0392b;
     }
 
+    &__success {
+        font-size: 13px;
+        color: #2e7d32;
+    }
+
     &__lang-row {
         display: flex;
         gap: .5rem;

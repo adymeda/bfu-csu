@@ -6,6 +6,7 @@ const router = Router()
 
 router.get('/search', checkAuth, controller.search)
 router.get('/suggested', checkAuth, controller.getSuggested)
+router.get('/roots', checkAuth, controller.getRoots)
 
 router.post('/', checkAuth, controller.create)
 

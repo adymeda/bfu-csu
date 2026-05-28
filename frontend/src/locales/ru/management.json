@@ -18,6 +18,17 @@
         "empty": "Нет участников",
         "makeAdmin": "Назначить администратором",
         "revokeAdmin": "Забрать права администратора",
-        "removeFromGroup": "Удалить из группы"
-    }
+        "removeFromGroup": "Удалить из группы",
+        "addMember": "Добавить участника",
+        "addMemberSearch": "Поиск пользователя...",
+        "addMemberEmpty": "Ничего не найдено",
+        "rename": "Переименовать группу",
+        "delete": "Удалить группу",
+        "createModalTitle": "Создать группу",
+        "createChildModalTitle": "Создать подгруппу",
+        "create": "Создать",
+        "cancel": "Отмена"
+    },
+    "loading": "Загрузка…",
+    "noUsers": "Пользователи не найдены"
 }

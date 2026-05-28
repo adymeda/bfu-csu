@@ -20,12 +20,14 @@ function EventDetail({ event }: EventDetailProps) {
                 <div className="event-detail__meta">
                     <div className="event-detail__meta-row">
                         <ClockIcon />
-                        <span>{formatTime(event.startDate)}-{formatTime(event.endDate)}</span>
+                        <span>{formatTime(event.startDate)}{event.endDate && `-${formatTime(event.endDate)}`}</span>
                     </div>
-                    <div className="event-detail__meta-row">
-                        <MapPinIcon />
-                        <span>{event.place}</span>
-                    </div>
+                    {event.place && (
+                        <div className="event-detail__meta-row">
+                            <MapPinIcon />
+                            <span>{event.place}</span>
+                        </div>
+                    )}
                     {event.organizer && (
                         <div className="event-detail__meta-row">
                             <UserIcon />

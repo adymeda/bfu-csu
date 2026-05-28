@@ -54,6 +54,15 @@ class GroupsController {
         }
     }
 
+    async getRoots(req: Request, res: Response, next: NextFunction) {
+        try {
+            const groups = await service.roots(res.locals.userId as number)
+            res.json(groups)
+        } catch(err) {
+            next(err)
+        }
+    }
+
     async getById(req: Request, res: Response, next: NextFunction) {
         const id = parseId(req.params["id"])
         if(id === null) return res.status(400).json({

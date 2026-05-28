@@ -30,6 +30,37 @@ class UsersController {
         }
     }
 
+    async list(req: Request, res: Response, next: NextFunction) {
+        const rawLimit = req.query["limit"]
+        const rawOffset = req.query["offset"]
+        const rawQ = req.query["q"]
+
+        let limit = 20
+        if(rawLimit !== undefined) {
+            limit = Number(rawLimit)
+            if(!Number.isInteger(limit) || limit < 1 || limit > 50) return res.status(400).json({
+                error: "limit should be an integer between 1 and 50"
+            })
+        }
+
+        let offset = 0
+        if(rawOffset !== undefined) {
+            offset = Number(rawOffset)
+            if(!Number.isInteger(offset) || offset < 0) return res.status(400).json({
+                error: "offset should be a non-negative integer"
+            })
+        }
+
+        const q = typeof rawQ === 'string' && rawQ.length > 0 ? rawQ : undefined
+
+        try {
+            const { items, total } = await service.list({ ...(q !== undefined && { q }), limit, offset })
+            res.json({ items, total, limit, offset })
+        } catch(err) {
+            next(err)
+        }
+    }
+
     async getById(req: Request, res: Response, next: NextFunction) {
         const id = parseId(req.params["id"])
 

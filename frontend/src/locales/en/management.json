@@ -18,6 +18,17 @@
         "empty": "No members",
         "makeAdmin": "Make admin",
         "revokeAdmin": "Revoke admin rights",
-        "removeFromGroup": "Remove from group"
-    }
+        "removeFromGroup": "Remove from group",
+        "addMember": "Add member",
+        "addMemberSearch": "Search for a user...",
+        "addMemberEmpty": "Nothing found",
+        "rename": "Rename group",
+        "delete": "Delete group",
+        "createModalTitle": "Create group",
+        "createChildModalTitle": "Create subgroup",
+        "create": "Create",
+        "cancel": "Cancel"
+    },
+    "loading": "Loading…",
+    "noUsers": "No users found"
 }

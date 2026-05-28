@@ -80,6 +80,10 @@ class GroupsService {
     async suggested(userId: number): Promise<GroupPublic[]> {
         return repo.suggested(userId)
     }
+
+    async roots(userId: number): Promise<GroupPublic[]> {
+        return repo.findRoots(userId)
+    }
 }
 
 export default new GroupsService()

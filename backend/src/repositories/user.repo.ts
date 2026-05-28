@@ -12,6 +12,32 @@ class UsersRepository {
         return rows[0]!
     }
 
+    async list(params: { q?: string, limit: number, offset: number }): Promise<{ items: UserPublic[], total: number }> {
+        const conditions: string[] = []
+        const values: unknown[] = []
+
+        if(params.q !== undefined) {
+            values.push(`%${params.q}%`)
+            conditions.push(`display_name ILIKE $${values.length}`)
+        }
+
+        const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+
+        const { rows: countRows } = await pool.query<{ count: string }>(
+            `SELECT count(*)::int AS count FROM users ${where}`,
+            values
+        )
+        const total = Number(countRows[0]?.count ?? 0)
+
+        const { rows } = await pool.query<UserPublic>(
+            `SELECT id, display_name, accent_color FROM users ${where}
+                ORDER BY display_name
+                LIMIT $${values.length + 1} OFFSET $${values.length + 2}`,
+            [...values, params.limit, params.offset]
+        )
+        return { items: rows, total }
+    }
+
     async findById(id: number): Promise<UserPublic | null> {
         const { rows } = await pool.query<UserPublic>(
             `SELECT id, display_name, accent_color FROM users WHERE id = $1`,

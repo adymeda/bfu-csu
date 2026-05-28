@@ -264,6 +264,19 @@ class GroupsRepository {
         return rows
     }
 
+    async findRoots(userId: number): Promise<GroupPublic[]> {
+        const { rows } = await pool.query<GroupPublic>(
+            `${VISIBILITY_CTE}
+            SELECT g.id, g.name, g.parent_id
+            FROM groups g
+            WHERE g.parent_id IS NULL
+                AND (g.id IN (SELECT id FROM vis) OR g.id IN (SELECT id FROM root))
+            ORDER BY g.name`,
+            [userId]
+        )
+        return rows
+    }
+
     async suggested(userId: number): Promise<GroupPublic[]> {
         const { rows } = await pool.query<GroupPublic>(
             `${VISIBILITY_CTE},

@@ -3,7 +3,7 @@ import "@styles/components/inbox/Message.scss"
 import type { MessageProps } from "./types"
 import Avatar from "@components/ui/Avatar"
 
-function Message({ title, author, authorColor, authorIcon, isRead=false, selected=false, text }: MessageProps) {
+function Message({ title, author, authorColor, authorIcon, isRead=false, selected=false, text, date }: MessageProps) {
     return (
         <div className={clsx("message", !isRead && "message--unread", selected && "message--selected")}>
             <div className="message__header">
@@ -18,7 +18,7 @@ function Message({ title, author, authorColor, authorIcon, isRead=false, selecte
             <div className="message__content">
                 { text }
             </div>
-            <div className="message__date">Сегодня в 18:35</div>
+            {date && <div className="message__date">{date}</div>}
         </div>
     )
 }

@@ -42,6 +42,13 @@ export interface DropdownProps {
     triggerClassName?: string
 }
 
+export interface ModalProps {
+    title: string,
+    onClose: () => void,
+    children: React.ReactNode,
+    footer?: React.ReactNode
+}
+
 export interface TabItem {
     key: string,
     label: string

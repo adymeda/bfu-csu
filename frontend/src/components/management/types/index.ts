@@ -39,7 +39,10 @@ export interface GroupInfoProps {
     parentName: string | null,
     onClose?: () => void,
     onToggleAdmin: (memberId: number) => void,
-    onRemoveMember: (memberId: number) => void
+    onRemoveMember: (memberId: number) => void,
+    onAddMember: (userId: number) => void,
+    onRename: (name: string) => void,
+    onDelete: () => void
 }
 
 export interface GroupMemberRowProps {

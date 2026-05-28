@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import {
     UserGroupIcon,
@@ -10,32 +10,20 @@ import {
 import "@styles/pages/ManagementPage.scss"
 import Tabs from "@components/ui/Tabs"
 import Tree from "@components/ui/Tree"
+import Modal from "@components/ui/Modal"
+import Button from "@components/ui/Button"
 import UserListItem from "@components/management/UserListItem"
 import UserInfo from "@components/management/UserInfo"
 import GroupInfo from "@components/management/GroupInfo"
-import { MOCK_USERS, MOCK_GROUPS } from "@components/management/mock"
-import type { ManagementGroup } from "@components/management/types"
-import type { TreeNode } from "@components/ui/types"
+import type { ManagementGroup, ManagementUser, GroupMember } from "@components/management/types"
+import { useUsers } from "../hooks/users"
+import {
+    useGroupTree, useGroupMembers, useGroupAdmins,
+    useCreateGroup, useUpdateGroup, useDeleteGroup,
+    useAddGroupMember, useRemoveGroupMember, useAddGroupAdmin, useRemoveGroupAdmin
+} from "../hooks/groups"
 
 type ActiveTab = "users" | "groups"
-
-function buildGroupTree(groups: ManagementGroup[]): TreeNode[] {
-    const byParent = new Map<number | null, ManagementGroup[]>()
-    for(const g of groups) {
-        const list = byParent.get(g.parent_id) ?? []
-        list.push(g)
-        byParent.set(g.parent_id, list)
-    }
-    function build(parentId: number | null): TreeNode[] {
-        const list = byParent.get(parentId) ?? []
-        return list.map(g => ({
-            id: g.id,
-            label: g.name,
-            children: build(g.id)
-        }))
-    }
-    return build(null)
-}
 
 function ManagementPage() {
     const { t } = useTranslation("management")
@@ -47,26 +35,57 @@ function ManagementPage() {
     const [isUserClosing, setIsUserClosing] = useState(false)
 
     // Groups tab state
-    const [groups, setGroups] = useState<ManagementGroup[]>(MOCK_GROUPS)
     const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null)
     const [isGroupClosing, setIsGroupClosing] = useState(false)
     const [creating, setCreating] = useState<{ parentId: number | null } | null>(null)
+    const [newGroupName, setNewGroupName] = useState("")
 
     const isUserContentOpen = selectedUserId !== null && !isUserClosing
     const isGroupContentOpen = selectedGroupId !== null && !isGroupClosing
 
-    const filteredUsers = MOCK_USERS.filter(u =>
-        u.display_name.toLowerCase().includes(userSearch.trim().toLowerCase())
-    )
-    const selectedUser = MOCK_USERS.find(u => u.id === selectedUserId)
+    const usersQuery = useUsers({ q: userSearch.trim(), limit: 50 })
+    const users = usersQuery.data?.items ?? []
+    const selectedUserRaw = users.find(u => u.id === selectedUserId)
+    const selectedUser: ManagementUser | undefined = selectedUserRaw
+        ? { id: selectedUserRaw.id, display_name: selectedUserRaw.display_name, accent_color: selectedUserRaw.accent_color, groups: [] }
+        : undefined
 
-    const groupTree = useMemo(() => buildGroupTree(groups), [groups])
-    const selectedGroup = groups.find(g => g.id === selectedGroupId)
-    const parentName = selectedGroup
-        ? (selectedGroup.parent_id !== null
-            ? groups.find(g => g.id === selectedGroup.parent_id)?.name ?? null
-            : null)
+    const groupTreeQuery = useGroupTree()
+    const groupTree = groupTreeQuery.data?.tree ?? []
+    const groupsFlat = groupTreeQuery.data?.groups ?? []
+
+    const membersQuery = useGroupMembers(activeTab === "groups" ? selectedGroupId : null)
+    const adminsQuery = useGroupAdmins(activeTab === "groups" ? selectedGroupId : null)
+
+    const createGroup = useCreateGroup()
+    const updateGroup = useUpdateGroup()
+    const deleteGroup = useDeleteGroup()
+    const addMember = useAddGroupMember()
+    const removeMember = useRemoveGroupMember()
+    const addAdmin = useAddGroupAdmin()
+    const removeAdmin = useRemoveGroupAdmin()
+
+    const selectedGroupRaw = groupsFlat.find(g => g.id === selectedGroupId)
+    const parentName = selectedGroupRaw && selectedGroupRaw.parent_id !== null
+        ? groupsFlat.find(g => g.id === selectedGroupRaw.parent_id)?.name ?? null
         : null
+
+    const selectedGroup: ManagementGroup | undefined = (() => {
+        if(!selectedGroupRaw) return undefined
+        const adminIds = new Set((adminsQuery.data ?? []).map(a => a.user_id))
+        const members: GroupMember[] = (membersQuery.data ?? []).map(m => ({
+            id: m.id,
+            display_name: m.display_name,
+            accent_color: m.accent_color,
+            isAdmin: adminIds.has(m.id)
+        }))
+        for(const a of adminsQuery.data ?? []) {
+            if(!members.some(m => m.id === a.user_id)) {
+                members.push({ id: a.user_id, display_name: a.display_name, accent_color: a.accent_color, isAdmin: true })
+            }
+        }
+        return { id: selectedGroupRaw.id, name: selectedGroupRaw.name, parent_id: selectedGroupRaw.parent_id, members }
+    })()
 
     function handleUserClose() {
         if(window.matchMedia("(max-width: 768px)").matches) {
@@ -93,67 +112,63 @@ function ManagementPage() {
     }
 
     function handleCreateRoot() {
+        setNewGroupName("")
         setCreating({ parentId: null })
     }
 
     function handleCreateChild() {
         if(selectedGroupId === null) return
+        setNewGroupName("")
         setCreating({ parentId: selectedGroupId })
     }
 
-    function commitCreate(rawName: string) {
-        const name = rawName.trim()
-        if(creating === null) return
-        if(!name) {
-            setCreating(null)
-            return
-        }
-        const nextId = groups.reduce((max, g) => Math.max(max, g.id), 0) + 1
-        const newGroup: ManagementGroup = {
-            id: nextId,
-            name,
-            parent_id: creating.parentId,
-            members: []
-        }
-        setGroups([...groups, newGroup])
-        setSelectedGroupId(nextId)
+    function handleCreateSubmit() {
+        const name = newGroupName.trim()
+        if(!name || creating === null) return
+        const parentId = creating.parentId
         setCreating(null)
+        createGroup.mutate({ name, parentId }, {
+            onSuccess: created => setSelectedGroupId(created.id)
+        })
     }
 
     function handleToggleAdmin(memberId: number) {
-        if(selectedGroupId === null) return
-        setGroups(groups.map(g => {
-            if(g.id !== selectedGroupId) return g
-            return {
-                ...g,
-                members: g.members.map(m =>
-                    m.id === memberId ? { ...m, isAdmin: !m.isAdmin } : m
-                )
-            }
-        }))
+        if(selectedGroupId === null || !selectedGroup) return
+        const member = selectedGroup.members.find(m => m.id === memberId)
+        if(!member) return
+        if(member.isAdmin) removeAdmin.mutate({ groupId: selectedGroupId, userId: memberId })
+        else addAdmin.mutate({ groupId: selectedGroupId, userId: memberId })
     }
 
     function handleRemoveMember(memberId: number) {
         if(selectedGroupId === null) return
-        setGroups(groups.map(g => {
-            if(g.id !== selectedGroupId) return g
-            return { ...g, members: g.members.filter(m => m.id !== memberId) }
-        }))
+        removeMember.mutate({ groupId: selectedGroupId, userId: memberId })
+    }
+
+    function handleAddMember(userId: number) {
+        if(selectedGroupId === null) return
+        addMember.mutate({ groupId: selectedGroupId, userId })
+    }
+
+    function handleRename(name: string) {
+        if(selectedGroupId === null) return
+        updateGroup.mutate({ id: selectedGroupId, data: { name } })
+    }
+
+    function handleDeleteGroup() {
+        if(selectedGroupId === null) return
+        deleteGroup.mutate(selectedGroupId, { onSuccess: handleGroupClose })
     }
 
     useEffect(() => {
         function onKeyDown(e: KeyboardEvent) {
             if(e.key !== "Escape") return
-            if(creating !== null) {
-                setCreating(null)
-                return
-            }
             if(activeTab === "users" && selectedUserId !== null) handleUserClose()
             else if(activeTab === "groups" && selectedGroupId !== null) handleGroupClose()
         }
         document.addEventListener("keydown", onKeyDown)
         return () => document.removeEventListener("keydown", onKeyDown)
-    }, [activeTab, selectedUserId, selectedGroupId, isUserClosing, isGroupClosing, creating])
+    }, [activeTab, selectedUserId, selectedGroupId, isUserClosing, isGroupClosing])
 
     return (
         <div className="management">
@@ -177,10 +192,16 @@ function ManagementPage() {
                             />
                         </div>
                         <div className="management-users-sidebar__list">
-                            {filteredUsers.map(u => (
+                            {usersQuery.isLoading && (
+                                <div className="management-users-sidebar__empty">{t("loading")}</div>
+                            )}
+                            {!usersQuery.isLoading && users.length === 0 && (
+                                <div className="management-users-sidebar__empty">{t("noUsers")}</div>
+                            )}
+                            {users.map(u => (
                                 <UserListItem
                                     key={u.id}
-                                    user={u}
+                                    user={{ id: u.id, display_name: u.display_name, accent_color: u.accent_color, groups: [] }}
                                     selected={selectedUserId === u.id}
                                     onClick={() => setSelectedUserId(u.id)}
                                 />
@@ -216,18 +237,6 @@ function ManagementPage() {
                             </button>
                         </div>
                         <div className="management-groups-sidebar__list">
-                            {creating && (
-                                <input
-                                    className="management-groups-sidebar__new"
-                                    autoFocus
-                                    placeholder={t("group.namePlaceholder")}
-                                    onKeyDown={e => {
-                                        if(e.key === "Enter") commitCreate(e.currentTarget.value)
-                                        else if(e.key === "Escape") setCreating(null)
-                                    }}
-                                    onBlur={e => commitCreate(e.currentTarget.value)}
-                                />
-                            )}
                             <Tree
                                 nodes={groupTree}
                                 selectedId={selectedGroupId ?? undefined}
@@ -243,6 +252,9 @@ function ManagementPage() {
                                 onClose={handleGroupClose}
                                 onToggleAdmin={handleToggleAdmin}
                                 onRemoveMember={handleRemoveMember}
+                                onAddMember={handleAddMember}
+                                onRename={handleRename}
+                                onDelete={handleDeleteGroup}
                             />
                             : <div className="management-groups-content__empty">
                                 <UserGroupIcon />
@@ -250,6 +262,37 @@ function ManagementPage() {
                             </div>}
                     </div>
                 </div>}
+            {creating && (
+                <Modal
+                    title={creating.parentId === null ? t("group.createModalTitle") : t("group.createChildModalTitle")}
+                    onClose={() => setCreating(null)}
+                    footer={
+                        <>
+                            <Button buttonLevel={2} onClick={() => setCreating(null)}>
+                                {t("group.cancel")}
+                            </Button>
+                            <Button
+                                buttonLevel={1}
+                                onClick={handleCreateSubmit}
+                                disabled={newGroupName.trim().length === 0 || createGroup.isPending}
+                            >
+                                {t("group.create")}
+                            </Button>
+                        </>
+                    }
+                >
+                    <div className="management-create-group">
+                        <label className="management-create-group__label">{t("group.namePlaceholder")}</label>
+                        <input
+                            className="management-create-group__input"
+                            autoFocus
+                            value={newGroupName}
+                            onChange={e => setNewGroupName(e.target.value)}
+                            onKeyDown={e => { if(e.key === "Enter") handleCreateSubmit() }}
+                        />
+                    </div>
+                </Modal>
+            )}
         </div>
     )
 }

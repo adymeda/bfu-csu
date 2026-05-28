@@ -2,7 +2,7 @@ import "@styles/layouts/MainLayout.scss"
 import { Outlet, useNavigate } from "react-router"
 import { useTranslation } from "react-i18next"
 import Logo from "../components/ui/Logo"
-import { ArrowLeftEndOnRectangleIcon, CalendarIcon, InboxIcon, MagnifyingGlassIcon, Cog6ToothIcon, UserGroupIcon } from "@heroicons/react/24/outline"
+import { ArrowLeftEndOnRectangleIcon, CalendarIcon, InboxIcon, Cog6ToothIcon, UserGroupIcon } from "@heroicons/react/24/outline"
 import NavButton from "../components/ui/NavButton"
 import Avatar from "../components/ui/Avatar"
 import Dropdown from "../components/ui/Dropdown"
@@ -78,7 +78,7 @@ function MainLayout() {
                         path="/management"
                         Icon={UserGroupIcon}
                     />
-                    <button className="mobile-profile-button nav-button" onClick={() => {}}>
+                    <button className="mobile-profile-button nav-button" onClick={() => navigate("/settings")}>
                         <Avatar placeholder={username} color={avatarColor} />
                         Профиль
                     </button>

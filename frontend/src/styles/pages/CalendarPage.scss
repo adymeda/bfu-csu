@@ -175,6 +175,10 @@
     }
 
     @media screen and (max-width: 768px) {
+        &__titlebar {
+            flex-direction: column;
+        }
+
         &__events-preview {
             flex-direction: column;
         }

@@ -1,6 +1,9 @@
 {
     "inboxSearchPlaceholder": "Search by name, content...",
     "selectMessage": "Click on a message on the left to open it",
+    "loading": "Loading…",
+    "noMessages": "No messages",
+    "loadMore": "Load more",
     "tabs": {
         "incoming": "Inbox",
         "sent": "Sent",
@@ -17,7 +20,10 @@
         "reply": "Reply",
         "replyAll": "Reply to all",
         "forward": "Forward",
-        "copyText": "Copy text"
+        "copyText": "Copy text",
+        "favorite": "Favorite",
+        "delete": "Delete",
+        "download": "Download"
     },
     "recipients": {
         "searchPlaceholder": "Search for a recipient...",
@@ -25,6 +31,24 @@
     },
     "attachments": {
         "addFile": "Add file",
-        "createEvent": "Create event"
+        "createEvent": "Create event",
+        "createDeadline": "Set deadline"
+    },
+    "detection": {
+        "eventText": "An event is mentioned in the text. Add it?",
+        "deadlineText": "A deadline is mentioned in the text. Add it?",
+        "createEvent": "Create event",
+        "createDeadline": "Add deadline"
+    },
+    "schedule": {
+        "eventTitle": "New event",
+        "deadlineTitle": "New deadline",
+        "name": "Title",
+        "start": "Start",
+        "end": "End (optional)",
+        "due": "Due",
+        "endBeforeStart": "End cannot be before start",
+        "save": "Save",
+        "cancel": "Cancel"
     }
 }

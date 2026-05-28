@@ -14,22 +14,16 @@ export interface MessageProps {
     isRead?: boolean,
     selected?: boolean,
     text: string,
+    date?: string,
     onClose?: () => void
 }
 
 export interface Recipient {
-    id: string
+    id: number
     name: string
     isGroup: boolean
 }
 
-export interface MessageCreateData {
-    subject: string
-    body: string
-    recipientIds: string[]
-}
-
 export interface MessageCreateProps {
     onClose: () => void
-    onSend?: (data: MessageCreateData) => void
 }

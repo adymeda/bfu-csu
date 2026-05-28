@@ -1,0 +1,30 @@
+.schedule-form {
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: .35rem;
+    }
+
+    &__label {
+        font-size: 13px;
+        color: var(--text-info-color);
+    }
+
+    &__input {
+        width: 100%;
+        padding: .5rem .6rem;
+        font-size: 14px;
+        color: var(--text-primary-color);
+        background: white;
+        border: 1px solid var(--border-primary-color);
+        border-radius: .5rem;
+        outline: none;
+
+        &:focus { border-color: var(--accent-hover-color); }
+    }
+
+    &__error {
+        font-size: 12px;
+        color: #c0392b;
+    }
+}

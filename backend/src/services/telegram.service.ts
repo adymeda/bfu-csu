@@ -1,3 +1,7 @@
+export type TelegramLinkResult =
+    | { ok: true, telegram_id: number }
+    | { ok: false, reason: "not_found" | "expired" | "unavailable" }
+
 class TelegramService {
     private readonly url = process.env["TELEGRAM_SERVICE_URL"] ?? ""
     private readonly token = process.env["TELEGRAM_SERVICE_TOKEN"] ?? ""
@@ -35,6 +39,32 @@ class TelegramService {
         } catch (err) {
             console.warn("[telegram] /api/notify unreachable:", (err as Error).message)
             return null
+        }
+    }
+
+    async link(userId: number, code: string): Promise<TelegramLinkResult> {
+        if(this.isMisconfigured()) return { ok: false, reason: "unavailable" }
+        try {
+            const res = await fetch(`${this.url}/api/link`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${this.token}`,
+                },
+                body: JSON.stringify({ user_id: userId, code }),
+                signal: AbortSignal.timeout(10000),
+            })
+            if(res.status === 404) return { ok: false, reason: "not_found" }
+            if(res.status === 410) return { ok: false, reason: "expired" }
+            if(!res.ok) {
+                console.warn(`[telegram] /api/link returned ${res.status}`)
+                return { ok: false, reason: "unavailable" }
+            }
+            const body = await res.json() as { telegram_id: number }
+            return { ok: true, telegram_id: body.telegram_id }
+        } catch (err) {
+            console.warn("[telegram] /api/link unreachable:", (err as Error).message)
+            return { ok: false, reason: "unavailable" }
         }
     }
 

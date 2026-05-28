@@ -19,7 +19,7 @@ function assignRows(events: CalendarEvent[]): PositionedEvent[] {
 
     return sorted.map(event => {
         const startMin = dateToMinutes(event.startDate)
-        const endMin = dateToMinutes(event.endDate)
+        const endMin = event.endDate ? dateToMinutes(event.endDate) : startMin + 60
 
         const rowIndex = rowEndTimes.findIndex(t => t + 60 <= startMin)
 
@@ -128,7 +128,7 @@ function DayCalendar({ events, deadlines = [], date, selectedEventId, onEventSel
 
                             {positionedEvents.map(({ event, row }) => {
                                 const startMin = dateToMinutes(event.startDate)
-                                const endMin = dateToMinutes(event.endDate)
+                                const endMin = event.endDate ? dateToMinutes(event.endDate) : startMin + 60
                                 const left = (startMin / TOTAL_MINUTES) * totalWidth
                                 const width = ((endMin - startMin) / TOTAL_MINUTES) * totalWidth
 
@@ -148,7 +148,7 @@ function DayCalendar({ events, deadlines = [], date, selectedEventId, onEventSel
                                             {event.title}
                                         </span>
                                         <span className="day-calendar__event-time">
-                                            {formatTime(event.startDate)}-{formatTime(event.endDate)}
+                                            {formatTime(event.startDate)}{event.endDate && `-${formatTime(event.endDate)}`}
                                         </span>
                                     </div>
                                 )

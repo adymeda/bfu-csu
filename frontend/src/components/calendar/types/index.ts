@@ -4,8 +4,8 @@ export interface CalendarEvent {
     id: string
     title: string
     startDate: Date
-    endDate: Date
-    place: string
+    endDate?: Date
+    place?: string
     color: string
     organizer?: string
     description?: string
