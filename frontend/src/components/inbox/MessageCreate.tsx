@@ -10,6 +10,7 @@ import MessageRecipient from "./MessageRecipient"
 import ScheduleModal, { type SubmitResult } from "./ScheduleModal"
 import { useSendMessage } from "../../hooks/messages"
 import { useUsers } from "../../hooks/users"
+import { useAuth } from "../../contexts/AuthContext"
 import { useSearchGroups } from "../../hooks/groups"
 import { uploadAttachments, formatBytes } from "../../api/attachments"
 import type { AttachmentPublic, MessageEventInput, MessageDeadlineInput } from "../../api/types"
@@ -47,11 +48,11 @@ function detectContent(text: string): DetectionResult {
 	return null
 }
 
-function MessageCreate({ onClose }: MessageCreateProps) {
+function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, initialContent }: MessageCreateProps) {
     const { t, i18n } = useTranslation('inbox')
-    const [subject, setSubject] = useState("")
-    const [body, setBody] = useState("")
-    const [selected, setSelected] = useState<Recipient[]>([])
+    const [subject, setSubject] = useState(initialSubject ?? "")
+    const [body, setBody] = useState(initialContent ?? "")
+    const [selected, setSelected] = useState<Recipient[]>(initialRecipients ?? [])
     const [attachments, setAttachments] = useState<AttachmentPublic[]>([])
     const [events, setEvents] = useState<MessageEventInput[]>([])
     const [deadlines, setDeadlines] = useState<MessageDeadlineInput[]>([])
@@ -80,6 +81,7 @@ function MessageCreate({ onClose }: MessageCreateProps) {
     const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
+    const { user: currentUser } = useAuth()
     const sendMessage = useSendMessage()
     const { data: usersData } = useUsers({ q: recipientQuery, limit: 8 })
     const { data: groupsData } = useSearchGroups(recipientQuery)
@@ -104,7 +106,7 @@ function MessageCreate({ onClose }: MessageCreateProps) {
     const available: Recipient[] = [
         ...(usersData?.items ?? []).map(u => ({ id: u.id, name: u.display_name, isGroup: false })),
         ...(groupsData ?? []).map(g => ({ id: g.id, name: g.name, isGroup: true }))
-    ].filter(r => !selectedKeys.has(`${r.isGroup ? "g" : "u"}${r.id}`))
+    ].filter(r => !selectedKeys.has(`${r.isGroup ? "g" : "u"}${r.id}`) && (r.isGroup || r.id !== currentUser?.id))
 
     function addRecipient(r: Recipient) {
         setSelected(prev => [...prev, r])
@@ -210,6 +212,14 @@ function MessageCreate({ onClose }: MessageCreateProps) {
                         value={body}
                         onChange={e => setBody(e.target.value)}
                     />
+
+                    {replyTo && (
+                        <div className="message-create__reply-to">
+                            <span className="message-create__reply-to-label">{t("replyTo")}</span>
+                            <div className="message-create__reply-to-author">{replyTo.senderName}</div>
+                            <p className="message-create__reply-to-content">{replyTo.content}</p>
+                        </div>
+                    )}
 
                     {detected && (
                         <div className={clsx("message-create__detection", `message-create__detection--${detected}`, visible && "message-create__detection--visible")}>

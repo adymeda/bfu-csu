@@ -24,6 +24,15 @@ export interface Recipient {
     isGroup: boolean
 }
 
+export interface ReplyToInfo {
+    senderName: string
+    content: string
+}
+
 export interface MessageCreateProps {
     onClose: () => void
+    initialRecipients?: Recipient[]
+    initialSubject?: string
+    replyTo?: ReplyToInfo
+    initialContent?: string
 }

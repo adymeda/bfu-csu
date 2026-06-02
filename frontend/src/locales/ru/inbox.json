@@ -25,6 +25,10 @@
         "delete": "Удалить",
         "download": "Скачать"
     },
+    "replyTo": "В ответ на:",
+    "forward": {
+        "title": "Переслать сообщение"
+    },
     "recipients": {
         "searchPlaceholder": "Поиск получателя...",
         "allAdded": "Все получатели добавлены"

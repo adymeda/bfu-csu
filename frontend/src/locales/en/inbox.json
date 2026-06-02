@@ -25,6 +25,10 @@
         "delete": "Delete",
         "download": "Download"
     },
+    "replyTo": "In reply to:",
+    "forward": {
+        "title": "Forward message"
+    },
     "recipients": {
         "searchPlaceholder": "Search for a recipient...",
         "allAdded": "All recipients added"

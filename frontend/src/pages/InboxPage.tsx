@@ -12,7 +12,15 @@ import {
     useMessages, useMessage, useMarkRead, useToggleFavorite, useDeleteMessage,
     type MessagesFilter
 } from "../hooks/messages"
+import type { Recipient, ReplyToInfo } from "../components/inbox/types"
 import type { FC, SVGProps } from "react"
+
+type ComposeContext = {
+    initialRecipients?: Recipient[]
+    initialSubject?: string
+    replyTo?: ReplyToInfo
+    initialContent?: string
+}
 
 type Tab = {
     key?: string
@@ -45,6 +53,7 @@ function InboxPage() {
         return state?.messageId ?? null
     })
     const [isComposing, setIsComposing] = useState(false)
+    const [composeContext, setComposeContext] = useState<ComposeContext>({})
     const [isClosing, setIsClosing] = useState(false)
     const [search, setSearch] = useState("")
     const tabsRef = useRef<HTMLDivElement>(null)
@@ -87,11 +96,33 @@ function InboxPage() {
 
     function handleComposeOpen() {
         setIsComposing(true)
+        setComposeContext({})
         setCurrentMessageId(null)
     }
 
     function handleComposeClose() {
         setIsComposing(false)
+        setComposeContext({})
+    }
+
+    function handleReply(sender: Recipient, title: string, content: string) {
+        setIsComposing(true)
+        setCurrentMessageId(null)
+        setComposeContext({
+            initialRecipients: [sender],
+            initialSubject: `Re: ${title}`,
+            replyTo: { senderName: sender.name, content }
+        })
+    }
+
+    function handleForward(recipients: Recipient[], title: string, content: string) {
+        setIsComposing(true)
+        setCurrentMessageId(null)
+        setComposeContext({
+            initialRecipients: recipients,
+            initialSubject: `Fwd: ${title}`,
+            initialContent: content
+        })
     }
 
     function handleMessageClose() {
@@ -188,13 +219,15 @@ function InboxPage() {
             </div>
             <div className={clsx("inbox-content", isContentOpen && "inbox-content--active")}>
                 {isComposing
-                ? <MessageCreate onClose={handleComposeClose} />
+                ? <MessageCreate onClose={handleComposeClose} {...composeContext} />
                 : currentMessageId !== null && messageQuery.data
                 ? <MessageDisplay
                     message={messageQuery.data}
                     onClose={handleMessageClose}
                     onToggleFavorite={() => toggleFavorite.mutate({ id: currentMessageId, favorite: !messageQuery.data!.is_favorite })}
                     onDelete={() => deleteMessage.mutate(currentMessageId, { onSuccess: handleMessageClose })}
+                    onReply={handleReply}
+                    onForward={handleForward}
                   />
                 : <div className="inbox-content__empty">
                     <EnvelopeIcon />
