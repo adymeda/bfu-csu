@@ -1,5 +1,6 @@
 import clsx from "clsx"
 import { useRef, useState, useEffect } from "react"
+import { useLocation } from "react-router"
 import { useTranslation } from "react-i18next"
 import { EnvelopeIcon, MagnifyingGlassIcon, PencilSquareIcon, StarIcon as StarOutline } from "@heroicons/react/24/outline"
 import { StarIcon as StarSolid } from "@heroicons/react/24/solid"
@@ -37,8 +38,12 @@ function filterForTab(index: number): MessagesFilter | null {
 
 function InboxPage() {
     const { t, i18n } = useTranslation('inbox')
+    const location = useLocation()
     const [activeTab, setActiveTab] = useState(1)
-    const [currentMessageId, setCurrentMessageId] = useState<number | null>(null)
+    const [currentMessageId, setCurrentMessageId] = useState<number | null>(() => {
+        const state = location.state as { messageId?: number } | null
+        return state?.messageId ?? null
+    })
     const [isComposing, setIsComposing] = useState(false)
     const [isClosing, setIsClosing] = useState(false)
     const [search, setSearch] = useState("")

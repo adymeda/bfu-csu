@@ -9,6 +9,7 @@ import EventList from "../components/calendar/EventList"
 import EventDetail from "../components/calendar/EventDetail"
 import { toCalendarEvent, toCalendarDeadline } from "../components/calendar/adapters"
 import { useEvents, useDeadlines } from "../hooks/calendar"
+import { useMessage } from "../hooks/messages"
 import { toISODate, isSameDay, isSameMonth, addDays, addMonths, startOfMonth } from "@helpers"
 
 type View = "month" | "day"
@@ -94,6 +95,22 @@ function CalendarPage() {
     })()
 
     const selectedEvent = eventsForDay.find(e => e.id === selectedEventId) ?? null
+    const { data: linkedMessageData } = useMessage(selectedEvent?.messageId ?? null)
+
+    const enrichedEvent = useMemo(() => {
+        if(!selectedEvent) return null
+        if(!linkedMessageData) return selectedEvent
+        return {
+            ...selectedEvent,
+            linkedMessage: {
+                title: linkedMessageData.title,
+                author: linkedMessageData.sender.display_name,
+                authorColor: `#${linkedMessageData.sender.accent_color}`,
+                text: linkedMessageData.content,
+                isRead: linkedMessageData.is_read,
+            }
+        }
+    }, [selectedEvent, linkedMessageData])
 
     const isOnToday = view === "day"
         ? isSameDay(selectedDate, today)
@@ -214,8 +231,8 @@ function CalendarPage() {
                             />
                         </div>
                         <div className="calendar-page__events-detail">
-                            {selectedEvent
-                                ? <EventDetail event={selectedEvent} />
+                            {enrichedEvent
+                                ? <EventDetail event={enrichedEvent} />
                                 : <div className="calendar-page__events-placeholder">
                                     <span>{t("selectEvent")}</span>
                                 </div>

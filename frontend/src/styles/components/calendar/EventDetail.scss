@@ -73,4 +73,20 @@
         text-transform: uppercase;
         letter-spacing: .05em;
     }
+
+    &__message-link {
+        all: unset;
+        display: block;
+        cursor: pointer;
+        border-radius: 8px;
+
+        &:hover .message {
+            background-color: var(--hover-color);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+    }
 }

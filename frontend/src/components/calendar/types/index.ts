@@ -9,6 +9,7 @@ export interface CalendarEvent {
     color: string
     organizer?: string
     description?: string
+    messageId?: number | null
     linkedMessage?: MessageProps
 }
 

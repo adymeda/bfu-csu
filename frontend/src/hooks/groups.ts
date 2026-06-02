@@ -13,8 +13,6 @@ export interface GroupTree {
     groups: GroupPublic[]
 }
 
-// The API has no "whole tree" endpoint, so build it from the visible roots and
-// recursively load each node's children.
 async function loadGroupTree(): Promise<GroupTree> {
     const flat: GroupPublic[] = []
     async function build(group: GroupPublic): Promise<TreeNode> {

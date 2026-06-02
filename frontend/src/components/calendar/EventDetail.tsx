@@ -1,5 +1,6 @@
 import { ClockIcon, MapPinIcon, UserIcon } from "@heroicons/react/24/outline"
 import { useTranslation } from "react-i18next"
+import { useNavigate } from "react-router"
 import "@styles/components/calendar/EventDetail.scss"
 import Message from "@components/inbox/Message"
 import type { CalendarEvent } from "./types"
@@ -11,6 +12,7 @@ interface EventDetailProps {
 
 function EventDetail({ event }: EventDetailProps) {
     const { t } = useTranslation('calendar')
+    const navigate = useNavigate()
 
     return (
         <div className="event-detail">
@@ -41,10 +43,15 @@ function EventDetail({ event }: EventDetailProps) {
                 {event.linkedMessage && (
                     <div className="event-detail__message">
                         <span className="event-detail__message-label">{t('linkedMessage')}</span>
-                        <Message author={event.linkedMessage.author}
-                            title={event.linkedMessage.title}
-                            text={event.linkedMessage.text}
-                            isRead />
+                        <button
+                            className="event-detail__message-link"
+                            onClick={() => navigate("/inbox", { state: { messageId: event.messageId } })}
+                        >
+                            <Message author={event.linkedMessage.author}
+                                title={event.linkedMessage.title}
+                                text={event.linkedMessage.text}
+                                isRead />
+                        </button>
                     </div>
                 )}
             </div>
