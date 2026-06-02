@@ -48,6 +48,7 @@ function EventDetail({ event }: EventDetailProps) {
                             onClick={() => navigate("/inbox", { state: { messageId: event.messageId } })}
                         >
                             <Message author={event.linkedMessage.author}
+                                authorColor={event.linkedMessage.authorColor}
                                 title={event.linkedMessage.title}
                                 text={event.linkedMessage.text}
                                 isRead />
