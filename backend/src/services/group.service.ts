@@ -25,8 +25,8 @@ class GroupsService {
         return repo.delete(id)
     }
 
-    async findChildren(groupId: number): Promise<GroupPublic[]> {
-        return repo.findChildren(groupId)
+    async findChildren(groupId: number, userId: number): Promise<GroupPublic[]> {
+        return repo.findChildren(groupId, userId)
     }
 
     async findAncestors(groupId: number): Promise<GroupPublic[]> {

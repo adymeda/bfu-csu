@@ -15,9 +15,15 @@ const VISIBILITY_CTE = `
     ),
     root AS (SELECT id FROM groups WHERE parent_id IS NULL LIMIT 1),
     faculty_root AS (
+        -- Normal case: direct children of root that are in the user's ancestor chain
         SELECT uanc.id FROM user_anc uanc
         JOIN groups g ON g.id = uanc.id
         JOIN root r ON g.parent_id = r.id
+        UNION
+        -- Root-admin case: if user is member/admin of root itself, all children of root are visible
+        SELECT g.id FROM groups g, root r
+        WHERE g.parent_id = r.id
+          AND EXISTS (SELECT 1 FROM user_anc ua WHERE ua.id = r.id)
     ),
     vis AS (
         SELECT id FROM faculty_root
@@ -65,12 +71,14 @@ class GroupsRepository {
         return (rowCount ?? 0) > 0
     }
 
-    async findChildren(groupId: number): Promise<GroupPublic[]> {
+    async findChildren(groupId: number, userId: number): Promise<GroupPublic[]> {
         const { rows } = await pool.query<GroupPublic>(
-            `SELECT id, name, parent_id FROM groups
-                WHERE parent_id = $1
-                ORDER BY name`,
-            [groupId]
+            `${VISIBILITY_CTE}
+            SELECT g.id, g.name, g.parent_id FROM groups g
+            WHERE g.parent_id = $2
+              AND (g.id IN (SELECT id FROM vis) OR g.id IN (SELECT id FROM root))
+            ORDER BY g.name`,
+            [userId, groupId]
         )
         return rows
     }
@@ -233,10 +241,9 @@ class GroupsRepository {
         return rows[0]?.allowed ?? false
     }
 
-    async search(userId: number, q: string): Promise<GroupPublic[]> {
+    async search(_userId: number, q: string): Promise<GroupPublic[]> {
         const { rows } = await pool.query<GroupPublic>(
-            `${VISIBILITY_CTE},
-            depths AS (
+            `WITH RECURSIVE depths AS (
                 SELECT id, 0 AS d FROM groups WHERE parent_id IS NULL
                 UNION ALL
                 SELECT g.id, dp.d + 1 FROM groups g JOIN depths dp ON g.parent_id = dp.id
@@ -244,22 +251,17 @@ class GroupsRepository {
             SELECT g.id, g.name, g.parent_id
             FROM groups g
             JOIN depths d ON g.id = d.id
-            WHERE (g.id IN (SELECT id FROM vis) OR g.id IN (SELECT id FROM root))
-                AND g.name ILIKE '%' || $2 || '%'
+            WHERE g.name ILIKE '%' || $1 || '%'
             ORDER BY
                 CASE
-                    WHEN lower(g.name) = lower($2) THEN 0
-                    WHEN lower(g.name) ILIKE lower($2) || '%' THEN 1
+                    WHEN lower(g.name) = lower($1) THEN 0
+                    WHEN lower(g.name) ILIKE lower($1) || '%' THEN 1
                     ELSE 2
                 END,
-                CASE WHEN g.id IN (SELECT id FROM user_anc) THEN 0 ELSE 1 END,
-                CASE WHEN g.parent_id IN (
-                    SELECT ug.parent_id FROM groups ug
-                    WHERE ug.id IN (SELECT id FROM user_scope)
-                ) THEN 0 ELSE 1 END,
                 d.d,
-                g.name`,
-            [userId, q]
+                g.name
+            LIMIT 20`,
+            [q]
         )
         return rows
     }
@@ -279,7 +281,12 @@ class GroupsRepository {
 
     async suggested(userId: number): Promise<GroupPublic[]> {
         const { rows } = await pool.query<GroupPublic>(
-            `${VISIBILITY_CTE},
+            `WITH RECURSIVE
+            user_scope AS (
+                SELECT group_id AS id FROM group_members WHERE user_id = $1
+                UNION
+                SELECT group_id AS id FROM group_admins WHERE user_id = $1
+            ),
             depths AS (
                 SELECT id, 0 AS d FROM groups WHERE parent_id IS NULL
                 UNION ALL
@@ -288,10 +295,8 @@ class GroupsRepository {
             SELECT g.id, g.name, g.parent_id
             FROM groups g
             JOIN depths d ON g.id = d.id
-            WHERE (g.id IN (SELECT id FROM vis) OR g.id IN (SELECT id FROM root))
-                AND g.id NOT IN (SELECT id FROM user_scope)
             ORDER BY
-                CASE WHEN g.id IN (SELECT id FROM user_anc) THEN 0 ELSE 1 END,
+                CASE WHEN g.id IN (SELECT id FROM user_scope) THEN 0 ELSE 1 END,
                 d.d,
                 g.name
             LIMIT 20`,

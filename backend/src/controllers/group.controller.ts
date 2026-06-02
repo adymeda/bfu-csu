@@ -162,7 +162,7 @@ class GroupsController {
                 error: "Group not found"
             })
 
-            const children = await service.findChildren(id)
+            const children = await service.findChildren(id, res.locals.userId as number)
             res.json(children)
         } catch(err) {
             next(err)
