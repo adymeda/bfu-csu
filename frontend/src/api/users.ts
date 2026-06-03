@@ -1,5 +1,5 @@
 import { apiFetch } from "./client"
-import type { UserListResponse, UserPublic, User } from "./types"
+import type { UserListResponse, UserPublic, User, GroupPublic } from "./types"
 
 export interface UpdateUserData {
     email?: string
@@ -32,4 +32,29 @@ export function listUsers(params: ListUsersParams = {}): Promise<UserListRespons
 
 export function getUser(id: number): Promise<UserPublic> {
     return apiFetch<UserPublic>(`/users/${id}`)
+}
+
+export interface CreateUserData {
+    email: string
+    password: string
+    display_name: string
+}
+
+export function createUser(data: CreateUserData): Promise<User> {
+    return apiFetch<User>("/users", {
+        method: "POST",
+        body: JSON.stringify(data)
+    })
+}
+
+export function deleteUser(id: number): Promise<void> {
+    return apiFetch<void>(`/users/${id}`, { method: "DELETE" })
+}
+
+export interface UserGroupPublic extends GroupPublic {
+    position: string | null
+}
+
+export function getUserGroups(id: number): Promise<UserGroupPublic[]> {
+    return apiFetch<UserGroupPublic[]>(`/users/${id}/groups`)
 }

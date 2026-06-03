@@ -127,7 +127,10 @@ export function useRemoveGroupMember() {
     return useMutation({
         mutationFn: ({ groupId, userId }: { groupId: number, userId: number }) =>
             removeGroupMember(groupId, userId),
-        onSuccess: (_d, { groupId }) => qc.invalidateQueries({ queryKey: ["group", groupId, "members"] })
+        onSuccess: (_d, { groupId, userId }) => {
+            qc.invalidateQueries({ queryKey: ["group", groupId, "members"] })
+            qc.invalidateQueries({ queryKey: ["user", userId, "groups"] })
+        }
     })
 }
 

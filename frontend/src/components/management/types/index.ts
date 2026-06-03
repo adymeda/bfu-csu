@@ -1,11 +1,15 @@
-import type { TreeNode } from "@components/ui/types"
+export interface UserGroupItem {
+    id: number,
+    name: string,
+    position: string | null
+}
 
 export interface ManagementUser {
     id: number,
     display_name: string,
     accent_color: string,
     image?: string,
-    groups: TreeNode[]
+    groups: UserGroupItem[]
 }
 
 export interface UserListItemProps {
@@ -16,7 +20,11 @@ export interface UserListItemProps {
 
 export interface UserInfoProps {
     user: ManagementUser,
-    onClose?: () => void
+    onClose?: () => void,
+    onRename: (name: string) => void,
+    onDelete: () => void,
+    onRemoveFromGroup: (groupId: number) => void,
+    groupsLoading?: boolean
 }
 
 export interface GroupMember {

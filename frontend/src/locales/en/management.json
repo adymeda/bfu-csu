@@ -41,5 +41,20 @@
         "aliasPlaceholder": "Alias"
     },
     "loading": "Loading…",
-    "noUsers": "No users found"
+    "noUsers": "No users found",
+    "user": {
+        "create": "Create user",
+        "createTitle": "New user",
+        "email": "Email",
+        "password": "Password",
+        "name": "Full name",
+        "add": "Create",
+        "cancel": "Cancel",
+        "rename": "Edit name",
+        "delete": "Delete user",
+        "removeFromGroup": "Remove from group",
+        "groupsEmpty": "Not a member of any group",
+        "emailTaken": "Email is already taken",
+        "createError": "Failed to create user"
+    }
 }
