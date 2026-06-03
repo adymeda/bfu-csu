@@ -87,12 +87,13 @@ class UsersController {
             error: "id should be a number"
         })
 
-        const userId = res.locals.userId as number
-        if(id !== userId) return res.status(403).json({
-            error: "Forbidden"
-        })
+        const actorId = res.locals.userId as number
 
         try {
+            if(id !== actorId && !(await service.isGlobalAdmin(actorId))) return res.status(403).json({
+                error: "Forbidden"
+            })
+
             const user = await service.update(id, req.body as Record<string, unknown>)
             if(!user) return res.status(400).json({
                 error: "No fields to update"
@@ -111,18 +112,34 @@ class UsersController {
             error: "id should be a number"
         })
 
-        const userId = res.locals.userId as number
-        if(id !== userId) return res.status(403).json({
-            error: "Forbidden"
-        })
+        const actorId = res.locals.userId as number
 
         try {
+            if(id !== actorId && !(await service.isGlobalAdmin(actorId))) return res.status(403).json({
+                error: "Forbidden"
+            })
+
             const deleted = await service.delete(id)
             if(!deleted) return res.status(404).json({
                 error: "User not found"
             })
 
             res.status(204).send()
+        } catch(err) {
+            next(err)
+        }
+    }
+
+    async getGroups(req: Request, res: Response, next: NextFunction) {
+        const id = parseId(req.params["id"])
+
+        if(id === null) return res.status(400).json({
+            error: "id should be a number"
+        })
+
+        try {
+            const groups = await service.getGroups(id)
+            res.json(groups)
         } catch(err) {
             next(err)
         }

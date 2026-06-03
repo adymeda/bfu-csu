@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs"
 import repo from "../repositories/user.repo"
 import { pickAccentColor } from "../utils/color"
 import type { User, UserPublic, CreateUserDto, UpdateUserDto } from "../types/user"
+import type { GroupPublic } from "../types/group"
 
 const UPDATABLE_FIELDS = ['email', 'password', 'display_name', 'accent_color'] as const
 
@@ -44,6 +45,14 @@ class UsersService {
 
     async delete(id: number): Promise<boolean> {
         return repo.delete(id)
+    }
+
+    async isGlobalAdmin(userId: number): Promise<boolean> {
+        return repo.isGlobalAdmin(userId)
+    }
+
+    async getGroups(userId: number): Promise<(GroupPublic & { position: string | null })[]> {
+        return repo.findGroups(userId)
     }
 }
 

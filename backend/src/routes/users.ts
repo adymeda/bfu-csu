@@ -6,6 +6,7 @@ const router = Router()
 
 router.post('/', controller.register)
 router.get('/', checkAuth, controller.list)
+router.get('/:id/groups', checkAuth, controller.getGroups)
 router.get('/:id', checkAuth, controller.getById)
 router.patch('/:id', checkAuth, controller.update)
 router.delete('/:id', checkAuth, controller.delete)

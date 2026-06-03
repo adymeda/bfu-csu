@@ -1,5 +1,6 @@
 import pool from "../db"
 import type { UserPublic, User, CreateUserDto, UpdateUserDto } from "../types/user"
+import type { GroupPublic } from "../types/group"
 
 class UsersRepository {
     async create(data: CreateUserDto & { accent_color: string }): Promise<User> {
@@ -90,6 +91,31 @@ class UsersRepository {
             `UPDATE users SET last_login_at = now() WHERE id = $1`,
             [id]
         )
+    }
+
+    async isGlobalAdmin(userId: number): Promise<boolean> {
+        const { rows } = await pool.query<{ ok: boolean }>(
+            `SELECT EXISTS (
+                SELECT 1 FROM group_admins ga
+                JOIN groups g ON g.id = ga.group_id
+                WHERE g.parent_id IS NULL AND ga.is_super = true AND ga.user_id = $1
+            ) AS ok`,
+            [userId]
+        )
+        return rows[0]?.ok ?? false
+    }
+
+    async findGroups(userId: number): Promise<(GroupPublic & { position: string | null })[]> {
+        const { rows } = await pool.query<GroupPublic & { position: string | null }>(
+            `SELECT g.id, g.name, g.parent_id, gr.position
+            FROM group_members gm
+            JOIN groups g ON g.id = gm.group_id
+            LEFT JOIN group_roles gr ON gr.group_id = gm.group_id AND gr.user_id = gm.user_id
+            WHERE gm.user_id = $1
+            ORDER BY g.name`,
+            [userId]
+        )
+        return rows
     }
 }
 
