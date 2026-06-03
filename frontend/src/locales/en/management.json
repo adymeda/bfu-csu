@@ -27,7 +27,18 @@
         "createModalTitle": "Create group",
         "createChildModalTitle": "Create subgroup",
         "create": "Create",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "save": "Save",
+        "add": "Add",
+        "editRole": "Edit position",
+        "roleModalTitle": "Member position",
+        "rolePlaceholder": "Position",
+        "roleEmptyHint": "Leave empty to remove the position",
+        "aliases": "Aliases",
+        "addAlias": "Add alias",
+        "removeAlias": "Remove alias",
+        "aliasModalTitle": "New alias",
+        "aliasPlaceholder": "Alias"
     },
     "loading": "Loading…",
     "noUsers": "No users found"

@@ -6,7 +6,7 @@ import type { GroupMemberRowProps } from "./types"
 import Avatar from "@components/ui/Avatar"
 import Dropdown from "@components/ui/Dropdown"
 
-function GroupMemberRow({ member, onToggleAdmin, onRemove }: GroupMemberRowProps) {
+function GroupMemberRow({ member, onToggleAdmin, onRemove, onEditRole }: GroupMemberRowProps) {
     const { t } = useTranslation("management")
 
     return (
@@ -16,7 +16,12 @@ function GroupMemberRow({ member, onToggleAdmin, onRemove }: GroupMemberRowProps
                 color={member.accent_color ? `#${member.accent_color}` : "var(--accent-color)"}
                 image={member.image}
             />
-            <span className="group-member-row__name">{member.display_name}</span>
+            <div className="group-member-row__info">
+                <span className="group-member-row__name">{member.display_name}</span>
+                {member.position && (
+                    <span className="group-member-row__position">{member.position}</span>
+                )}
+            </div>
             {member.isAdmin && <StarIcon className="group-member-row__admin" />}
             <Dropdown
                 triggerClassName="group-member-row__menu-trigger"
@@ -29,6 +34,9 @@ function GroupMemberRow({ member, onToggleAdmin, onRemove }: GroupMemberRowProps
                 <div className="group-member-row__menu">
                     <div className="group-member-row__menu-item" onClick={onToggleAdmin}>
                         {member.isAdmin ? t("group.revokeAdmin") : t("group.makeAdmin")}
+                    </div>
+                    <div className="group-member-row__menu-item" onClick={onEditRole}>
+                        {t("group.editRole")}
                     </div>
                     <div className="group-member-row__menu-item group-member-row__menu-item--danger" onClick={onRemove}>
                         {t("group.removeFromGroup")}

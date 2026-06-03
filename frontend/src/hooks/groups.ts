@@ -3,7 +3,8 @@ import {
     searchGroups, getSuggestedGroups, getRootGroups, getGroup, getGroupChildren,
     createGroup, updateGroup, deleteGroup,
     getGroupMembers, addGroupMember, removeGroupMember,
-    getGroupAdmins, addGroupAdmin, removeGroupAdmin
+    getGroupAdmins, addGroupAdmin, removeGroupAdmin,
+    addGroupAlias, removeGroupAlias, setGroupRole
 } from "../api/groups"
 import type { GroupPublic } from "../api/types"
 import type { TreeNode } from "@components/ui/types"
@@ -145,5 +146,32 @@ export function useRemoveGroupAdmin() {
         mutationFn: ({ groupId, userId }: { groupId: number, userId: number }) =>
             removeGroupAdmin(groupId, userId),
         onSuccess: (_d, { groupId }) => qc.invalidateQueries({ queryKey: ["group", groupId, "admins"] })
+    })
+}
+
+export function useAddGroupAlias() {
+    const qc = useQueryClient()
+    return useMutation({
+        mutationFn: ({ groupId, alias }: { groupId: number, alias: string }) =>
+            addGroupAlias(groupId, alias),
+        onSuccess: (_d, { groupId }) => qc.invalidateQueries({ queryKey: ["group", groupId] })
+    })
+}
+
+export function useRemoveGroupAlias() {
+    const qc = useQueryClient()
+    return useMutation({
+        mutationFn: ({ groupId, alias }: { groupId: number, alias: string }) =>
+            removeGroupAlias(groupId, alias),
+        onSuccess: (_d, { groupId }) => qc.invalidateQueries({ queryKey: ["group", groupId] })
+    })
+}
+
+export function useSetGroupRole() {
+    const qc = useQueryClient()
+    return useMutation({
+        mutationFn: ({ groupId, userId, position }: { groupId: number, userId: number, position: string }) =>
+            setGroupRole(groupId, userId, position),
+        onSuccess: (_d, { groupId }) => qc.invalidateQueries({ queryKey: ["group", groupId, "members"] })
     })
 }

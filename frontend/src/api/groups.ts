@@ -1,5 +1,5 @@
 import { apiFetch } from "./client"
-import type { GroupPublic, GroupMember, GroupAdmin } from "./types"
+import type { GroupPublic, GroupDetail, GroupMember, GroupAdmin } from "./types"
 
 export function searchGroups(q: string): Promise<GroupPublic[]> {
     return apiFetch<GroupPublic[]>(`/groups/search?q=${encodeURIComponent(q)}`)
@@ -13,8 +13,8 @@ export function getSuggestedGroups(): Promise<GroupPublic[]> {
     return apiFetch<GroupPublic[]>("/groups/suggested")
 }
 
-export function getGroup(id: number): Promise<GroupPublic> {
-    return apiFetch<GroupPublic>(`/groups/${id}`)
+export function getGroup(id: number): Promise<GroupDetail> {
+    return apiFetch<GroupDetail>(`/groups/${id}`)
 }
 
 export function getGroupChildren(id: number): Promise<GroupPublic[]> {
@@ -67,4 +67,22 @@ export function addGroupAdmin(id: number, userId: number, isSuper = false): Prom
 
 export function removeGroupAdmin(id: number, userId: number): Promise<void> {
     return apiFetch<void>(`/groups/${id}/admins/${userId}`, { method: "DELETE" })
+}
+
+export function addGroupAlias(id: number, alias: string): Promise<void> {
+    return apiFetch<void>(`/groups/${id}/aliases`, {
+        method: "POST",
+        body: JSON.stringify({ alias })
+    })
+}
+
+export function removeGroupAlias(id: number, alias: string): Promise<void> {
+    return apiFetch<void>(`/groups/${id}/aliases/${encodeURIComponent(alias)}`, { method: "DELETE" })
+}
+
+export function setGroupRole(id: number, userId: number, position: string): Promise<void> {
+    return apiFetch<void>(`/groups/${id}/roles/${userId}`, {
+        method: "PUT",
+        body: JSON.stringify({ position })
+    })
 }

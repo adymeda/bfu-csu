@@ -15,11 +15,25 @@
         flex-shrink: 0;
     }
 
-    &__name {
+    &__info {
+        display: flex;
+        flex-direction: column;
         flex-grow: 1;
         min-width: 0;
+        gap: 1px;
+    }
+
+    &__name {
         font-size: 13px;
         color: var(--text-primary-color);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__position {
+        font-size: 11px;
+        color: var(--text-info-color);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;

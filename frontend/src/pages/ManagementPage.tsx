@@ -18,9 +18,10 @@ import GroupInfo from "@components/management/GroupInfo"
 import type { ManagementGroup, ManagementUser, GroupMember } from "@components/management/types"
 import { useUsers } from "../hooks/users"
 import {
-    useGroupTree, useGroupMembers, useGroupAdmins,
+    useGroupTree, useGroup, useGroupMembers, useGroupAdmins,
     useCreateGroup, useUpdateGroup, useDeleteGroup,
-    useAddGroupMember, useRemoveGroupMember, useAddGroupAdmin, useRemoveGroupAdmin
+    useAddGroupMember, useRemoveGroupMember, useAddGroupAdmin, useRemoveGroupAdmin,
+    useAddGroupAlias, useRemoveGroupAlias, useSetGroupRole
 } from "../hooks/groups"
 
 type ActiveTab = "users" | "groups"
@@ -54,6 +55,7 @@ function ManagementPage() {
     const groupTree = groupTreeQuery.data?.tree ?? []
     const groupsFlat = groupTreeQuery.data?.groups ?? []
 
+    const groupDetailQuery = useGroup(activeTab === "groups" ? selectedGroupId : null)
     const membersQuery = useGroupMembers(activeTab === "groups" ? selectedGroupId : null)
     const adminsQuery = useGroupAdmins(activeTab === "groups" ? selectedGroupId : null)
 
@@ -64,6 +66,9 @@ function ManagementPage() {
     const removeMember = useRemoveGroupMember()
     const addAdmin = useAddGroupAdmin()
     const removeAdmin = useRemoveGroupAdmin()
+    const addAlias = useAddGroupAlias()
+    const removeAlias = useRemoveGroupAlias()
+    const setRole = useSetGroupRole()
 
     const selectedGroupRaw = groupsFlat.find(g => g.id === selectedGroupId)
     const parentName = selectedGroupRaw && selectedGroupRaw.parent_id !== null
@@ -77,14 +82,21 @@ function ManagementPage() {
             id: m.id,
             display_name: m.display_name,
             accent_color: m.accent_color,
-            isAdmin: adminIds.has(m.id)
+            isAdmin: adminIds.has(m.id),
+            position: m.position ?? null
         }))
         for(const a of adminsQuery.data ?? []) {
             if(!members.some(m => m.id === a.user_id)) {
-                members.push({ id: a.user_id, display_name: a.display_name, accent_color: a.accent_color, isAdmin: true })
+                members.push({ id: a.user_id, display_name: a.display_name, accent_color: a.accent_color, isAdmin: true, position: null })
             }
         }
-        return { id: selectedGroupRaw.id, name: selectedGroupRaw.name, parent_id: selectedGroupRaw.parent_id, members }
+        return {
+            id: selectedGroupRaw.id,
+            name: selectedGroupRaw.name,
+            parent_id: selectedGroupRaw.parent_id,
+            aliases: groupDetailQuery.data?.aliases ?? [],
+            members
+        }
     })()
 
     function handleUserClose() {
@@ -158,6 +170,21 @@ function ManagementPage() {
     function handleDeleteGroup() {
         if(selectedGroupId === null) return
         deleteGroup.mutate(selectedGroupId, { onSuccess: handleGroupClose })
+    }
+
+    function handleSetRole(memberId: number, position: string) {
+        if(selectedGroupId === null) return
+        setRole.mutate({ groupId: selectedGroupId, userId: memberId, position })
+    }
+
+    function handleAddAlias(alias: string) {
+        if(selectedGroupId === null) return
+        addAlias.mutate({ groupId: selectedGroupId, alias })
+    }
+
+    function handleRemoveAlias(alias: string) {
+        if(selectedGroupId === null) return
+        removeAlias.mutate({ groupId: selectedGroupId, alias })
     }
 
     useEffect(() => {
@@ -255,6 +282,9 @@ function ManagementPage() {
                                 onAddMember={handleAddMember}
                                 onRename={handleRename}
                                 onDelete={handleDeleteGroup}
+                                onSetRole={handleSetRole}
+                                onAddAlias={handleAddAlias}
+                                onRemoveAlias={handleRemoveAlias}
                             />
                             : <div className="management-groups-content__empty">
                                 <UserGroupIcon />

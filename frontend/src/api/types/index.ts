@@ -35,7 +35,7 @@ export interface LinkPublic {
     link_value: string
 }
 
-// ─── Calendar ───────────────────────────────────────────────────────────────
+
 
 export interface EventResolved {
     id: number
@@ -73,7 +73,7 @@ export interface CreateDeadlineDto {
     message_id?: number | null
 }
 
-// ─── Messages ─────────────────────────────────────────────────────────────────
+
 
 export interface MessageListItem {
     id: number
@@ -113,9 +113,7 @@ export interface RecipientInput {
     id: number
 }
 
-// Events/deadlines attached to a message: the backend ignores assignee_id here
-// (created_by = sender, assignees = the message recipients), so only these
-// fields are sent. Standalone CreateEventDto/CreateDeadlineDto keep assignee_id.
+
 export interface MessageEventInput {
     title: string
     start_at: string
@@ -147,7 +145,6 @@ export interface Message {
     created_at: string
 }
 
-// ─── Groups ───────────────────────────────────────────────────────────────────
 
 export interface GroupPublic {
     id: number
@@ -155,10 +152,15 @@ export interface GroupPublic {
     parent_id: number | null
 }
 
+export interface GroupDetail extends GroupPublic {
+    aliases: string[]
+}
+
 export interface GroupMember {
     id: number
     display_name: string
     accent_color: string
+    position: string | null
 }
 
 export interface GroupAdmin {

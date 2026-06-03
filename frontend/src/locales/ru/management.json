@@ -27,7 +27,18 @@
         "createModalTitle": "Создать группу",
         "createChildModalTitle": "Создать подгруппу",
         "create": "Создать",
-        "cancel": "Отмена"
+        "cancel": "Отмена",
+        "save": "Сохранить",
+        "add": "Добавить",
+        "editRole": "Изменить должность",
+        "roleModalTitle": "Должность участника",
+        "rolePlaceholder": "Должность",
+        "roleEmptyHint": "Оставьте пустым, чтобы удалить должность",
+        "aliases": "Псевдонимы",
+        "addAlias": "Добавить псевдоним",
+        "removeAlias": "Удалить псевдоним",
+        "aliasModalTitle": "Новый псевдоним",
+        "aliasPlaceholder": "Псевдоним"
     },
     "loading": "Загрузка…",
     "noUsers": "Пользователи не найдены"

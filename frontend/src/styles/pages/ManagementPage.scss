@@ -210,6 +210,7 @@
     }
 
     &__input {
+        box-sizing: border-box;
         width: 100%;
         padding: .5rem .6rem;
         font-size: 14px;

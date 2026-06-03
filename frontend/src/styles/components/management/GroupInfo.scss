@@ -73,7 +73,7 @@
     &__body {
         flex-grow: 1;
         overflow-y: auto;
-        padding: 1.5rem;
+        padding: 1rem;
         display: flex;
         flex-direction: column;
         gap: 1.25rem;
@@ -113,6 +113,72 @@
         justify-content: space-between;
         gap: 1rem;
         font-size: 13px;
+
+        &--column {
+            flex-direction: column;
+            gap: .5rem;
+        }
+    }
+
+    &__aliases {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .375rem;
+    }
+
+    &__alias-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: .25rem;
+        padding: .2rem .5rem;
+        background: var(--bg-secondary-color, #f0f0f0);
+        border-radius: 1rem;
+        font-size: 12px;
+        color: var(--text-secondary-color);
+    }
+
+    &__alias-text {
+        line-height: 1.3;
+    }
+
+    &__alias-remove {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: none;
+        background: none;
+        cursor: pointer;
+        color: var(--text-info-color);
+        border-radius: 50%;
+        line-height: 1;
+
+        svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        &:hover { color: #c0392b; }
+    }
+
+    &__alias-add {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border: 1px dashed var(--border-primary-color);
+        border-radius: 1rem;
+        background: none;
+        cursor: pointer;
+        color: var(--text-info-color);
+
+        svg { width: 14px; height: 14px; }
+
+        &:hover {
+            border-color: var(--accent-hover-color);
+            color: var(--accent-hover-color);
+        }
     }
 
     &__meta-label {
