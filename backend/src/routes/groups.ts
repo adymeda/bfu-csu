@@ -25,4 +25,9 @@ router.get('/:id/admins', checkAuth, controller.getAdmins)
 router.post('/:id/admins', checkAuth, controller.addAdmin)
 router.delete('/:id/admins/:userId', checkAuth, controller.removeAdmin)
 
+router.post('/:id/aliases', checkAuth, controller.addAlias)
+router.delete('/:id/aliases/:alias', checkAuth, controller.removeAlias)
+
+router.put('/:id/roles/:userId', checkAuth, controller.setRole)
+
 export default router

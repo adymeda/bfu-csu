@@ -367,6 +367,112 @@ class GroupsController {
             next(err)
         }
     }
+
+    async addAlias(req: Request, res: Response, next: NextFunction) {
+        const id = parseId(req.params["id"])
+        if(id === null) return res.status(400).json({
+            error: "id should be an integer"
+        })
+
+        const { alias } = req.body as { alias: unknown }
+        if(typeof alias !== "string" || alias.trim().length === 0)
+            return res.status(400).json({
+                error: "alias should be a non-empty string"
+            })
+
+        try {
+            const visible = await service.isVisible(res.locals.userId as number, id)
+            if(!visible) return res.status(404).json({
+                error: "Group not found"
+            })
+
+            const isAdmin = await service.isAdmin(res.locals.userId as number, id)
+            if(!isAdmin) return res.status(403).json({
+                error: "Forbidden"
+            })
+
+            await service.addAlias(id, alias.trim())
+            res.status(201).json({ group_id: id, alias: alias.trim() })
+        } catch(err: unknown) {
+            const pg = err as { code?: string }
+            if(pg.code === "23505") res.status(409).json({
+                error: "Alias already exists"
+            })
+            else next(err)
+        }
+    }
+
+    async removeAlias(req: Request, res: Response, next: NextFunction) {
+        const id = parseId(req.params["id"])
+        if(id === null) return res.status(400).json({
+            error: "id should be an integer"
+        })
+
+        const alias = req.params["alias"]
+        if(typeof alias !== "string" || alias.length === 0)
+            return res.status(400).json({
+                error: "alias should be a non-empty string"
+            })
+
+        try {
+            const visible = await service.isVisible(res.locals.userId as number, id)
+            if(!visible) return res.status(404).json({
+                error: "Group not found"
+            })
+
+            const isAdmin = await service.isAdmin(res.locals.userId as number, id)
+            if(!isAdmin) return res.status(403).json({
+                error: "Forbidden"
+            })
+
+            const removed = await service.removeAlias(id, alias)
+            if(!removed) return res.status(404).json({
+                error: "Alias not found"
+            })
+
+            res.status(204).send()
+        } catch(err) {
+            next(err)
+        }
+    }
+
+    async setRole(req: Request, res: Response, next: NextFunction) {
+        const id = parseId(req.params["id"])
+        const userId = parseId(req.params["userId"])
+        if(id === null || userId === null)
+            return res.status(400).json({
+                error: "id and userId should be integers"
+            })
+
+        const { position } = req.body as { position: unknown }
+        if(typeof position !== "string")
+            return res.status(400).json({
+                error: "position should be a string"
+            })
+
+        try {
+            const visible = await service.isVisible(res.locals.userId as number, id)
+            if(!visible) return res.status(404).json({
+                error: "Group not found"
+            })
+
+            const isAdmin = await service.isAdmin(res.locals.userId as number, id)
+            if(!isAdmin) return res.status(403).json({
+                error: "Forbidden"
+            })
+
+            const trimmed = position.trim()
+            if(trimmed.length === 0) {
+                await service.removeRole(id, userId)
+                return res.json({ group_id: id, user_id: userId, position: null })
+            }
+
+            await service.setRole(id, userId, trimmed)
+            res.json({ group_id: id, user_id: userId, position: trimmed })
+        } catch(err) {
+            next(err)
+        }
+    }
 }
 
 export default new GroupsController()

@@ -314,6 +314,37 @@ class GroupsRepository {
         )
         return rows
     }
+
+    async addAlias(groupId: number, alias: string): Promise<void> {
+        await pool.query(
+            `INSERT INTO group_aliases (group_id, alias) VALUES ($1, $2)`,
+            [groupId, alias]
+        )
+    }
+
+    async removeAlias(groupId: number, alias: string): Promise<boolean> {
+        const { rowCount } = await pool.query(
+            `DELETE FROM group_aliases WHERE group_id = $1 AND alias = $2`,
+            [groupId, alias]
+        )
+        return (rowCount ?? 0) > 0
+    }
+
+    async setRole(groupId: number, userId: number, position: string): Promise<void> {
+        await pool.query(
+            `INSERT INTO group_roles (group_id, user_id, position) VALUES ($1, $2, $3)
+            ON CONFLICT (group_id, user_id) DO UPDATE SET position = EXCLUDED.position`,
+            [groupId, userId, position]
+        )
+    }
+
+    async removeRole(groupId: number, userId: number): Promise<boolean> {
+        const { rowCount } = await pool.query(
+            `DELETE FROM group_roles WHERE group_id = $1 AND user_id = $2`,
+            [groupId, userId]
+        )
+        return (rowCount ?? 0) > 0
+    }
 }
 
 export default new GroupsRepository()

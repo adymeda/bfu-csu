@@ -84,6 +84,22 @@ class GroupsService {
     async roots(userId: number): Promise<GroupPublic[]> {
         return repo.findRoots(userId)
     }
+
+    async addAlias(groupId: number, alias: string): Promise<void> {
+        return repo.addAlias(groupId, alias)
+    }
+
+    async removeAlias(groupId: number, alias: string): Promise<boolean> {
+        return repo.removeAlias(groupId, alias)
+    }
+
+    async setRole(groupId: number, userId: number, position: string): Promise<void> {
+        return repo.setRole(groupId, userId, position)
+    }
+
+    async removeRole(groupId: number, userId: number): Promise<boolean> {
+        return repo.removeRole(groupId, userId)
+    }
 }
 
 export default new GroupsService()
