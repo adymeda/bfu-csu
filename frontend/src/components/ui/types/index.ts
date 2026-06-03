@@ -1,4 +1,10 @@
 import type { MouseEventHandler } from "react"
+import type { Toast } from "../../../contexts/types"
+
+export interface ToastProps {
+    toast: Toast
+    onDismiss: (id: string) => void
+}
 
 export interface ButtonProps {
     onClick?: MouseEventHandler,
