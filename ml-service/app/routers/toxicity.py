@@ -4,14 +4,10 @@ from fastapi import APIRouter, Depends
 
 from ..config import settings
 from ..models import get_toxicity_model
-from ..schemas import CheckRequest, CheckResponse, HealthResponse
+from ..schemas import CheckRequest, CheckResponse
 from ..security import require_service_token
 
 router = APIRouter(prefix="/api")
-
-@router.get("/health", response_model=HealthResponse)
-async def health() -> HealthResponse:
-	return HealthResponse(status="ok")
 
 @router.post(
 	"/check",
