@@ -139,6 +139,10 @@
         }
 
         &__messages {
+            display: flex;
+            flex-direction: column;
+            gap: .25rem;
+
             flex-grow: 1;
             min-height: 0;
             overflow-y: auto;
