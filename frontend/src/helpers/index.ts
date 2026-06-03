@@ -48,3 +48,14 @@ export function startOfMonth(date: Date): Date {
 export function formatTime(date: Date): string {
     return `${date.getHours()}:${String(date.getMinutes()).padStart(2, "0")}`
 }
+
+export function isoToLocalInput(iso: string): string {
+    const d = new Date(iso)
+    if(isNaN(d.getTime())) return ""
+    const y = d.getFullYear()
+    const mo = String(d.getMonth() + 1).padStart(2, "0")
+    const day = String(d.getDate()).padStart(2, "0")
+    const h = String(d.getHours()).padStart(2, "0")
+    const mi = String(d.getMinutes()).padStart(2, "0")
+    return `${y}-${mo}-${day}T${h}:${mi}`
+}

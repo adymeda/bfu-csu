@@ -1,6 +1,6 @@
 import "@styles/components/inbox/MessageCreate.scss"
 import type { MessageCreateProps, Recipient } from "./types"
-import { ChevronLeftIcon, FlagIcon, GlobeAltIcon, MagnifyingGlassIcon, PaperAirplaneIcon, PaperClipIcon, PlusIcon, UsersIcon, XMarkIcon } from "@heroicons/react/24/outline"
+import { ChevronLeftIcon, FlagIcon, GlobeAltIcon, LightBulbIcon, MagnifyingGlassIcon, PaperAirplaneIcon, PaperClipIcon, PlusIcon, UsersIcon, XMarkIcon } from "@heroicons/react/24/outline"
 import { useState, useEffect, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import clsx from "clsx"
@@ -13,8 +13,9 @@ import { useUsers } from "../../hooks/users"
 import { useAuth } from "../../contexts/AuthContext"
 import { useToast } from "../../contexts/ToastContext"
 import { useSearchGroups, useSuggestedRecipients } from "../../hooks/groups"
+import { useComposeMessage, useExtractEvent } from "../../hooks/llm"
 import { uploadAttachments, formatBytes } from "../../api/attachments"
-import type { AttachmentPublic, MessageEventInput, MessageDeadlineInput } from "../../api/types"
+import type { AttachmentPublic, MessageEventInput, MessageDeadlineInput, ExtractEventResult } from "../../api/types"
 
 // ─── Event / deadline detection ──────────────────────────────────────────────
 
@@ -58,9 +59,12 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
     const [events, setEvents] = useState<MessageEventInput[]>([])
     const [deadlines, setDeadlines] = useState<MessageDeadlineInput[]>([])
     const [modal, setModal] = useState<"event" | "deadline" | null>(null)
+    const [modalPrefill, setModalPrefill] = useState<ExtractEventResult | null>(null)
     const [recipientQuery, setRecipientQuery] = useState("")
     const [detected, setDetected] = useState<DetectionResult>(null)
     const [visible, setVisible] = useState(false)
+    const [composePrompt, setComposePrompt] = useState("")
+    const [composeWarnings, setComposeWarnings] = useState<string[]>([])
 
     const locale = i18n.language === "ru" ? "ru-RU" : "en-US"
     const formatDateTime = (iso: string) => new Intl.DateTimeFormat(locale, {
@@ -70,6 +74,7 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
     function openModal(m: "event" | "deadline") {
         // Dropdown has no imperative close — nudge it shut via an outside mousedown.
         document.dispatchEvent(new MouseEvent("mousedown"))
+        setModalPrefill(null)
         setModal(m)
     }
 
@@ -77,7 +82,14 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
         if(result.mode === "event") setEvents(prev => [...prev, result.value])
         else setDeadlines(prev => [...prev, result.value])
         setModal(null)
+        setModalPrefill(null)
     }
+
+    function handleModalClose() {
+        setModal(null)
+        setModalPrefill(null)
+    }
+
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -85,6 +97,8 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
     const { user: currentUser } = useAuth()
     const toast = useToast()
     const sendMessage = useSendMessage()
+    const composeMutation = useComposeMessage()
+    const extractMutation = useExtractEvent()
     const isSearching = recipientQuery.trim().length > 0
     const { data: usersData } = useUsers({ q: recipientQuery, limit: 8 })
     const { data: searchedGroups } = useSearchGroups(recipientQuery)
@@ -135,6 +149,44 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
             const uploaded = await uploadAttachments(picked)
             setAttachments(prev => [...prev, ...uploaded])
         } catch { /* ignore upload error for now */ }
+    }
+
+    function handleCompose() {
+        if(!composePrompt.trim() || composeMutation.isPending) return
+        setComposeWarnings([])
+        composeMutation.mutate(composePrompt.trim(), {
+            onSuccess: (data) => {
+                setSubject(data.subject)
+                setBody(data.body)
+                setSelected(data.recipients.map(r => ({
+                    id: r.id,
+                    name: r.name,
+                    isGroup: r.type === 1,
+                })))
+                setComposeWarnings(data.warnings)
+                if(data.warnings.length === 0) {
+                    document.dispatchEvent(new MouseEvent("mousedown"))
+                }
+            },
+            onError: () => toast.error(t("compose.error")),
+        })
+    }
+
+    function handleExtract() {
+        if(extractMutation.isPending) return
+        extractMutation.mutate(body, {
+            onSuccess: (res) => {
+                const mode = res.is_deadline ? "deadline" : "event"
+                setModalPrefill(res)
+                setModal(mode)
+            },
+            onError: () => {
+                const mode = detected ?? "event"
+                setModalPrefill(null)
+                setModal(mode)
+                toast.error(t("detection.extractError"))
+            },
+        })
     }
 
     const canSend = subject.trim().length > 0 && body.trim().length > 0 && selected.length > 0 && !sendMessage.isPending
@@ -218,12 +270,51 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
                         </Dropdown>
                     </div>
 
-                    <textarea
-                        className="message-create__body"
-                        placeholder={t('message.text')}
-                        value={body}
-                        onChange={e => setBody(e.target.value)}
-                    />
+                    <div className="message-create__body-wrapper">
+                        <textarea
+                            className="message-create__body"
+                            placeholder={t('message.text')}
+                            value={body}
+                            onChange={e => setBody(e.target.value)}
+                        />
+                        <Dropdown
+                            trigger={
+                                <button className="message-create__lightbulb" title={t("compose.tooltip")}>
+                                    <LightBulbIcon />
+                                </button>
+                            }
+                        >
+                            <div className="message-create__compose-dropdown">
+                                <textarea
+                                    className="message-create__compose-input"
+                                    placeholder={t("compose.placeholder")}
+                                    value={composePrompt}
+                                    onChange={e => setComposePrompt(e.target.value)}
+                                    rows={3}
+                                />
+                                <button
+                                    className="message-create__compose-submit"
+                                    onClick={handleCompose}
+                                    disabled={!composePrompt.trim() || composeMutation.isPending}
+                                >
+                                    {composeMutation.isPending
+                                        ? <><span className="message-create__spinner" />  {t("compose.generating")}</>
+                                        : t("compose.generate")
+                                    }
+                                </button>
+                                {composeWarnings.length > 0 && (
+                                    <div className="message-create__compose-warnings">
+                                        <span className="message-create__compose-warnings-label">{t("compose.warnings")}</span>
+                                        <ul>
+                                            {composeWarnings.map((w, i) => (
+                                                <li key={i}>{w}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+                        </Dropdown>
+                    </div>
 
                     {replyTo && (
                         <div className="message-create__reply-to">
@@ -240,9 +331,14 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
                                     ? t("detection.deadlineText")
                                     : t("detection.eventText")}
                             </span>
-                            <button className="message-create__detection-button" onClick={() => openModal(detected)}>
-                                {detected === "deadline" ? t("detection.createDeadline") : t("detection.createEvent")}
-                            </button>
+                            {extractMutation.isPending
+                                ? <span className="message-create__detection-spinner" />
+                                : (
+                                    <button className="message-create__detection-button" onClick={handleExtract}>
+                                        {detected === "deadline" ? t("detection.createDeadline") : t("detection.createEvent")}
+                                    </button>
+                                )
+                            }
                         </div>
                     )}
 
@@ -333,8 +429,12 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
             {modal && (
                 <ScheduleModal
                     mode={modal}
-                    onClose={() => setModal(null)}
+                    onClose={handleModalClose}
                     onSubmit={handleSchedule}
+                    initialTitle={modalPrefill?.title ?? undefined}
+                    initialStart={modal === "event" && modalPrefill?.start_at ? modalPrefill.start_at : undefined}
+                    initialEnd={modal === "event" && modalPrefill?.end_at ? modalPrefill.end_at : undefined}
+                    initialDue={modal === "deadline" && modalPrefill?.start_at ? modalPrefill.start_at : undefined}
                 />
             )}
         </>

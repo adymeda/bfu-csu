@@ -42,7 +42,16 @@
         "eventText": "An event is mentioned in the text. Add it?",
         "deadlineText": "A deadline is mentioned in the text. Add it?",
         "createEvent": "Create event",
-        "createDeadline": "Add deadline"
+        "createDeadline": "Add deadline",
+        "extractError": "Could not extract information"
+    },
+    "compose": {
+        "tooltip": "Generate message",
+        "placeholder": "Describe what message to send and to whom",
+        "generate": "Generate",
+        "generating": "Generating…",
+        "error": "Could not generate message",
+        "warnings": "Warnings:"
     },
     "schedule": {
         "eventTitle": "New event",

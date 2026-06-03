@@ -4,6 +4,7 @@ import "@styles/components/inbox/ScheduleModal.scss"
 import Modal from "@components/ui/Modal"
 import Button from "@components/ui/Button"
 import type { MessageEventInput, MessageDeadlineInput } from "../../api/types"
+import { isoToLocalInput } from "@helpers/index"
 
 type SubmitResult =
     | { mode: "event", value: MessageEventInput }
@@ -13,14 +14,18 @@ interface ScheduleModalProps {
     mode: "event" | "deadline"
     onClose: () => void
     onSubmit: (result: SubmitResult) => void
+    initialTitle?: string
+    initialStart?: string
+    initialEnd?: string
+    initialDue?: string
 }
 
-function ScheduleModal({ mode, onClose, onSubmit }: ScheduleModalProps) {
+function ScheduleModal({ mode, onClose, onSubmit, initialTitle, initialStart, initialEnd, initialDue }: ScheduleModalProps) {
     const { t } = useTranslation("inbox")
-    const [title, setTitle] = useState("")
-    const [start, setStart] = useState("")
-    const [end, setEnd] = useState("")
-    const [due, setDue] = useState("")
+    const [title, setTitle] = useState(initialTitle ?? "")
+    const [start, setStart] = useState(initialStart ? isoToLocalInput(initialStart) : "")
+    const [end, setEnd] = useState(initialEnd ? isoToLocalInput(initialEnd) : "")
+    const [due, setDue] = useState(initialDue ? isoToLocalInput(initialDue) : "")
 
     const endBeforeStart = mode === "event" && end !== "" && start !== "" && new Date(end) < new Date(start)
     const valid = mode === "event"

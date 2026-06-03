@@ -169,3 +169,21 @@ export interface GroupAdmin {
     display_name: string
     accent_color: string
 }
+
+export interface ComposeResult {
+    subject: string
+    body: string
+    recipients: MessageRecipientResolved[]
+    warnings: string[]
+}
+
+export interface ExtractEventResult {
+    is_deadline: boolean
+    title: string | null
+    start_at: string | null
+    end_at: string | null
+}
+
+export interface SummarizeResult {
+    summary: string
+}
