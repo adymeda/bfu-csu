@@ -11,10 +11,15 @@ export interface GroupPublic {
     parent_id: number | null
 }
 
+export interface GroupDetail extends GroupPublic {
+    aliases: string[]
+}
+
 export interface GroupMember {
     id: number
     display_name: string
     accent_color: string
+    position: string | null
 }
 
 export interface GroupAdmin {

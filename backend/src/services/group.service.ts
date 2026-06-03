@@ -1,10 +1,10 @@
 import repo from "../repositories/group.repo"
-import type { GroupPublic, GroupMember, GroupAdmin, CreateGroupDto, UpdateGroupDto } from "../types/group"
+import type { GroupPublic, GroupDetail, GroupMember, GroupAdmin, CreateGroupDto, UpdateGroupDto } from "../types/group"
 
 const UPDATABLE_FIELDS = ["name", "parent_id"] as const
 
 class GroupsService {
-    async findById(id: number): Promise<GroupPublic | null> {
+    async findById(id: number): Promise<GroupDetail | null> {
         return repo.findById(id)
     }
 

@@ -1,5 +1,5 @@
 import pool from "../db"
-import type { GroupPublic, GroupMember, GroupAdmin, CreateGroupDto, UpdateGroupDto } from "../types/group"
+import type { GroupPublic, GroupDetail, GroupMember, GroupAdmin, CreateGroupDto, UpdateGroupDto } from "../types/group"
 
 const VISIBILITY_CTE = `
     WITH RECURSIVE
@@ -33,9 +33,14 @@ const VISIBILITY_CTE = `
 `
 
 class GroupsRepository {
-    async findById(id: number): Promise<GroupPublic | null> {
-        const { rows } = await pool.query<GroupPublic>(
-            `SELECT id, name, parent_id FROM groups WHERE id = $1`,
+    async findById(id: number): Promise<GroupDetail | null> {
+        const { rows } = await pool.query<GroupDetail>(
+            `SELECT g.id, g.name, g.parent_id,
+                COALESCE(array_agg(ga.alias) FILTER (WHERE ga.alias IS NOT NULL), '{}') AS aliases
+            FROM groups g
+            LEFT JOIN group_aliases ga ON ga.group_id = g.id
+            WHERE g.id = $1
+            GROUP BY g.id`,
             [id]
         )
         return rows[0] ?? null
@@ -153,19 +158,24 @@ class GroupsRepository {
                     UNION ALL
                     SELECT g.id FROM groups g JOIN subtree s ON g.parent_id = s.id
                 )
-                SELECT DISTINCT u.id, u.display_name, u.accent_color
-                FROM group_members gm
-                JOIN subtree s ON gm.group_id = s.id
-                JOIN users u ON u.id = gm.user_id
-                ORDER BY u.display_name`,
+                SELECT * FROM (
+                    SELECT DISTINCT ON (u.id) u.id, u.display_name, u.accent_color, gr.position
+                    FROM group_members gm
+                    JOIN subtree s ON gm.group_id = s.id
+                    JOIN users u ON u.id = gm.user_id
+                    LEFT JOIN group_roles gr ON gr.group_id = gm.group_id AND gr.user_id = gm.user_id
+                    ORDER BY u.id, gr.position NULLS LAST
+                ) t
+                ORDER BY t.display_name`,
                 [groupId]
             )
             return rows
         }
         const { rows } = await pool.query<GroupMember>(
-            `SELECT u.id, u.display_name, u.accent_color
+            `SELECT u.id, u.display_name, u.accent_color, gr.position
                 FROM group_members gm
                 JOIN users u ON u.id = gm.user_id
+                LEFT JOIN group_roles gr ON gr.group_id = gm.group_id AND gr.user_id = gm.user_id
                 WHERE gm.group_id = $1
                 ORDER BY u.display_name`,
             [groupId]
