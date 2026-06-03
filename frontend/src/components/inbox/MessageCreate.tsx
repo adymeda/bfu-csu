@@ -11,7 +11,7 @@ import ScheduleModal, { type SubmitResult } from "./ScheduleModal"
 import { useSendMessage } from "../../hooks/messages"
 import { useUsers } from "../../hooks/users"
 import { useAuth } from "../../contexts/AuthContext"
-import { useSearchGroups, useSuggestedGroups } from "../../hooks/groups"
+import { useSearchGroups, useSuggestedRecipients } from "../../hooks/groups"
 import { uploadAttachments, formatBytes } from "../../api/attachments"
 import type { AttachmentPublic, MessageEventInput, MessageDeadlineInput } from "../../api/types"
 
@@ -83,10 +83,10 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
 
     const { user: currentUser } = useAuth()
     const sendMessage = useSendMessage()
+    const isSearching = recipientQuery.trim().length > 0
     const { data: usersData } = useUsers({ q: recipientQuery, limit: 8 })
     const { data: searchedGroups } = useSearchGroups(recipientQuery)
-    const { data: suggestedGroups } = useSuggestedGroups()
-    const groupsData = recipientQuery.trim().length > 0 ? searchedGroups : suggestedGroups
+    const { data: suggested } = useSuggestedRecipients()
 
     useEffect(() => {
         if (timerRef.current) clearTimeout(timerRef.current)
@@ -105,10 +105,14 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
     }, [body])
 
     const selectedKeys = new Set(selected.map(r => `${r.isGroup ? "g" : "u"}${r.id}`))
-    const available: Recipient[] = [
-        ...(usersData?.items ?? []).map(u => ({ id: u.id, name: u.display_name, isGroup: false })),
-        ...(groupsData ?? []).map(g => ({ id: g.id, name: g.name, isGroup: true }))
-    ].filter(r => !selectedKeys.has(`${r.isGroup ? "g" : "u"}${r.id}`) && (r.isGroup || r.id !== currentUser?.id))
+    const rawRecipients: Recipient[] = isSearching
+        ? [
+            ...(usersData?.items ?? []).map(u => ({ id: u.id, name: u.display_name, isGroup: false })),
+            ...(searchedGroups ?? []).map(g => ({ id: g.id, name: g.name, isGroup: true })),
+        ]
+        : (suggested ?? []).map(r => ({ id: r.id, name: r.name, isGroup: r.type === 1 }))
+    const available = rawRecipients.filter(r =>
+        !selectedKeys.has(`${r.isGroup ? "g" : "u"}${r.id}`) && (r.isGroup || r.id !== currentUser?.id))
 
     function addRecipient(r: Recipient) {
         setSelected(prev => [...prev, r])

@@ -40,3 +40,10 @@ export interface AddAdminDto {
 }
 
 export type UpdateGroupDto = Partial<{ name: string; parent_id: number | null }>
+
+export interface SuggestedRecipient {
+	type: number
+	id: number
+	name: string
+	accent_color: string | null
+}

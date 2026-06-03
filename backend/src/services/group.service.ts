@@ -1,5 +1,5 @@
 import repo from "../repositories/group.repo"
-import type { GroupPublic, GroupDetail, GroupMember, GroupAdmin, CreateGroupDto, UpdateGroupDto } from "../types/group"
+import type { GroupPublic, GroupDetail, GroupMember, GroupAdmin, CreateGroupDto, UpdateGroupDto, SuggestedRecipient } from "../types/group"
 
 const UPDATABLE_FIELDS = ["name", "parent_id"] as const
 
@@ -77,7 +77,7 @@ class GroupsService {
         return repo.search(userId, q)
     }
 
-    async suggested(userId: number): Promise<GroupPublic[]> {
+    async suggested(userId: number): Promise<SuggestedRecipient[]> {
         return repo.suggested(userId)
     }
 

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
-    searchGroups, getSuggestedGroups, getRootGroups, getGroup, getGroupChildren,
+    searchGroups, getSuggestedRecipients, getRootGroups, getGroup, getGroupChildren,
     createGroup, updateGroup, deleteGroup,
     getGroupMembers, addGroupMember, removeGroupMember,
     getGroupAdmins, addGroupAdmin, removeGroupAdmin,
@@ -45,10 +45,10 @@ export function useSearchGroups(q: string) {
     })
 }
 
-export function useSuggestedGroups() {
+export function useSuggestedRecipients() {
     return useQuery({
         queryKey: ["groups", "suggested"],
-        queryFn: getSuggestedGroups
+        queryFn: getSuggestedRecipients
     })
 }
 

@@ -1,5 +1,5 @@
 import { apiFetch } from "./client"
-import type { GroupPublic, GroupDetail, GroupMember, GroupAdmin } from "./types"
+import type { GroupPublic, GroupDetail, GroupMember, GroupAdmin, MessageRecipientResolved } from "./types"
 
 export function searchGroups(q: string): Promise<GroupPublic[]> {
     return apiFetch<GroupPublic[]>(`/groups/search?q=${encodeURIComponent(q)}`)
@@ -9,8 +9,8 @@ export function getRootGroups(): Promise<GroupPublic[]> {
     return apiFetch<GroupPublic[]>("/groups/roots")
 }
 
-export function getSuggestedGroups(): Promise<GroupPublic[]> {
-    return apiFetch<GroupPublic[]>("/groups/suggested")
+export function getSuggestedRecipients(): Promise<MessageRecipientResolved[]> {
+    return apiFetch<MessageRecipientResolved[]>("/groups/suggested")
 }
 
 export function getGroup(id: number): Promise<GroupDetail> {

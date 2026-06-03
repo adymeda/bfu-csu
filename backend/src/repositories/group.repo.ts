@@ -1,5 +1,5 @@
 import pool from "../db"
-import type { GroupPublic, GroupDetail, GroupMember, GroupAdmin, CreateGroupDto, UpdateGroupDto } from "../types/group"
+import type { GroupPublic, GroupDetail, GroupMember, GroupAdmin, CreateGroupDto, UpdateGroupDto, SuggestedRecipient } from "../types/group"
 
 const VISIBILITY_CTE = `
     WITH RECURSIVE
@@ -261,7 +261,11 @@ class GroupsRepository {
             SELECT g.id, g.name, g.parent_id
             FROM groups g
             JOIN depths d ON g.id = d.id
-            WHERE g.name ILIKE '%' || $1 || '%'
+            WHERE (g.name ILIKE '%' || $1 || '%'
+               OR EXISTS (
+                   SELECT 1 FROM group_aliases ga
+                   WHERE ga.group_id = g.id AND ga.alias ILIKE '%' || $1 || '%'
+               ))
             ORDER BY
                 CASE
                     WHEN lower(g.name) = lower($1) THEN 0
@@ -289,27 +293,57 @@ class GroupsRepository {
         return rows
     }
 
-    async suggested(userId: number): Promise<GroupPublic[]> {
-        const { rows } = await pool.query<GroupPublic>(
+    async suggested(userId: number): Promise<SuggestedRecipient[]> {
+        const { rows } = await pool.query<SuggestedRecipient>(
             `WITH RECURSIVE
             user_scope AS (
                 SELECT group_id AS id FROM group_members WHERE user_id = $1
                 UNION
                 SELECT group_id AS id FROM group_admins WHERE user_id = $1
             ),
-            depths AS (
-                SELECT id, 0 AS d FROM groups WHERE parent_id IS NULL
+            ancestors AS (
+                SELECT g.parent_id AS id, 1 AS dist
+                FROM groups g
+                WHERE g.id IN (SELECT id FROM user_scope) AND g.parent_id IS NOT NULL
                 UNION ALL
-                SELECT g.id, dp.d + 1 FROM groups g JOIN depths dp ON g.parent_id = dp.id
+                SELECT g.parent_id, a.dist + 1
+                FROM groups g JOIN ancestors a ON g.id = a.id
+                WHERE g.parent_id IS NOT NULL
+            ),
+            ancestor_tier AS (
+                SELECT id, MIN(dist) AS dist FROM ancestors GROUP BY id
+            ),
+            parents AS (
+                SELECT DISTINCT g.parent_id AS id
+                FROM groups g
+                WHERE g.id IN (SELECT id FROM user_scope) AND g.parent_id IS NOT NULL
+            ),
+            siblings AS (
+                SELECT g.id FROM groups g
+                WHERE g.parent_id IN (SELECT id FROM parents)
+                  AND g.id NOT IN (SELECT id FROM user_scope)
+            ),
+            tiers AS (
+                SELECT id, CASE WHEN dist = 1 THEN 1 ELSE dist + 1 END AS tier FROM ancestor_tier
+                UNION ALL SELECT id, 2 FROM siblings
+                UNION ALL SELECT id, 1000000 FROM user_scope
+            ),
+            group_tier AS (
+                SELECT id, MIN(tier) AS tier FROM tiers GROUP BY id
             )
-            SELECT g.id, g.name, g.parent_id
-            FROM groups g
-            JOIN depths d ON g.id = d.id
-            ORDER BY
-                CASE WHEN g.id IN (SELECT id FROM user_scope) THEN 0 ELSE 1 END,
-                d.d,
-                g.name
-            LIMIT 20`,
+            SELECT type, id, name, accent_color FROM (
+                SELECT 1 AS type, g.id, g.name, NULL::varchar AS accent_color, gt.tier, 0 AS is_user
+                FROM groups g JOIN group_tier gt ON g.id = gt.id
+                UNION ALL
+                SELECT 0 AS type, u.id, u.display_name AS name, u.accent_color, MIN(gt.tier) AS tier, 1 AS is_user
+                FROM group_members gm
+                JOIN group_tier gt ON gm.group_id = gt.id
+                JOIN users u ON u.id = gm.user_id
+                WHERE u.id <> $1
+                GROUP BY u.id, u.display_name, u.accent_color
+            ) rows
+            ORDER BY tier, is_user, name
+            LIMIT 50`,
             [userId]
         )
         return rows
