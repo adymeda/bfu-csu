@@ -38,6 +38,7 @@
     &__skin {
         position: relative;
 
+        flex-shrink: 0;
         display: flex;
         justify-content: center;
         align-items: center;
