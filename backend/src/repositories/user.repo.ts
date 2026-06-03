@@ -105,6 +105,19 @@ class UsersRepository {
         return rows[0]?.ok ?? false
     }
 
+    async findByDisplayName(name: string): Promise<UserPublic | null> {
+        const { rows } = await pool.query<UserPublic>(
+            `SELECT id, display_name, accent_color FROM users
+            WHERE lower(display_name) = lower($1)
+               OR lower(display_name) LIKE lower($1) || ' %'
+            ORDER BY
+                CASE WHEN lower(display_name) = lower($1) THEN 0 ELSE 1 END
+            LIMIT 1`,
+            [name]
+        )
+        return rows[0] ?? null
+    }
+
     async findGroups(userId: number): Promise<(GroupPublic & { position: string | null })[]> {
         const { rows } = await pool.query<GroupPublic & { position: string | null }>(
             `SELECT g.id, g.name, g.parent_id, gr.position

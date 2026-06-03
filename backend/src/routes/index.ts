@@ -10,6 +10,7 @@ import eventsRouter from "./events"
 import deadlinesRouter from "./deadlines"
 import attachmentsRouter from "./attachments"
 import healthRouter from "./health"
+import llmRouter from "./llm"
 
 router.use("/users/link", linksRouter)
 router.use("/users", usersRouter)
@@ -20,5 +21,6 @@ router.use("/events", eventsRouter)
 router.use("/deadlines", deadlinesRouter)
 router.use("/attachments", attachmentsRouter)
 router.use("/health", healthRouter)
+router.use("/llm", llmRouter)
 
 export default router

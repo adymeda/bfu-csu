@@ -364,6 +364,79 @@ class GroupsRepository {
         return (rowCount ?? 0) > 0
     }
 
+    async resolveByName(name: string): Promise<number | null> {
+        const { rows } = await pool.query<{ id: number }>(
+            `WITH RECURSIVE depths AS (
+                SELECT id, 0 AS d FROM groups WHERE parent_id IS NULL
+                UNION ALL
+                SELECT g.id, dp.d + 1 FROM groups g JOIN depths dp ON g.parent_id = dp.id
+            )
+            SELECT g.id FROM groups g
+            JOIN depths d ON g.id = d.id
+            WHERE lower(g.name) = lower($1)
+               OR lower(g.name) LIKE lower($1) || ' %'
+               OR EXISTS (
+                   SELECT 1 FROM group_aliases ga
+                   WHERE ga.group_id = g.id
+                     AND (lower(ga.alias) = lower($1) OR lower(ga.alias) LIKE lower($1) || ' %')
+               )
+            ORDER BY
+                CASE WHEN lower(g.name) = lower($1) THEN 0 ELSE 1 END,
+                d.d
+            LIMIT 1`,
+            [name]
+        )
+        return rows[0]?.id ?? null
+    }
+
+    async resolveByPath(parent: string, child: string): Promise<number | null> {
+        const { rows } = await pool.query<{ id: number }>(
+            `WITH RECURSIVE ancestors AS (
+                SELECT g.id, g.parent_id, 0 AS dist
+                FROM groups g
+                WHERE lower(g.name) = lower($2)
+                   OR EXISTS (
+                       SELECT 1 FROM group_aliases ga
+                       WHERE ga.group_id = g.id AND lower(ga.alias) = lower($2)
+                   )
+                UNION ALL
+                SELECT g.id, g.parent_id, a.dist + 1
+                FROM groups g JOIN ancestors a ON g.parent_id = a.id
+                WHERE a.id != g.id
+            ),
+            candidates AS (
+                SELECT a.id,
+                    (SELECT MIN(dist) FROM ancestors anc
+                     WHERE anc.id = a.id) AS child_dist,
+                    MIN(CASE
+                        WHEN lower(p.name) = lower($1) OR EXISTS (
+                            SELECT 1 FROM group_aliases ga
+                            WHERE ga.group_id = p.id AND lower(ga.alias) = lower($1)
+                        ) THEN 1 ELSE NULL
+                    END) AS has_parent
+                FROM ancestors a
+                JOIN groups p ON p.id = a.parent_id
+                GROUP BY a.id
+            )
+            SELECT id FROM candidates
+            WHERE has_parent = 1
+            ORDER BY child_dist
+            LIMIT 1`,
+            [parent, child]
+        )
+        return rows[0]?.id ?? null
+    }
+
+    async findUserByPosition(groupId: number, position: string): Promise<number | null> {
+        const { rows } = await pool.query<{ user_id: number }>(
+            `SELECT user_id FROM group_roles
+            WHERE group_id = $1 AND lower(position) = lower($2)
+            LIMIT 1`,
+            [groupId, position]
+        )
+        return rows[0]?.user_id ?? null
+    }
+
     async setRole(groupId: number, userId: number, position: string): Promise<void> {
         await pool.query(
             `INSERT INTO group_roles (group_id, user_id, position) VALUES ($1, $2, $3)
