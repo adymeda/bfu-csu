@@ -141,10 +141,17 @@ async def compose_message(body: ComposeMessageRequest) -> ComposeMessageResponse
 
 @router.post("/summarize-inbox", response_model=SummarizeInboxResponse)
 async def summarize_inbox(body: SummarizeInboxRequest) -> SummarizeInboxResponse:
-    messages_text = "\n\n".join(
-        f"[{'Не прочитано' if not m.is_read else 'Прочитано'}] {m.created_at} от {m.sender_name}:\n{m.body}"
-        for m in body.messages
-    )
+    def _format_message(m) -> str:
+        tags = []
+        if m.category:
+            tags.append(m.category)
+        if m.requires_response:
+            tags.append("требует ответа")
+        tag_str = f" ({', '.join(tags)})" if tags else ""
+        read_str = "Не прочитано" if not m.is_read else "Прочитано"
+        return f"[{read_str}{tag_str}] {m.created_at} от {m.sender_name}:\n{m.body}"
+
+    messages_text = "\n\n".join(_format_message(m) for m in body.messages)
     data = await _chat(SUMMARIZE_INBOX_SYSTEM_PROMPT, messages_text)
     try:
         return SummarizeInboxResponse(**data)

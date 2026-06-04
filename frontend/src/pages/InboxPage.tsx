@@ -2,12 +2,14 @@ import clsx from "clsx"
 import { useRef, useState, useEffect } from "react"
 import { useLocation } from "react-router"
 import { useTranslation } from "react-i18next"
-import { EnvelopeIcon, MagnifyingGlassIcon, PencilSquareIcon, StarIcon as StarOutline } from "@heroicons/react/24/outline"
+import { EnvelopeIcon, LightBulbIcon, MagnifyingGlassIcon, PencilSquareIcon, StarIcon as StarOutline } from "@heroicons/react/24/outline"
 import { StarIcon as StarSolid } from "@heroicons/react/24/solid"
 import "@styles/pages/InboxPage.scss"
 import Message from "@components/inbox/Message"
 import MessageDisplay from "@components/inbox/MessageDisplay"
 import MessageCreate from "@components/inbox/MessageCreate"
+import InboxSummary from "@components/inbox/InboxSummary"
+import Dropdown from "@components/ui/Dropdown"
 import {
     useMessages, useMessage, useMarkRead, useToggleFavorite, useDeleteMessage,
     type MessagesFilter
@@ -33,15 +35,26 @@ const TABS: Tab[] = [
     { key: "tabs.incoming" },
     { key: "tabs.sent" },
     { key: "tabs.important" },
-    { key: "tabs.events" }
+    { key: "tabs.study" },
+    { key: "tabs.org" },
+    { key: "tabs.personal" },
+    { key: "tabs.announce" },
+    { key: "tabs.events" },
+    { key: "tabs.deadlines" },
 ]
 
-// Only favorites and incoming are backed by the API. Sent / important / events
-// have no endpoint yet, so those tabs return null and render empty.
-function filterForTab(index: number): MessagesFilter | null {
+function filterForTab(index: number): MessagesFilter {
     if(index === 0) return { favorite: true }
-    if(index === 1) return {}
-    return null
+    if(index === 1) return { box: "inbox" }
+    if(index === 2) return { box: "sent" }
+    if(index === 3) return { requires_response: true }
+    if(index === 4) return { box: "inbox", category: "учебное" }
+    if(index === 5) return { box: "inbox", category: "организационное" }
+    if(index === 6) return { box: "inbox", category: "личное" }
+    if(index === 7) return { box: "inbox", category: "объявление" }
+    if(index === 8) return { has_events: true }
+    if(index === 9) return { has_deadlines: true }
+    return { box: "inbox" }
 }
 
 function InboxPage() {
@@ -59,7 +72,7 @@ function InboxPage() {
     const tabsRef = useRef<HTMLDivElement>(null)
 
     const filter = filterForTab(activeTab)
-    const messagesQuery = useMessages(filter ?? {}, filter !== null)
+    const messagesQuery = useMessages(filter)
     const markRead = useMarkRead()
     const toggleFavorite = useToggleFavorite()
     const deleteMessage = useDeleteMessage()
@@ -162,6 +175,16 @@ function InboxPage() {
                             onChange={e => setSearch(e.target.value)}
                         />
                     </div>
+                    <Dropdown
+                        className="inbox-sidebar__summary-menu"
+                        trigger={
+                            <button className="inbox-sidebar__summary-btn" title={t("summary.tooltip")}>
+                                <LightBulbIcon />
+                            </button>
+                        }
+                    >
+                        <InboxSummary />
+                    </Dropdown>
                     <button className="inbox-sidebar__new-message" onClick={handleComposeOpen}>
                         <PencilSquareIcon />
                     </button>
@@ -203,6 +226,8 @@ function InboxPage() {
                                 isRead={m.is_read}
                                 date={formatDate(m.created_at)}
                                 selected={currentMessageId === m.id}
+                                category={m.category}
+                                requiresResponse={m.requires_response ?? false}
                             />
                         </div>
                     ))}

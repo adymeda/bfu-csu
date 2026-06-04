@@ -15,6 +15,8 @@ export interface MessageProps {
     selected?: boolean,
     text: string,
     date?: string,
+    category?: string | null,
+    requiresResponse?: boolean,
     onClose?: () => void
 }
 

@@ -7,8 +7,19 @@
     "tabs": {
         "incoming": "Inbox",
         "sent": "Sent",
-        "important": "Important",
-        "events": "With events"
+        "important": "Requires response",
+        "study": "Academic",
+        "org": "Organizational",
+        "personal": "Personal",
+        "announce": "Announcement",
+        "events": "With events",
+        "deadlines": "With deadlines"
+    },
+    "summary": {
+        "tooltip": "Inbox digest",
+        "loading": "Analysing inbox…",
+        "error": "Digest service unavailable",
+        "empty": "Nothing to summarize yet"
     },
     "message": {
         "topic": "Message topic",

@@ -75,6 +75,15 @@ export interface CreateDeadlineDto {
 
 
 
+export const MESSAGE_CATEGORY_LABELS: Record<string, string> = {
+    "учебное": "Учебное",
+    "организационное": "Организационное",
+    "личное": "Личное",
+    "объявление": "Объявление",
+}
+
+export type MessageBox = "inbox" | "sent"
+
 export interface MessageListItem {
     id: number
     title: string
@@ -85,6 +94,8 @@ export interface MessageListItem {
     is_read: boolean
     is_favorite: boolean
     created_at: string
+    category: string | null
+    requires_response: boolean | null
 }
 
 export interface MessageRecipientResolved {

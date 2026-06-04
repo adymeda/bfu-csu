@@ -47,6 +47,8 @@ class MessageRef(BaseModel):
     body: str
     created_at: str
     is_read: bool
+    category: str | None = None
+    requires_response: bool | None = None
 
 class SummarizeInboxRequest(BaseModel):
     messages: list[MessageRef] = Field(..., min_length=1)

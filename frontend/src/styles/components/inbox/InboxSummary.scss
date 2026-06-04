@@ -1,0 +1,39 @@
+.inbox-summary {
+	width: 280px;
+	padding: .75rem 1rem;
+	font-size: 13px;
+	color: var(--text-primary-color);
+	line-height: 1.55;
+
+	&--loading {
+		display: flex;
+		align-items: center;
+		gap: .5rem;
+		color: var(--text-info-color);
+	}
+
+	&--error,
+	&--empty {
+		color: var(--text-info-color);
+	}
+
+	&__spinner {
+		display: inline-block;
+		flex-shrink: 0;
+		width: 14px;
+		height: 14px;
+		border: 2px solid currentColor;
+		border-top-color: transparent;
+		border-radius: 50%;
+		animation: inbox-summary-spin .6s linear infinite;
+	}
+
+	&__text {
+		margin: 0;
+		white-space: pre-wrap;
+	}
+}
+
+@keyframes inbox-summary-spin {
+	to { transform: rotate(360deg); }
+}

@@ -128,7 +128,7 @@ class MlService {
 		return await res.json() as ExtractDeadlineResponse
 	}
 
-	async summarizeInbox(messages: { sender_name: string, body: string, created_at: string, is_read: boolean }[]): Promise<SummarizeInboxResponse> {
+	async summarizeInbox(messages: { sender_name: string, body: string, created_at: string, is_read: boolean, category: string | null, requires_response: boolean | null }[]): Promise<SummarizeInboxResponse> {
 		if(this.isMisconfigured()) throw new Error("ML service is not configured")
 		const res = await fetch(`${this.url}/api/llm/summarize-inbox`, {
 			method: "POST",

@@ -123,7 +123,7 @@ class LlmService {
     async summarize(userId: number): Promise<SummarizeResult> {
         const items = await messageRepo.findListByUser(userId, {
             box: "inbox",
-            limit: 30,
+            limit: 10,
             before: null,
             favorite: false,
             unread: false,
@@ -138,6 +138,8 @@ class LlmService {
             body: item.content,
             created_at: item.created_at.toISOString(),
             is_read: item.is_read,
+            category: item.category,
+            requires_response: item.requires_response,
         }))
 
         const resp = await mlService.summarizeInbox(messages)

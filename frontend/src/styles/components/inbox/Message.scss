@@ -67,11 +67,45 @@
         overflow: hidden;
     }
 
-    &__date {
+    &__footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .25rem;
         margin-top: .5rem;
+    }
 
+    &__category {
+        font-size: 11px;
+        color: var(--accent-hover-color);
+        background: rgba(33, 20, 95, 0.07);
+        border-radius: .25rem;
+        padding: 1px 6px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    &__date {
         font-size: 12px;
         color: var(--text-info-color);
         text-align: right;
+        margin-left: auto;
+    }
+
+    &__requires-response {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--accent-hover-color);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1;
+        margin-left: .25rem;
+        flex-shrink: 0;
+        vertical-align: middle;
     }
 }

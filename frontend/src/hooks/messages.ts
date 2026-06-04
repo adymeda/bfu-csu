@@ -8,8 +8,13 @@ import type { SendMessageDto, RecipientInput } from "../api/types"
 const PAGE_SIZE = 20
 
 export interface MessagesFilter {
+    box?: "inbox" | "sent"
     favorite?: boolean
     unread?: boolean
+    category?: string
+    requires_response?: boolean
+    has_events?: boolean
+    has_deadlines?: boolean
 }
 
 export function useMessages(filter: MessagesFilter, enabled = true) {

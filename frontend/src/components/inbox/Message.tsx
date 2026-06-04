@@ -2,8 +2,9 @@ import clsx from "clsx"
 import "@styles/components/inbox/Message.scss"
 import type { MessageProps } from "./types"
 import Avatar from "@components/ui/Avatar"
+import { MESSAGE_CATEGORY_LABELS } from "../../api/types"
 
-function Message({ title, author, authorColor, authorIcon, isRead=false, selected=false, text, date }: MessageProps) {
+function Message({ title, author, authorColor, authorIcon, isRead=false, selected=false, text, date, category, requiresResponse=false }: MessageProps) {
     return (
         <div className={clsx("message", !isRead && "message--unread", selected && "message--selected")}>
             <div className="message__header">
@@ -14,11 +15,19 @@ function Message({ title, author, authorColor, authorIcon, isRead=false, selecte
             </div>
             <div className="message__title">
                 <span>{ title }</span>
+                {requiresResponse && (
+                    <span className="message__requires-response" title="Требуется ответ">!</span>
+                )}
             </div>
             <div className="message__content">
                 { text }
             </div>
-            {date && <div className="message__date">{date}</div>}
+            <div className="message__footer">
+                {category && (
+                    <span className="message__category">{MESSAGE_CATEGORY_LABELS[category] ?? category}</span>
+                )}
+                {date && <span className="message__date">{date}</span>}
+            </div>
         </div>
     )
 }
