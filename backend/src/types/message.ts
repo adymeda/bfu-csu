@@ -10,6 +10,15 @@ export const RECIPIENT_TYPE = {
     GROUP: 1,
 } as const
 
+export const MESSAGE_CATEGORY = {
+    STUDY: "учебное",
+    ORG: "организационное",
+    PERSONAL: "личное",
+    ANNOUNCEMENT: "объявление",
+} as const
+
+export const MESSAGE_CATEGORIES: ReadonlySet<string> = new Set(Object.values(MESSAGE_CATEGORY))
+
 export interface Message {
     id: number
     sender_id: number
@@ -55,10 +64,22 @@ export interface ForwardMessageDto {
 }
 
 export interface MessageListQuery {
+    box: "inbox" | "sent"
     limit: number
     before: number | null
     favorite: boolean
     unread: boolean
+    category: string | null
+    requires_response: boolean
+    has_events: boolean
+    has_deadlines: boolean
+}
+
+export interface MessageTag {
+    message_id: number
+    category: string | null
+    requires_response: boolean | null
+    updated_at: Date
 }
 
 export interface MessageStateUpdate {
@@ -76,6 +97,8 @@ export interface MessageListItem {
     is_read: boolean
     is_favorite: boolean
     created_at: Date
+    category: string | null
+    requires_response: boolean | null
 }
 
 export interface MessageRecipientResolved {
@@ -104,6 +127,8 @@ export interface MessageListRow {
     sender_accent_color: string
     is_read: boolean
     is_favorite: boolean
+    category: string | null
+    requires_response: boolean | null
 }
 
 export interface RecipientJoinRow {

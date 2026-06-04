@@ -28,7 +28,11 @@ export interface SummarizeInboxResponse {
 	summary: string
 }
 
-// Resolved types returned to frontend
+export interface CategorizeMessageResponse {
+	category: string
+	requires_response: boolean
+}
+
 
 export interface ResolvedRecipient {
 	type: 0 | 1

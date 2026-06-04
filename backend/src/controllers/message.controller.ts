@@ -4,6 +4,7 @@ import mlService from "../services/ml.service"
 import notificationsService from "../services/notifications.service"
 import userRepo from "../repositories/user.repo"
 import type { RecipientInput, CreateMessageDto } from "../types/message"
+import { MESSAGE_CATEGORIES } from "../types/message"
 import type { CreateEventDto } from "../types/event"
 import type { CreateDeadlineDto } from "../types/deadline"
 import { parseId } from "../utils/parseId"
@@ -147,6 +148,8 @@ class MessagesController {
                 })
             }
 
+            void service.categorize(msg.id, title, content)
+
             res.status(201).json(msg)
         } catch (err: unknown) {
             if(err instanceof AttachmentLinkError) return res.status(400).json({
@@ -178,11 +181,41 @@ class MessagesController {
             })
         }
 
+        const rawBox = req.query["box"] ?? "inbox"
+        if(rawBox !== "inbox" && rawBox !== "sent")
+            return res.status(400).json({
+                error: "box must be \"inbox\" or \"sent\""
+            })
+        const box = rawBox as "inbox" | "sent"
+
+        const rawCategory = req.query["category"]
+        let category: string | null = null
+        if(rawCategory !== undefined) {
+            if(typeof rawCategory !== "string" || !MESSAGE_CATEGORIES.has(rawCategory))
+                return res.status(400).json({
+                    error: "category must be one of: учебное, организационное, личное, объявление"
+                })
+            category = rawCategory
+        }
+
         const favorite = req.query["favorite"] === "1"
         const unread = req.query["unread"] === "1"
+        const requires_response = req.query["requires_response"] === "1"
+        const has_events = req.query["has_events"] === "1"
+        const has_deadlines = req.query["has_deadlines"] === "1"
 
         try {
-            const messages = await service.findList(res.locals.userId as number, { limit, before, favorite, unread })
+            const messages = await service.findList(res.locals.userId as number, {
+                box,
+                limit,
+                before,
+                favorite,
+                unread,
+                category,
+                requires_response,
+                has_events,
+                has_deadlines,
+            })
             res.json(messages)
         } catch (err) {
             next(err)

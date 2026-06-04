@@ -1,5 +1,7 @@
 import repo from "../repositories/message.repo"
+import mlService from "./ml.service"
 import type { Message, MessageListItem, MessageDetail, CreateMessageDto, RecipientInput, MessageListQuery, MessageStateUpdate } from "../types/message"
+import { MESSAGE_CATEGORIES } from "../types/message"
 
 class MessagesService {
     async create(dto: CreateMessageDto, senderId: number): Promise<Message> {
@@ -34,6 +36,20 @@ class MessagesService {
 
     async setState(messageId: number, userId: number, dto: MessageStateUpdate): Promise<boolean> {
         return repo.setState(messageId, userId, dto)
+    }
+
+    async categorize(messageId: number, subject: string, body: string): Promise<void> {
+        try {
+            const result = await mlService.categorizeMessage(subject, body)
+            if(result === null) return
+            if(!MESSAGE_CATEGORIES.has(result.category)) {
+                console.warn(`[messages] categorize: unexpected category "${result.category}", skipping`)
+                return
+            }
+            await repo.upsertTag(messageId, result.category, result.requires_response)
+        } catch (err) {
+            console.error("[messages] categorize error:", (err as Error).message)
+        }
     }
 
     async forward(messageId: number, senderId: number, recipients: RecipientInput[]): Promise<Message | null> {

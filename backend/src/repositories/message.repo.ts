@@ -128,17 +128,34 @@ class MessagesRepository {
     }
 
     async findListByUser(userId: number, query: MessageListQuery): Promise<MessageListItem[]> {
-        const { limit, before, favorite, unread } = query
-        const conditions: string[] = ["s.user_id = $1", "s.is_deleted = false"]
+        const { box, limit, before, favorite, unread, category, requires_response, has_events, has_deadlines } = query
         const values: unknown[] = [userId]
         let paramIdx = 2
+
+        const conditions: string[] = []
+
+        let stateJoin: string
+        if(box === "sent") {
+            conditions.push("m.sender_id = $1")
+            stateJoin = "LEFT JOIN message_states s ON s.message_id = m.id AND s.user_id = $1"
+        } else {
+            conditions.push("s.user_id = $1", "s.is_deleted = false")
+            stateJoin = "JOIN message_states s ON s.message_id = m.id AND s.user_id = $1"
+        }
 
         if(before !== null) {
             conditions.push(`m.id < $${paramIdx++}`)
             values.push(before)
         }
-        if(favorite) conditions.push("s.is_favorite = true")
-        if(unread) conditions.push("s.is_read = false")
+        if(favorite) conditions.push("COALESCE(s.is_favorite, false) = true")
+        if(unread) conditions.push("COALESCE(s.is_read, false) = false")
+        if(category !== null) {
+            conditions.push(`t.category = $${paramIdx++}`)
+            values.push(category)
+        }
+        if(requires_response) conditions.push("t.requires_response = true")
+        if(has_events) conditions.push("EXISTS (SELECT 1 FROM events e WHERE e.message_id = m.id)")
+        if(has_deadlines) conditions.push("EXISTS (SELECT 1 FROM deadlines d WHERE d.message_id = m.id)")
 
         values.push(limit)
         const limitParam = `$${paramIdx}`
@@ -149,10 +166,13 @@ class MessagesRepository {
             `SELECT
                 m.id, m.title, m.content, m.reply_to, m.forwarded_from, m.created_at,
                 u.id AS sender_id, u.display_name AS sender_display_name, u.accent_color AS sender_accent_color,
-                s.is_read, s.is_favorite
+                COALESCE(s.is_read, false) AS is_read,
+                COALESCE(s.is_favorite, false) AS is_favorite,
+                t.category, t.requires_response
             FROM messages m
-            JOIN message_states s ON s.message_id = m.id
+            ${stateJoin}
             JOIN users u ON u.id = m.sender_id
+            LEFT JOIN message_tags t ON t.message_id = m.id
             WHERE ${where}
             ORDER BY m.id DESC
             LIMIT ${limitParam}`,
@@ -173,6 +193,8 @@ class MessagesRepository {
             },
             is_read: row.is_read,
             is_favorite: row.is_favorite,
+            category: row.category ?? null,
+            requires_response: row.requires_response ?? null,
         }))
     }
 
@@ -181,10 +203,13 @@ class MessagesRepository {
             `SELECT
                 m.id, m.title, m.content, m.reply_to, m.forwarded_from, m.created_at,
                 m.sender_id, u.display_name AS sender_display_name, u.accent_color AS sender_accent_color,
-                s.is_read, s.is_favorite
+                COALESCE(s.is_read, false) AS is_read,
+                COALESCE(s.is_favorite, false) AS is_favorite,
+                t.category, t.requires_response
             FROM messages m
             JOIN users u ON u.id = m.sender_id
             LEFT JOIN message_states s ON s.message_id = m.id AND s.user_id = $2
+            LEFT JOIN message_tags t ON t.message_id = m.id
             WHERE m.id = $1`,
             [messageId, userId]
         )
@@ -271,8 +296,10 @@ class MessagesRepository {
                 display_name: msg.sender_display_name,
                 accent_color: msg.sender_accent_color,
             },
-            is_read: msg.is_read ?? false,
-            is_favorite: msg.is_favorite ?? false,
+            is_read: msg.is_read,
+            is_favorite: msg.is_favorite,
+            category: msg.category ?? null,
+            requires_response: msg.requires_response ?? null,
             recipients: recipientRows.map(r => ({
                 type: r.type,
                 id: r.id,
@@ -308,6 +335,16 @@ class MessagesRepository {
             [messageId, userId, dto.value]
         )
         return (rowCount ?? 0) > 0
+    }
+
+    async upsertTag(messageId: number, category: string, requiresResponse: boolean): Promise<void> {
+        await pool.query(
+            `INSERT INTO message_tags (message_id, category, requires_response)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (message_id) DO UPDATE
+                SET category = $2, requires_response = $3, updated_at = now()`,
+            [messageId, category, requiresResponse]
+        )
     }
 }
 

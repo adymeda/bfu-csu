@@ -1,4 +1,4 @@
-import type { ComposeMessageResponse, ExtractDeadlineResponse, ExtractEventResponse, SummarizeInboxResponse } from "../types/llm"
+import type { CategorizeMessageResponse, ComposeMessageResponse, ExtractDeadlineResponse, ExtractEventResponse, SummarizeInboxResponse } from "../types/llm"
 
 class MlService {
 	private readonly url = process.env["ML_SERVICE_URL"] ?? ""
@@ -35,6 +35,29 @@ class MlService {
 			return await res.json() as { toxic: boolean, score: number }
 		} catch (err) {
 			console.warn("[ml] /api/check unreachable:", (err as Error).message, "\nallowing message through")
+			return null
+		}
+	}
+
+	async categorizeMessage(subject: string, body: string): Promise<CategorizeMessageResponse | null> {
+		if(this.isMisconfigured()) return null
+		try {
+			const res = await fetch(`${this.url}/api/llm/categorize-message`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${this.token}`,
+				},
+				body: JSON.stringify({ subject, body }),
+				signal: AbortSignal.timeout(30000),
+			})
+			if(!res.ok) {
+				console.warn(`[ml] /api/llm/categorize-message returned ${res.status}, skipping categorization`)
+				return null
+			}
+			return await res.json() as CategorizeMessageResponse
+		} catch (err) {
+			console.warn("[ml] /api/llm/categorize-message unreachable:", (err as Error).message, "\nskipping categorization")
 			return null
 		}
 	}
