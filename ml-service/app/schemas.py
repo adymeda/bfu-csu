@@ -11,15 +11,18 @@ class HealthResponse(BaseModel):
     status: str
 
 
+class ExtractEventRequest(BaseModel):
+    text: str = Field(..., min_length=1)
+
 class ExtractEventResponse(BaseModel):
-    is_deadline: bool = False
     title: str | None = None
     start_at: str | None = None
     end_at: str | None = None
     location: str | None = None
 
-class ExtractEventRequest(BaseModel):
-    text: str = Field(..., min_length=1)
+class ExtractDeadlineResponse(BaseModel):
+    title: str | None = None
+    due_at: str | None = None
 
 
 class EmployeeRef(BaseModel):

@@ -13,11 +13,15 @@ export interface ComposeMessageResponse {
 }
 
 export interface ExtractEventResponse {
-	is_deadline: boolean
 	title: string | null
 	start_at: string | null
 	end_at: string | null
 	location: string | null
+}
+
+export interface ExtractDeadlineResponse {
+	title: string | null
+	due_at: string | null
 }
 
 export interface SummarizeInboxResponse {
@@ -39,11 +43,15 @@ export interface ComposeResult {
 	warnings: string[]
 }
 
-export interface ExtractResult {
-	is_deadline: boolean
+export interface ExtractEventResult {
 	title: string | null
 	start_at: string | null
 	end_at: string | null
+}
+
+export interface ExtractDeadlineResult {
+	title: string | null
+	due_at: string | null
 }
 
 export interface SummarizeResult {

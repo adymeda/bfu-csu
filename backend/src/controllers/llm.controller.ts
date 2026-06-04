@@ -24,10 +24,25 @@ class LlmController {
             return res.status(400).json({ error: "text should be a non-empty string" })
 
         try {
-            const result = await service.extract(text.trim())
+            const result = await service.extractEvent(text.trim())
             res.json(result)
         } catch(err) {
             console.error("[llm] extract-event error:", (err as Error).message)
+            res.status(502).json({ error: "LLM service unavailable" })
+        }
+    }
+
+    async extractDeadline(req: Request, res: Response, next: NextFunction) {
+        const { text } = req.body as { text: unknown }
+
+        if(typeof text !== "string" || text.trim().length === 0)
+            return res.status(400).json({ error: "text should be a non-empty string" })
+
+        try {
+            const result = await service.extractDeadline(text.trim())
+            res.json(result)
+        } catch(err) {
+            console.error("[llm] extract-deadline error:", (err as Error).message)
             res.status(502).json({ error: "LLM service unavailable" })
         }
     }

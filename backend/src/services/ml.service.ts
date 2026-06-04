@@ -1,4 +1,4 @@
-import type { ComposeMessageResponse, ExtractEventResponse, SummarizeInboxResponse } from "../types/llm"
+import type { ComposeMessageResponse, ExtractDeadlineResponse, ExtractEventResponse, SummarizeInboxResponse } from "../types/llm"
 
 class MlService {
 	private readonly url = process.env["ML_SERVICE_URL"] ?? ""
@@ -85,6 +85,24 @@ class MlService {
 			throw new Error(`[ml] /api/llm/extract-event returned ${res.status}: ${body}`)
 		}
 		return await res.json() as ExtractEventResponse
+	}
+
+	async extractDeadline(text: string): Promise<ExtractDeadlineResponse> {
+		if(this.isMisconfigured()) throw new Error("ML service is not configured")
+		const res = await fetch(`${this.url}/api/llm/extract-deadline`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"Authorization": `Bearer ${this.token}`,
+			},
+			body: JSON.stringify({ text }),
+			signal: AbortSignal.timeout(30000),
+		})
+		if(!res.ok) {
+			const body = await res.text().catch(() => "")
+			throw new Error(`[ml] /api/llm/extract-deadline returned ${res.status}: ${body}`)
+		}
+		return await res.json() as ExtractDeadlineResponse
 	}
 
 	async summarizeInbox(messages: { sender_name: string, body: string, created_at: string, is_read: boolean }[]): Promise<SummarizeInboxResponse> {

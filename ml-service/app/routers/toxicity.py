@@ -16,6 +16,6 @@ router = APIRouter(prefix="/api")
 )
 async def check_toxicity(body: CheckRequest) -> CheckResponse:
 	model = get_toxicity_model()
-	probe = await asyncio.to_thread(model.predict_probe, [body.text])
+	probe = await asyncio.to_thread(model.predict_proba, [body.text])
 	score: float = float(probe[0][1])
 	return CheckResponse(toxic=score >= settings.toxicity_threshold, score=round(score, 4))

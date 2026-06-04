@@ -13,9 +13,14 @@ import { useUsers } from "../../hooks/users"
 import { useAuth } from "../../contexts/AuthContext"
 import { useToast } from "../../contexts/ToastContext"
 import { useSearchGroups, useSuggestedRecipients } from "../../hooks/groups"
-import { useComposeMessage, useExtractEvent } from "../../hooks/llm"
+import { useComposeMessage, useExtractDeadline, useExtractEvent } from "../../hooks/llm"
 import { uploadAttachments, formatBytes } from "../../api/attachments"
-import type { AttachmentPublic, MessageEventInput, MessageDeadlineInput, ExtractEventResult } from "../../api/types"
+import type { AttachmentPublic, MessageEventInput, MessageDeadlineInput, ExtractDeadlineResult, ExtractEventResult } from "../../api/types"
+
+type ModalPrefill =
+    | { mode: "event" } & ExtractEventResult
+    | { mode: "deadline" } & ExtractDeadlineResult
+    | null
 
 // ─── Event / deadline detection ──────────────────────────────────────────────
 
@@ -59,7 +64,7 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
     const [events, setEvents] = useState<MessageEventInput[]>([])
     const [deadlines, setDeadlines] = useState<MessageDeadlineInput[]>([])
     const [modal, setModal] = useState<"event" | "deadline" | null>(null)
-    const [modalPrefill, setModalPrefill] = useState<ExtractEventResult | null>(null)
+    const [modalPrefill, setModalPrefill] = useState<ModalPrefill>(null)
     const [recipientQuery, setRecipientQuery] = useState("")
     const [detected, setDetected] = useState<DetectionResult>(null)
     const [visible, setVisible] = useState(false)
@@ -98,7 +103,9 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
     const toast = useToast()
     const sendMessage = useSendMessage()
     const composeMutation = useComposeMessage()
-    const extractMutation = useExtractEvent()
+    const extractEventMutation = useExtractEvent()
+    const extractDeadlineMutation = useExtractDeadline()
+    const extractMutation = detected === "deadline" ? extractDeadlineMutation : extractEventMutation
     const isSearching = recipientQuery.trim().length > 0
     const { data: usersData } = useUsers({ q: recipientQuery, limit: 8 })
     const { data: searchedGroups } = useSearchGroups(recipientQuery)
@@ -174,19 +181,31 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
 
     function handleExtract() {
         if(extractMutation.isPending) return
-        extractMutation.mutate(body, {
-            onSuccess: (res) => {
-                const mode = res.is_deadline ? "deadline" : "event"
-                setModalPrefill(res)
-                setModal(mode)
-            },
-            onError: () => {
-                const mode = detected ?? "event"
-                setModalPrefill(null)
-                setModal(mode)
-                toast.error(t("detection.extractError"))
-            },
-        })
+        if(detected === "deadline") {
+            extractDeadlineMutation.mutate(body, {
+                onSuccess: (res) => {
+                    setModalPrefill({ mode: "deadline", ...res })
+                    setModal("deadline")
+                },
+                onError: () => {
+                    setModalPrefill(null)
+                    setModal("deadline")
+                    toast.error(t("detection.extractError"))
+                },
+            })
+        } else {
+            extractEventMutation.mutate(body, {
+                onSuccess: (res) => {
+                    setModalPrefill({ mode: "event", ...res })
+                    setModal("event")
+                },
+                onError: () => {
+                    setModalPrefill(null)
+                    setModal("event")
+                    toast.error(t("detection.extractError"))
+                },
+            })
+        }
     }
 
     const canSend = subject.trim().length > 0 && body.trim().length > 0 && selected.length > 0 && !sendMessage.isPending
@@ -432,9 +451,9 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
                     onClose={handleModalClose}
                     onSubmit={handleSchedule}
                     initialTitle={modalPrefill?.title ?? undefined}
-                    initialStart={modal === "event" && modalPrefill?.start_at ? modalPrefill.start_at : undefined}
-                    initialEnd={modal === "event" && modalPrefill?.end_at ? modalPrefill.end_at : undefined}
-                    initialDue={modal === "deadline" && modalPrefill?.start_at ? modalPrefill.start_at : undefined}
+                    initialStart={modalPrefill?.mode === "event" ? (modalPrefill.start_at ?? undefined) : undefined}
+                    initialEnd={modalPrefill?.mode === "event" ? (modalPrefill.end_at ?? undefined) : undefined}
+                    initialDue={modalPrefill?.mode === "deadline" ? (modalPrefill.due_at ?? undefined) : undefined}
                 />
             )}
         </>

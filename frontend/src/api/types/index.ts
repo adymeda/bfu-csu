@@ -178,10 +178,14 @@ export interface ComposeResult {
 }
 
 export interface ExtractEventResult {
-    is_deadline: boolean
     title: string | null
     start_at: string | null
     end_at: string | null
+}
+
+export interface ExtractDeadlineResult {
+    title: string | null
+    due_at: string | null
 }
 
 export interface SummarizeResult {

@@ -2,7 +2,7 @@ import mlService from "./ml.service"
 import userRepo from "../repositories/user.repo"
 import groupRepo from "../repositories/group.repo"
 import messageRepo from "../repositories/message.repo"
-import type { ComposeResult, ExtractResult, SummarizeResult } from "../types/llm"
+import type { ComposeResult, ExtractDeadlineResult, ExtractEventResult, SummarizeResult } from "../types/llm"
 
 class LlmService {
     private async resolveGroup(ref: string): Promise<{ id: number, name: string } | null> {
@@ -34,6 +34,9 @@ class LlmService {
     async compose(userId: number, description: string): Promise<ComposeResult> {
         const userGroups = await userRepo.findGroups(userId)
         const authorGroups = userGroups.map(g => g.name)
+
+        // Инструкция здороваться
+        description = description + "\nНе забудь поздороваться"
 
         const resp = await mlService.composeMessage(description, authorGroups)
 
@@ -100,13 +103,20 @@ class LlmService {
         }
     }
 
-    async extract(text: string): Promise<ExtractResult> {
+    async extractEvent(text: string): Promise<ExtractEventResult> {
         const resp = await mlService.extractEvent(text)
         return {
-            is_deadline: resp.is_deadline,
             title: resp.title,
             start_at: resp.start_at,
             end_at: resp.end_at,
+        }
+    }
+
+    async extractDeadline(text: string): Promise<ExtractDeadlineResult> {
+        const resp = await mlService.extractDeadline(text)
+        return {
+            title: resp.title,
+            due_at: resp.due_at,
         }
     }
 

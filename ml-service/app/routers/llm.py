@@ -8,6 +8,7 @@ from gigachat import GigaChatAsyncClient, AuthenticationError, Chat, Messages, M
 from ..config import settings
 from ..prompts import (
     COMPOSE_MESSAGE_SYSTEM_PROMPT,
+    EXTRACT_DEADLINE_SYSTEM_PROMPT,
     EXTRACT_EVENT_SYSTEM_PROMPT,
     SUMMARIZE_INBOX_SYSTEM_PROMPT,
 )
@@ -15,6 +16,7 @@ from ..schemas import (
     ComposeMessageRequest,
     ComposeMessageResponse,
     EmployeeRef,
+    ExtractDeadlineResponse,
     ExtractEventRequest,
     ExtractEventResponse,
     SummarizeInboxRequest,
@@ -77,11 +79,23 @@ async def extract_event(body: ExtractEventRequest) -> ExtractEventResponse:
     try:
         end_at = _apply_default_duration(data.get("start_at"), data.get("end_at"))
         return ExtractEventResponse(
-            is_deadline=data.get("is_deadline", False),
             title=data.get("title"),
             start_at=data.get("start_at"),
             end_at=end_at,
             location=data.get("location"),
+        )
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="llm_schema_mismatch")
+
+
+@router.post("/extract-deadline", response_model=ExtractDeadlineResponse)
+async def extract_deadline(body: ExtractEventRequest) -> ExtractDeadlineResponse:
+    system = _inject_date(EXTRACT_DEADLINE_SYSTEM_PROMPT)
+    data = await _chat(system, body.text)
+    try:
+        return ExtractDeadlineResponse(
+            title=data.get("title"),
+            due_at=data.get("due_at"),
         )
     except Exception:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="llm_schema_mismatch")
