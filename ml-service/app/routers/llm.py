@@ -7,18 +7,33 @@ from gigachat import GigaChatAsyncClient, AuthenticationError, Chat, Messages, M
 
 from ..config import settings
 from ..prompts import (
+    CALENDAR_ANSWER_SYSTEM_PROMPT,
+    CALENDAR_PLAN_SYSTEM_PROMPT,
+    CATEGORIZE_MESSAGE_SYSTEM_PROMPT,
+    CHECK_TOXICITY_SYSTEM_PROMPT,
     COMPOSE_MESSAGE_SYSTEM_PROMPT,
     EXTRACT_DEADLINE_SYSTEM_PROMPT,
     EXTRACT_EVENT_SYSTEM_PROMPT,
+    REPHRASE_SYSTEM_PROMPT,
     SUMMARIZE_INBOX_SYSTEM_PROMPT,
 )
 from ..schemas import (
+    CalendarAnswerRequest,
+    CalendarAnswerResponse,
+    CalendarPlanRequest,
+    CalendarPlanResponse,
+    CategorizeMessageRequest,
+    CategorizeMessageResponse,
     ComposeMessageRequest,
     ComposeMessageResponse,
     EmployeeRef,
     ExtractDeadlineResponse,
     ExtractEventRequest,
     ExtractEventResponse,
+    LlmToxicityRequest,
+    LlmToxicityResponse,
+    RephraseRequest,
+    RephraseResponse,
     SummarizeInboxRequest,
     SummarizeInboxResponse,
 )
@@ -133,5 +148,78 @@ async def summarize_inbox(body: SummarizeInboxRequest) -> SummarizeInboxResponse
     data = await _chat(SUMMARIZE_INBOX_SYSTEM_PROMPT, messages_text)
     try:
         return SummarizeInboxResponse(**data)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="llm_schema_mismatch")
+
+
+@router.post("/categorize-message", response_model=CategorizeMessageResponse)
+async def categorize_message(body: CategorizeMessageRequest) -> CategorizeMessageResponse:
+    user_prompt = f"Тема: {body.subject}\n\nТекст: {body.body}"
+    data = await _chat(CATEGORIZE_MESSAGE_SYSTEM_PROMPT, user_prompt)
+    try:
+        return CategorizeMessageResponse(
+            category=data["category"],
+            requires_response=data["requires_response"],
+        )
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="llm_schema_mismatch")
+
+
+@router.post("/calendar-plan", response_model=CalendarPlanResponse)
+async def calendar_plan(body: CalendarPlanRequest) -> CalendarPlanResponse:
+    system = _inject_date(CALENDAR_PLAN_SYSTEM_PROMPT)
+    data = await _chat(system, body.question)
+    try:
+        return CalendarPlanResponse(
+            need_events=data["need_events"],
+            need_deadlines=data["need_deadlines"],
+            date_from=data["date_from"],
+            date_to=data["date_to"],
+        )
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="llm_schema_mismatch")
+
+
+@router.post("/calendar-answer", response_model=CalendarAnswerResponse)
+async def calendar_answer(body: CalendarAnswerRequest) -> CalendarAnswerResponse:
+    system = _inject_date(CALENDAR_ANSWER_SYSTEM_PROMPT)
+    events_text = ""
+    if body.events:
+        lines = []
+        for e in body.events:
+            time_info = e.start_at
+            if e.end_at:
+                time_info += f" – {e.end_at}"
+            loc = f", {e.location}" if e.location else ""
+            lines.append(f"  • {e.title} ({time_info}{loc})")
+        events_text = "Мероприятия:\n" + "\n".join(lines)
+    deadlines_text = ""
+    if body.deadlines:
+        lines = [f"  • {d.title} (срок: {d.due_at})" for d in body.deadlines]
+        deadlines_text = "Дедлайны:\n" + "\n".join(lines)
+    calendar_data = "\n\n".join(filter(None, [events_text, deadlines_text])) or "Данных нет."
+    user_prompt = f"Вопрос: {body.question}\n\n{calendar_data}"
+    data = await _chat(system, user_prompt)
+    try:
+        return CalendarAnswerResponse(answer=data["answer"])
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="llm_schema_mismatch")
+
+
+@router.post("/check-toxicity", response_model=LlmToxicityResponse)
+async def check_toxicity_llm(body: LlmToxicityRequest) -> LlmToxicityResponse:
+    user_prompt = f"Оценка ML-модели: {body.score:.4f}\n\nТекст сообщения:\n{body.text}"
+    data = await _chat(CHECK_TOXICITY_SYSTEM_PROMPT, user_prompt)
+    try:
+        return LlmToxicityResponse(toxic=data["toxic"])
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="llm_schema_mismatch")
+
+
+@router.post("/rephrase", response_model=RephraseResponse)
+async def rephrase(body: RephraseRequest) -> RephraseResponse:
+    data = await _chat(REPHRASE_SYSTEM_PROMPT, body.text)
+    try:
+        return RephraseResponse(text=data["text"])
     except Exception:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="llm_schema_mismatch")
