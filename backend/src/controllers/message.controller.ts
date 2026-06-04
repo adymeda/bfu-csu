@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express"
 import service from "../services/message.service"
-import mlService from "../services/ml.service"
+import llmService from "../services/llm.service"
 import notificationsService from "../services/notifications.service"
 import userRepo from "../repositories/user.repo"
 import type { RecipientInput, CreateMessageDto } from "../types/message"
@@ -121,10 +121,10 @@ class MessagesController {
                 })
             }
 
-            const moderation = await mlService.checkToxicity(`${title}\n${content}`)
-            if(moderation?.toxic) return res.status(422).json({
-                error: "Message rejected by toxicity filter",
-                score: moderation.score,
+            const { rejected } = await llmService.moderate(title, content)
+            if(rejected) return res.status(422).json({
+                error: "toxic_content",
+                can_rephrase: true,
             })
 
             const dto: CreateMessageDto = {
@@ -360,6 +360,21 @@ class MessagesController {
             })
 
             next(err)
+        }
+    }
+
+    async rephrase(req: Request, res: Response, next: NextFunction) {
+        const { text } = req.body as { text: unknown }
+
+        if(typeof text !== "string" || text.trim().length === 0)
+            return res.status(400).json({ error: "text should be a non-empty string" })
+
+        try {
+            const result = await llmService.rephrase(text.trim())
+            res.json(result)
+        } catch(err) {
+            console.error("[llm] rephrase error:", (err as Error).message)
+            res.status(502).json({ error: "LLM service unavailable" })
         }
     }
 }

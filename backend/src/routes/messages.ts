@@ -7,6 +7,8 @@ const router = Router()
 router.post("/", checkAuth, controller.create)
 router.get("/", checkAuth, controller.list)
 
+router.post("/rephrase", checkAuth, controller.rephrase)
+
 router.get("/:id", checkAuth, controller.getById)
 router.delete("/:id", checkAuth, controller.deleteMessage)
 

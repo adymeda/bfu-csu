@@ -8,6 +8,7 @@ import groupsRouter from "./groups"
 import messagesRouter from "./messages"
 import eventsRouter from "./events"
 import deadlinesRouter from "./deadlines"
+import calendarRouter from "./calendar"
 import attachmentsRouter from "./attachments"
 import healthRouter from "./health"
 import llmRouter from "./llm"
@@ -19,6 +20,7 @@ router.use("/groups", groupsRouter)
 router.use("/messages", messagesRouter)
 router.use("/events", eventsRouter)
 router.use("/deadlines", deadlinesRouter)
+router.use("/calendar", calendarRouter)
 router.use("/attachments", attachmentsRouter)
 router.use("/health", healthRouter)
 router.use("/llm", llmRouter)

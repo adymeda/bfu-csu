@@ -2,11 +2,13 @@ import clsx from "clsx"
 import { useState, useMemo } from "react"
 import "@styles/pages/CalendarPage.scss"
 import { useTranslation } from "react-i18next"
-import { CalendarDaysIcon, ViewColumnsIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
+import { CalendarDaysIcon, ViewColumnsIcon, ChevronLeftIcon, ChevronRightIcon, LightBulbIcon } from "@heroicons/react/24/outline"
 import DayCalendar from "../components/calendar/DayCalendar"
 import MonthCalendar from "../components/calendar/MonthCalendar"
 import EventList from "../components/calendar/EventList"
 import EventDetail from "../components/calendar/EventDetail"
+import CalendarAssistant from "../components/calendar/CalendarAssistant"
+import Dropdown from "../components/ui/Dropdown"
 import { toCalendarEvent, toCalendarDeadline } from "../components/calendar/adapters"
 import { useEvents, useDeadlines } from "../hooks/calendar"
 import { useMessage } from "../hooks/messages"
@@ -184,6 +186,16 @@ function CalendarPage() {
                         <ChevronRightIcon />
                     </button>
                 </div>
+
+                <Dropdown
+                    trigger={
+                        <button className="calendar-page__assistant-button" title={t("assistant.tooltip")}>
+                            <LightBulbIcon />
+                        </button>
+                    }
+                >
+                    <CalendarAssistant />
+                </Dropdown>
 
                 <div className="calendar-page__view-switch">
                     <button

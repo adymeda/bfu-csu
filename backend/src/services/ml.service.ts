@@ -1,4 +1,4 @@
-import type { CategorizeMessageResponse, ComposeMessageResponse, ExtractDeadlineResponse, ExtractEventResponse, SummarizeInboxResponse } from "../types/llm"
+import type { CategorizeMessageResponse, ComposeMessageResponse, ExtractDeadlineResponse, ExtractEventResponse, SummarizeInboxResponse, CalendarPlanResponse, CalendarAnswerResponse, CalendarEventRef, CalendarDeadlineRef, LlmToxicityResponse, RephraseResponse } from "../types/llm"
 
 class MlService {
 	private readonly url = process.env["ML_SERVICE_URL"] ?? ""
@@ -126,6 +126,84 @@ class MlService {
 			throw new Error(`[ml] /api/llm/extract-deadline returned ${res.status}: ${body}`)
 		}
 		return await res.json() as ExtractDeadlineResponse
+	}
+
+	// LLM-level toxicity arbitration (fail-open: returns null on error)
+	async checkToxicityLlm(text: string, score: number): Promise<LlmToxicityResponse | null> {
+		if(this.isMisconfigured()) return null
+		try {
+			const res = await fetch(`${this.url}/api/llm/check-toxicity`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${this.token}`,
+				},
+				body: JSON.stringify({ text, score }),
+				signal: AbortSignal.timeout(30000),
+			})
+			if(!res.ok) {
+				console.warn(`[ml] /api/llm/check-toxicity returned ${res.status}, allowing message through`)
+				return null
+			}
+			return await res.json() as LlmToxicityResponse
+		} catch (err) {
+			console.warn("[ml] /api/llm/check-toxicity unreachable:", (err as Error).message, "\nallowing message through")
+			return null
+		}
+	}
+
+	async rephrase(text: string): Promise<RephraseResponse> {
+		if(this.isMisconfigured()) throw new Error("ML service is not configured")
+		const res = await fetch(`${this.url}/api/llm/rephrase`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"Authorization": `Bearer ${this.token}`,
+			},
+			body: JSON.stringify({ text }),
+			signal: AbortSignal.timeout(30000),
+		})
+		if(!res.ok) {
+			const body = await res.text().catch(() => "")
+			throw new Error(`[ml] /api/llm/rephrase returned ${res.status}: ${body}`)
+		}
+		return await res.json() as RephraseResponse
+	}
+
+	async calendarPlan(question: string): Promise<CalendarPlanResponse> {
+		if(this.isMisconfigured()) throw new Error("ML service is not configured")
+		const res = await fetch(`${this.url}/api/llm/calendar-plan`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"Authorization": `Bearer ${this.token}`,
+			},
+			body: JSON.stringify({ question }),
+			signal: AbortSignal.timeout(30000),
+		})
+		if(!res.ok) {
+			const body = await res.text().catch(() => "")
+			throw new Error(`[ml] /api/llm/calendar-plan returned ${res.status}: ${body}`)
+		}
+		return await res.json() as CalendarPlanResponse
+	}
+
+	async calendarAnswer(question: string, events: CalendarEventRef[], deadlines: CalendarDeadlineRef[]): Promise<CalendarAnswerResponse> {
+		if(this.isMisconfigured()) throw new Error("ML service is not configured")
+		const res = await fetch(`${this.url}/api/llm/calendar-answer`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"Authorization": `Bearer ${this.token}`,
+			},
+			body: JSON.stringify({ question, events, deadlines }),
+			signal: AbortSignal.timeout(30000),
+		})
+		if(!res.ok) {
+			const body = await res.text().catch(() => "")
+			throw new Error(`[ml] /api/llm/calendar-answer returned ${res.status}: ${body}`)
+		}
+		return await res.json() as CalendarAnswerResponse
 	}
 
 	async summarizeInbox(messages: { sender_name: string, body: string, created_at: string, is_read: boolean, category: string | null, requires_response: boolean | null }[]): Promise<SummarizeInboxResponse> {

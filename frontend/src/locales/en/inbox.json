@@ -28,6 +28,8 @@
         "attachments": "Attachments",
         "attachmentsEmpty": "No attachments added",
         "send": "Send",
+        "sent": "Message sent",
+        "sendError": "Could not send the message",
         "reply": "Reply",
         "replyAll": "Reply to all",
         "forward": "Forward",
@@ -63,6 +65,12 @@
         "generating": "Generating…",
         "error": "Could not generate message",
         "warnings": "Warnings:"
+    },
+    "toxicity": {
+        "bannerText": "The message contains inappropriate content. Would you like to rephrase it?",
+        "rephrase": "Rephrase",
+        "rephrasing": "Rephrasing…",
+        "error": "Could not rephrase the message"
     },
     "schedule": {
         "eventTitle": "New event",

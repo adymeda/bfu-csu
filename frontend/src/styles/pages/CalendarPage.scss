@@ -88,6 +88,31 @@
         }
     }
 
+    &__assistant-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border: none;
+        background: none;
+        border-radius: 6px;
+        color: var(--text-secondary-color);
+        cursor: pointer;
+        transition: .15s;
+
+        svg {
+            width: 16px;
+            height: 16px;
+            stroke-width: 2;
+        }
+
+        &:hover {
+            background: var(--border-primary-color);
+            color: var(--text-primary-color);
+        }
+    }
+
     &__view-switch {
         display: flex;
         align-items: center;

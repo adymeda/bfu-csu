@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { composeMessage, extractDeadline, extractEvent, summarizeInbox } from "../api/llm"
+import { composeMessage, extractDeadline, extractEvent, summarizeInbox, askCalendar, rephrase } from "../api/llm"
 
 export function useComposeMessage() {
     return useMutation({
@@ -26,5 +26,17 @@ export function useSummarizeInbox(enabled: boolean) {
         enabled,
         retry: false,
         staleTime: 60_000,
+    })
+}
+
+export function useAskCalendar() {
+    return useMutation({
+        mutationFn: (question: string) => askCalendar(question),
+    })
+}
+
+export function useRephrase() {
+    return useMutation({
+        mutationFn: (text: string) => rephrase(text),
     })
 }

@@ -20,5 +20,14 @@
     "moreEvents": "{{count}} more",
     "selectEvent": "Select an event",
     "noEvents": "No events",
-    "linkedMessage": "Linked message"
+    "linkedMessage": "Linked message",
+    "assistant": {
+        "tooltip": "Calendar assistant",
+        "placeholder": "Ask about your events or deadlines...",
+        "ask": "Ask",
+        "asking": "Thinking…",
+        "loading": "Analysing calendar…",
+        "error": "Assistant service unavailable",
+        "empty": "Ask a question about your schedule"
+    }
 }

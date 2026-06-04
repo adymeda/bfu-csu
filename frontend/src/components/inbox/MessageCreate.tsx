@@ -13,9 +13,9 @@ import { useUsers } from "../../hooks/users"
 import { useAuth } from "../../contexts/AuthContext"
 import { useToast } from "../../contexts/ToastContext"
 import { useSearchGroups, useSuggestedRecipients } from "../../hooks/groups"
-import { useComposeMessage, useExtractDeadline, useExtractEvent } from "../../hooks/llm"
+import { useComposeMessage, useExtractDeadline, useExtractEvent, useRephrase } from "../../hooks/llm"
 import { uploadAttachments, formatBytes } from "../../api/attachments"
-import type { AttachmentPublic, MessageEventInput, MessageDeadlineInput, ExtractDeadlineResult, ExtractEventResult } from "../../api/types"
+import type { AttachmentPublic, MessageEventInput, MessageDeadlineInput, ExtractDeadlineResult, ExtractEventResult, ApiError } from "../../api/types"
 
 type ModalPrefill =
     | { mode: "event" } & ExtractEventResult
@@ -70,6 +70,7 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
     const [visible, setVisible] = useState(false)
     const [composePrompt, setComposePrompt] = useState("")
     const [composeWarnings, setComposeWarnings] = useState<string[]>([])
+    const [toxic, setToxic] = useState(false)
 
     const locale = i18n.language === "ru" ? "ru-RU" : "en-US"
     const formatDateTime = (iso: string) => new Intl.DateTimeFormat(locale, {
@@ -103,6 +104,7 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
     const toast = useToast()
     const sendMessage = useSendMessage()
     const composeMutation = useComposeMessage()
+    const rephraseMutation = useRephrase()
     const extractEventMutation = useExtractEvent()
     const extractDeadlineMutation = useExtractDeadline()
     const extractMutation = detected === "deadline" ? extractDeadlineMutation : extractEventMutation
@@ -112,6 +114,9 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
     const { data: suggested } = useSuggestedRecipients()
 
     useEffect(() => {
+        // Dismiss toxicity banner when the user edits the body
+        setToxic(false)
+
         if (timerRef.current) clearTimeout(timerRef.current)
         timerRef.current = setTimeout(() => {
             const result = detectContent(body)
@@ -208,7 +213,7 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
         }
     }
 
-    const canSend = subject.trim().length > 0 && body.trim().length > 0 && selected.length > 0 && !sendMessage.isPending
+    const canSend = subject.trim().length > 0 && body.trim().length > 0 && selected.length > 0 && !sendMessage.isPending && !rephraseMutation.isPending
 
     function handleSend() {
         if(!canSend) return
@@ -221,10 +226,29 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
             ...(deadlines.length > 0 && { deadlines })
         }, {
             onSuccess: () => {
-                toast.success("Сообщение отправлено")
+                setToxic(false)
+                toast.success(t("message.sent"))
                 onClose()
             },
-            onError: () => toast.error("Сообщение неприемлимо")
+            onError: (err) => {
+                const apiErr = err as ApiError
+                if(apiErr.status === 422) {
+                    setToxic(true)
+                } else {
+                    toast.error(t("message.sendError"))
+                }
+            }
+        })
+    }
+
+    function handleRephrase() {
+        if(rephraseMutation.isPending) return
+        rephraseMutation.mutate(body, {
+            onSuccess: ({ text }) => {
+                setBody(text)
+                setToxic(false)
+            },
+            onError: () => toast.error(t("toxicity.error")),
         })
     }
 
@@ -355,6 +379,22 @@ function MessageCreate({ onClose, initialRecipients, initialSubject, replyTo, in
                                 : (
                                     <button className="message-create__detection-button" onClick={handleExtract}>
                                         {detected === "deadline" ? t("detection.createDeadline") : t("detection.createEvent")}
+                                    </button>
+                                )
+                            }
+                        </div>
+                    )}
+
+                    {toxic && (
+                        <div className="message-create__detection message-create__detection--deadline message-create__detection--visible">
+                            <span className="message-create__detection-text">
+                                {t("toxicity.bannerText")}
+                            </span>
+                            {rephraseMutation.isPending
+                                ? <span className="message-create__detection-spinner" />
+                                : (
+                                    <button className="message-create__detection-button" onClick={handleRephrase}>
+                                        {t("toxicity.rephrase")}
                                     </button>
                                 )
                             }

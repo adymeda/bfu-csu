@@ -61,3 +61,40 @@ export interface ExtractDeadlineResult {
 export interface SummarizeResult {
 	summary: string
 }
+
+// Calendar assistant
+export interface CalendarPlanResponse {
+	need_events: boolean
+	need_deadlines: boolean
+	date_from: string
+	date_to: string
+}
+
+export interface CalendarEventRef {
+	title: string
+	start_at: string
+	end_at: string | null
+}
+
+export interface CalendarDeadlineRef {
+	title: string
+	due_at: string
+}
+
+export interface CalendarAnswerResponse {
+	answer: string
+}
+
+export interface CalendarAskResult {
+	answer: string
+}
+
+// Toxicity (LLM arbitration level)
+export interface LlmToxicityResponse {
+	toxic: boolean
+}
+
+// Rephrase
+export interface RephraseResponse {
+	text: string
+}

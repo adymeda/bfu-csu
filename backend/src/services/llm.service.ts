@@ -2,7 +2,12 @@ import mlService from "./ml.service"
 import userRepo from "../repositories/user.repo"
 import groupRepo from "../repositories/group.repo"
 import messageRepo from "../repositories/message.repo"
-import type { ComposeResult, ExtractDeadlineResult, ExtractEventResult, SummarizeResult } from "../types/llm"
+import eventService from "./event.service"
+import deadlineService from "./deadline.service"
+import type { ComposeResult, ExtractDeadlineResult, ExtractEventResult, SummarizeResult, CalendarAskResult } from "../types/llm"
+
+const TOX_LOW = Number(process.env["TOX_SCORE_LOW"] ?? 0.35)
+const TOX_HIGH = Number(process.env["TOX_SCORE_HIGH"] ?? 0.65)
 
 class LlmService {
     private async resolveGroup(ref: string): Promise<{ id: number, name: string } | null> {
@@ -118,6 +123,51 @@ class LlmService {
             title: resp.title,
             due_at: resp.due_at,
         }
+    }
+
+    // Two-level toxicity moderation. Fail-open: if ml-service is down, returns { rejected: false }.
+    async moderate(title: string, content: string): Promise<{ rejected: boolean }> {
+        const text = `${title}\n${content}`
+        const level1 = await mlService.checkToxicity(text)
+        if(level1 === null) return { rejected: false }
+        if(level1.score < TOX_LOW) return { rejected: false }
+        if(level1.score > TOX_HIGH) return { rejected: true }
+        // Borderline: ask LLM for arbitration
+        const level2 = await mlService.checkToxicityLlm(content, level1.score)
+        return { rejected: level2?.toxic === true }
+    }
+
+    async rephrase(text: string): Promise<{ text: string }> {
+        const resp = await mlService.rephrase(text)
+        return { text: resp.text }
+    }
+
+    async askCalendar(userId: number, question: string): Promise<CalendarAskResult> {
+        const plan = await mlService.calendarPlan(question)
+
+        const fromTs = `${plan.date_from}T00:00:00+02:00`
+        const toTs = `${plan.date_to}T23:59:59.999+02:00`
+
+        const events = plan.need_events
+            ? (await eventService.findByUser(userId, fromTs, toTs)).map(e => ({
+                title: e.title,
+                start_at: e.start_at instanceof Date ? e.start_at.toISOString() : String(e.start_at),
+                end_at: e.end_at ? (e.end_at instanceof Date ? e.end_at.toISOString() : String(e.end_at)) : null,
+            }))
+            : []
+
+        const deadlines = plan.need_deadlines
+            ? (await deadlineService.findByUser(userId, fromTs, toTs)).map(d => ({
+                title: d.title,
+                due_at: d.due_at instanceof Date ? d.due_at.toISOString() : String(d.due_at),
+            }))
+            : []
+
+        const resp = await mlService.calendarAnswer(question, events, deadlines)
+        const answer = resp.answer
+            .replace(/<br\s*\/?>/gi, "\n")
+            .replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, "$3.$2.$1")
+        return { answer }
     }
 
     async summarize(userId: number): Promise<SummarizeResult> {

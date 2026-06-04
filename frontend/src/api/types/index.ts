@@ -202,3 +202,11 @@ export interface ExtractDeadlineResult {
 export interface SummarizeResult {
     summary: string
 }
+
+export interface CalendarAskResult {
+    answer: string
+}
+
+export interface RephraseResult {
+    text: string
+}
