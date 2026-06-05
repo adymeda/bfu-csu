@@ -16,7 +16,7 @@ function Message({ title, author, authorColor, authorIcon, isRead=false, selecte
             <div className="message__title">
                 <span>{ title }</span>
                 {requiresResponse && (
-                    <span className="message__requires-response" title="Требуется ответ">!</span>
+                    <div className="message__requires-response" title="Требуется ответ">!</div>
                 )}
             </div>
             <div className="message__content">
